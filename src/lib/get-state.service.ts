@@ -23,7 +23,7 @@ export class GetStateService extends AbstractService {
 
     private _updateInterval: number;
 
-    public constructor(config: IGetStateServiceConfig) {
+    public constructor(config: ioBroker.AdapterConfig) {
         super(config);
         this.data = new GetStateData();
         this._updateInterval = config.updateInterval;

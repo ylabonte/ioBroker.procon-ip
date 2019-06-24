@@ -21,7 +21,7 @@ export class UsrcfgCgiService extends AbstractService {
 
     private relayDataInterpreter: RelayDataInterpreter;
 
-    public constructor(config: IServiceConfig, getStateService: GetStateService, relayDataInterpreter: RelayDataInterpreter) {
+    public constructor(config: ioBroker.AdapterConfig, getStateService: GetStateService, relayDataInterpreter: RelayDataInterpreter) {
         super(config);
         this.relayDataInterpreter = relayDataInterpreter;
         this.getStateService = getStateService;

@@ -90,8 +90,8 @@
 		]
 	},
 	"native": {
-		"controller_url": "",
-		"basic_auth": true,
+		"controllerUrl": "",
+		"basicAuth": true,
 		"username": "admin",
 		"password": "admin",
 		"updateInterval": 3000

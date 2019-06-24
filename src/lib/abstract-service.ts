@@ -20,7 +20,7 @@ export abstract class AbstractService {
 
     protected const = AbstractService;
 
-    protected constructor(config: IServiceConfig) {
+    protected constructor(config: ioBroker.AdapterConfig) {
         this._requestHeaders = new Headers();
         this._baseUrl = config.baseUrl;
         this._username = config.username;

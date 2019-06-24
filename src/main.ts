@@ -5,6 +5,12 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from "@iobroker/adapter-core";
+import {GetStateService} from "./lib/get-state.service";
+import {UsrcfgCgiService} from "./lib/usrcfg-cgi.service";
+import {RelayDataInterpreter} from "./lib/relay-data-interpreter";
+import {GetStateCategory} from "./lib/get-state-data";
+import {GetStateDataObject} from "./lib/get-state-data-object";
+import {RelayDataObject} from "./lib/relay-data-object";
 
 // Load your modules here, e.g.:
 // import * as fs from "fs";
@@ -16,8 +22,11 @@ declare global {
     namespace ioBroker {
         interface AdapterConfig {
             // Define the shape of your options here (recommended)
-            option1: boolean;
-            option2: string;
+            controllerUrl: string;
+            basicAuth: boolean;
+            username: string;
+            password: string;
+            updateInterval: number;
 
             // Or use a catch-all approach
             [key: string]: any;
@@ -26,6 +35,10 @@ declare global {
 }
 
 class ProconIp extends utils.Adapter {
+
+    private relayDataInterpreter: RelayDataInterpreter;
+    private getStateService: GetStateService|undefined;
+    private usrcfgCgiService: UsrcfgCgiService|undefined;
 
     public constructor(options: Partial<ioBroker.AdapterOptions> = {}) {
         super({
@@ -37,6 +50,7 @@ class ProconIp extends utils.Adapter {
         this.on("stateChange", this.onStateChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
         this.on("unload", this.onUnload.bind(this));
+        this.relayDataInterpreter = new RelayDataInterpreter();
     }
 
     /**
@@ -47,25 +61,70 @@ class ProconIp extends utils.Adapter {
 
         // The adapters config (in the instance object everything under the attribute "native") is accessible via
         // this.config:
-        this.log.info("config option1: " + this.config.option1);
-        this.log.info("config option2: " + this.config.option2);
+        this.log.info("config controllerUrl: " + this.config.controllerUrl);
+        this.log.info("config basicAuth: " + this.config.basicAuth);
+        this.log.info("config username: " + this.config.username);
+        this.log.info("config password: " + this.config.password);
+        this.log.info("config updateInterval: " + this.config.updateInterval);
 
+        this.getStateService = new GetStateService(this.config);
+        this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
+
+        this.getStateService.data.getDataObjectsByCategory(GetStateCategory.RELAYS).forEach((obj: GetStateDataObject) => {
+            this.setObject(`relay${obj.categoryId}.name`, {
+                type: "state",
+                common: {
+                    name: `relay${obj.categoryId}.name`,
+                    type: "string",
+                    role: "indicator",
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            });
+            this.setObject(`relay${obj.categoryId}.auto`, {
+                type: "state",
+                common: {
+                    name: `relay${obj.categoryId}.auto`,
+                    type: "boolean",
+                    role: "indicator",
+                    read: true,
+                    write: true,
+                },
+                native: {},
+            });
+            this.setObject(`relay${obj.categoryId}.state`, {
+                type: "state",
+                common: {
+                    name: `relay${obj.categoryId}.state`,
+                    type: "boolean",
+                    role: "indicator",
+                    read: true,
+                    write: true,
+                },
+                native: {},
+            });
+
+            this.setState(`relay${obj.categoryId}.name`, {val: obj.label, ack: true});
+            this.setState(`relay${obj.categoryId}.auto`, {val: this.relayDataInterpreter.isAuto(obj), ack: true});
+            this.setState(`relay${obj.categoryId}.state`, {val: this.relayDataInterpreter.isOn(obj), ack: true});
+        });
         /*
         For every state in the system there has to be also an object of type state
         Here a simple template for a boolean variable named "testVariable"
         Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
         */
-        await this.setObjectAsync("testVariable", {
-            type: "state",
-            common: {
-                name: "testVariable",
-                type: "boolean",
-                role: "indicator",
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
+        // await this.setObjectAsync("testVariable", {
+        //     type: "state",
+        //     common: {
+        //         name: "testVariable",
+        //         type: "boolean",
+        //         role: "indicator",
+        //         read: true,
+        //         write: true,
+        //     },
+        //     native: {},
+        // });
 
         // in this template all states changes inside the adapters namespace are subscribed
         this.subscribeStates("*");
@@ -75,14 +134,14 @@ class ProconIp extends utils.Adapter {
         you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
         */
         // the variable testVariable is set to true as command (ack=false)
-        await this.setStateAsync("testVariable", true);
+        // await this.setStateAsync("testVariable", true);
 
         // same thing, but the value is flagged "ack"
         // ack should be always set to true if the value is received from or acknowledged from the target system
-        await this.setStateAsync("testVariable", {val: true, ack: true});
+        // await this.setStateAsync("testVariable", {val: true, ack: true});
 
         // same thing, but the state is deleted after 30s (getState will return null afterwards)
-        await this.setStateAsync("testVariable", {val: true, ack: true, expire: 30});
+        // await this.setStateAsync("testVariable", {val: true, ack: true, expire: 30});
 
         // examples for the checkPassword/checkGroup functions
         // let result = await this.checkPasswordAsync("admin", "iobroker");
