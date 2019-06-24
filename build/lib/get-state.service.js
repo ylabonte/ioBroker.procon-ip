@@ -11,7 +11,7 @@ class GetStateService extends abstract_service_1.AbstractService {
         this._hasData = false;
         this.data = new get_state_data_1.GetStateData();
         this._updateInterval = config.updateInterval;
-        this._requestHeaders.set("Accept", "text/csv,text/plain");
+        this._requestHeaders.Accept = "text/csv,text/plain";
     }
     getUpdateInterval() {
         return this._updateInterval;

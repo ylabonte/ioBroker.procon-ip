@@ -27,7 +27,7 @@ export class GetStateService extends AbstractService {
         super(config);
         this.data = new GetStateData();
         this._updateInterval = config.updateInterval;
-        this._requestHeaders.set("Accept", "text/csv,text/plain");
+        this._requestHeaders.Accept = "text/csv,text/plain";
     }
 
     public getUpdateInterval(): number {

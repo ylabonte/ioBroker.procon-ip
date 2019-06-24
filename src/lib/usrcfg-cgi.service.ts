@@ -26,7 +26,7 @@ export class UsrcfgCgiService extends AbstractService {
         this.relayDataInterpreter = relayDataInterpreter;
         this.getStateService = getStateService;
         this.stateData = this.getStateService.data;
-        this._requestHeaders.set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        this._requestHeaders["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8";
     }
 
     public setOn(relayData: GetStateDataObject) {

@@ -16,12 +16,12 @@ export abstract class AbstractService {
     protected _password: string;
     protected _basicAuth: boolean;
 
-    protected _requestHeaders: Headers;
+    protected _requestHeaders: any;
 
     protected const = AbstractService;
 
     protected constructor(config: ioBroker.AdapterConfig) {
-        this._requestHeaders = new Headers();
+        this._requestHeaders = {};
         this._baseUrl = config.baseUrl;
         this._username = config.username;
         this._password = config.password;

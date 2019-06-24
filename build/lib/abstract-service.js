@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class AbstractService {
     constructor(config) {
         this.const = AbstractService;
-        this._requestHeaders = new Headers();
+        this._requestHeaders = {};
         this._baseUrl = config.baseUrl;
         this._username = config.username;
         this._password = config.password;
