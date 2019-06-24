@@ -28,10 +28,10 @@ export abstract class AbstractService {
         this._basicAuth = config.basicAuth;
     }
 
-    // public get baseUrl(): string {
-    //     return this._baseUrl;
-    // }
-    //
+    public get baseUrl(): string {
+        return this._baseUrl;
+    }
+
     // public get requestHeaders(): object {
     //     // if (this._basicAuth) {
     //     //     this.setHttpHeader("Authorization", `Basic ${this.base64Credentials}`)
@@ -39,11 +39,11 @@ export abstract class AbstractService {
     //
     //     return this._requestHeaders;
     // }
-    //
-    // public get url(): string {
-    //     return new URL(this.baseUrl + this._endpoint).href;
-    // }
-    //
+
+    public get url(): string {
+        return new URL(this.baseUrl + this._endpoint).href;
+    }
+
     // public setHttpHeader(name: string, value: string) {
     //     this._requestHeaders.set(name, value);
     // }
@@ -54,8 +54,8 @@ export abstract class AbstractService {
 
     protected get axiosRequestConfig(): AxiosRequestConfig {
         const config: AxiosRequestConfig = {
-            baseURL: this._baseUrl,
-            url: this._endpoint,
+            // baseURL: this._baseUrl,
+            url: this.url,
             method: this._method,
             headers: this._requestHeaders
         };

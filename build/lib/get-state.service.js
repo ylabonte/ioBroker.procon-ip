@@ -12,6 +12,7 @@ class GetStateService extends abstract_service_1.AbstractService {
         this.data = new get_state_data_1.GetStateData();
         this._updateInterval = config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
+        this._updateCallback = () => { };
     }
     getUpdateInterval() {
         return this._updateInterval;
@@ -22,7 +23,8 @@ class GetStateService extends abstract_service_1.AbstractService {
     isRunning() {
         return typeof this.next === "number";
     }
-    start() {
+    start(callable) {
+        this._updateCallback = callable;
         this.autoUpdate();
     }
     stop() {
@@ -43,6 +45,7 @@ class GetStateService extends abstract_service_1.AbstractService {
             this.data.parseCsv(data.data);
             this._hasData = true;
             //@todo Hide error view
+            this._updateCallback();
         }, (_) => {
             this._hasData = false;
             //@todo Show the error view

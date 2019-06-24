@@ -43,9 +43,18 @@ class ProconIp extends utils.Adapter {
             this.log.info("config updateInterval: " + this.config.updateInterval);
             this.getStateService = new get_state_service_1.GetStateService(this.config);
             this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
-            this.getStateService.data.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS).forEach((obj) => {
-                this.addRelay(obj).then(() => { this.log.info(`Addded relay: ${obj.label}`); })
-                    .catch((error) => this.log.error(error));
+            this.getStateService.getData().then((response) => {
+                this.getStateService.data.parseCsv(response.data);
+                this.getStateService.data.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS).forEach((obj) => {
+                    this.addRelay(obj).then(() => {
+                        this.log.info(`Addded relay: ${obj.label}`);
+                    }).catch((error) => {
+                        this.log.error(error);
+                    });
+                });
+                this.getStateService.start(this.updateStates);
+            }).catch((error) => {
+                this.log.error(error);
             });
             /*
             For every state in the system there has to be also an object of type state
@@ -136,6 +145,15 @@ class ProconIp extends utils.Adapter {
     // 		}
     // 	}
     // }
+    updateStates() {
+        this.getStateService.data.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS).forEach((obj) => {
+            this.addRelay(obj).then(() => {
+                this.log.info(`Addded relay: ${obj.label}`);
+            }).catch((error) => {
+                this.log.error(error);
+            });
+        });
+    }
     addRelay(obj) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.setObjectAsync(`relay${obj.categoryId}.name`, {

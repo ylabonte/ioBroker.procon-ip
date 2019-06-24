@@ -23,11 +23,14 @@ export class GetStateService extends AbstractService {
 
     private _updateInterval: number;
 
+    private _updateCallback: () => void;
+
     public constructor(config: ioBroker.AdapterConfig) {
         super(config);
         this.data = new GetStateData();
         this._updateInterval = config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
+        this._updateCallback = () => {};
     }
 
     public getUpdateInterval(): number {
@@ -42,7 +45,8 @@ export class GetStateService extends AbstractService {
         return typeof this.next === "number";
     }
 
-    public start() {
+    public start(callable: () => void) {
+        this._updateCallback = callable;
         this.autoUpdate();
     }
 
@@ -66,6 +70,7 @@ export class GetStateService extends AbstractService {
             this.data.parseCsv(data.data);
             this._hasData = true;
             //@todo Hide error view
+            this._updateCallback();
         },
         (_) => {
             this._hasData = false;

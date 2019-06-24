@@ -10,7 +10,6 @@ import {UsrcfgCgiService} from "./lib/usrcfg-cgi.service";
 import {RelayDataInterpreter} from "./lib/relay-data-interpreter";
 import {GetStateCategory} from "./lib/get-state-data";
 import {GetStateDataObject} from "./lib/get-state-data-object";
-import {RelayDataObject} from "./lib/relay-data-object";
 
 // Load your modules here, e.g.:
 // import * as fs from "fs";
@@ -36,9 +35,9 @@ declare global {
 
 class ProconIp extends utils.Adapter {
 
-    private relayDataInterpreter: RelayDataInterpreter;
-    private getStateService: GetStateService|undefined;
-    private usrcfgCgiService: UsrcfgCgiService|undefined;
+    private relayDataInterpreter!: RelayDataInterpreter;
+    private getStateService!: GetStateService;
+    private usrcfgCgiService!: UsrcfgCgiService;
 
     public constructor(options: Partial<ioBroker.AdapterOptions> = {}) {
         super({
@@ -70,9 +69,18 @@ class ProconIp extends utils.Adapter {
         this.getStateService = new GetStateService(this.config);
         this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
 
-        this.getStateService.data.getDataObjectsByCategory(GetStateCategory.RELAYS).forEach((obj: GetStateDataObject) => {
-            this.addRelay(obj).then(() => { this.log.info(`Addded relay: ${obj.label}`) })
-                .catch((error) => this.log.error(error));
+        this.getStateService.getData().then((response) => {
+            this.getStateService.data.parseCsv(response.data);
+            this.getStateService.data.getDataObjectsByCategory(GetStateCategory.RELAYS).forEach((obj: GetStateDataObject) => {
+                this.addRelay(obj).then(() => {
+                    this.log.info(`Addded relay: ${obj.label}`);
+                }).catch((error) => {
+                    this.log.error(error)
+                });
+            });
+            this.getStateService.start(this.updateStates);
+        }).catch((error) => {
+            this.log.error(error);
         });
         /*
         For every state in the system there has to be also an object of type state
@@ -169,6 +177,16 @@ class ProconIp extends utils.Adapter {
     // 		}
     // 	}
     // }
+
+    public updateStates() {
+        this.getStateService.data.getDataObjectsByCategory(GetStateCategory.RELAYS).forEach((obj: GetStateDataObject) => {
+            this.addRelay(obj).then(() => {
+                this.log.info(`Addded relay: ${obj.label}`);
+            }).catch((error) => {
+                this.log.error(error)
+            });
+        });
+    }
 
     public async addRelay(obj: GetStateDataObject) {
         await this.setObjectAsync(`relay${obj.categoryId}.name`, {
