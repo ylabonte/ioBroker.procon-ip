@@ -71,43 +71,8 @@ class ProconIp extends utils.Adapter {
         this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
 
         this.getStateService.data.getDataObjectsByCategory(GetStateCategory.RELAYS).forEach((obj: GetStateDataObject) => {
-            this.setObject(`relay${obj.categoryId}.name`, {
-                type: "state",
-                common: {
-                    name: `relay${obj.categoryId}.name`,
-                    type: "string",
-                    role: "indicator",
-                    read: true,
-                    write: false,
-                },
-                native: {},
-            });
-            this.setObject(`relay${obj.categoryId}.auto`, {
-                type: "state",
-                common: {
-                    name: `relay${obj.categoryId}.auto`,
-                    type: "boolean",
-                    role: "indicator",
-                    read: true,
-                    write: true,
-                },
-                native: {},
-            });
-            this.setObject(`relay${obj.categoryId}.state`, {
-                type: "state",
-                common: {
-                    name: `relay${obj.categoryId}.state`,
-                    type: "boolean",
-                    role: "indicator",
-                    read: true,
-                    write: true,
-                },
-                native: {},
-            });
-
-            this.setState(`relay${obj.categoryId}.name`, {val: obj.label, ack: true});
-            this.setState(`relay${obj.categoryId}.auto`, {val: this.relayDataInterpreter.isAuto(obj), ack: true});
-            this.setState(`relay${obj.categoryId}.state`, {val: this.relayDataInterpreter.isOn(obj), ack: true});
+            this.addRelay(obj).then(() => { this.log.info(`Addded relay: ${obj.label}`) })
+                .catch((error) => this.log.error(error));
         });
         /*
         For every state in the system there has to be also an object of type state
@@ -205,6 +170,46 @@ class ProconIp extends utils.Adapter {
     // 	}
     // }
 
+    public async addRelay(obj: GetStateDataObject) {
+        await this.setObjectAsync(`relay${obj.categoryId}.name`, {
+            type: "state",
+            common: {
+                name: `relay${obj.categoryId}.name`,
+                type: "string",
+                role: "indicator",
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
+        await this.setStateAsync(`relay${obj.categoryId}.name`, {val: obj.label, ack: true});
+
+        await this.setObjectAsync(`relay${obj.categoryId}.auto`, {
+            type: "state",
+            common: {
+                name: `relay${obj.categoryId}.auto`,
+                type: "boolean",
+                role: "indicator",
+                read: true,
+                write: true,
+            },
+            native: {},
+        });
+        await this.setStateAsync(`relay${obj.categoryId}.auto`, {val: this.relayDataInterpreter.isAuto(obj), ack: true});
+
+        await this.setObjectAsync(`relay${obj.categoryId}.state`, {
+            type: "state",
+            common: {
+                name: `relay${obj.categoryId}.state`,
+                type: "boolean",
+                role: "indicator",
+                read: true,
+                write: true,
+            },
+            native: {},
+        });
+        await this.setStateAsync(`relay${obj.categoryId}.state`, {val: this.relayDataInterpreter.isOn(obj), ack: true});
+    }
 }
 
 if (module.parent) {
