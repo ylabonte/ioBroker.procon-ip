@@ -12,26 +12,11 @@
 
 ## ProCon.IP pool control adapter for ioBroker
 
-Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via 
-the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).
+ioBroker adapter for basic support of the ProCon.IP pool control unit. It is intended for integration with your voice 
+assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).
 
-### Test the adapter manually on a local ioBroker installation
-
-In order to install the adapter locally without publishing, the following steps are recommended:
-1. Create a tarball from your dev directory:  
-	```bash
-	npm pack
-	```
-1. Upload the resulting file to your ioBroker host
-1. Install it locally (The paths are different on Windows):
-	```bash
-	cd /opt/iobroker
-	npm i /path/to/tarball.tgz
-	```
-
-For later updates, the above procedure is not necessary. Just do the following:
-1. Overwrite the changed files in the adapter directory (`/opt/iobroker/node_modules/iobroker.template`)
-1. Execute `iobroker upload template` on the ioBroker host
+Further documentation and german translation will follow, when the adapter really implements its major functionality and
+therefore becomes some kind of 'production ready'. 😉
 
 ## Changelog
 

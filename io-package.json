@@ -1,7 +1,7 @@
 {
 	"common": {
 		"name": "procon-ip",
-		"version": "0.0.1",
+		"version": "0.0.1-dev",
 		"news": {
 			"0.0.1": {
 				"en": "initial release",
@@ -47,10 +47,11 @@
 		"keywords": [
 			"ioBroker",
 			"ProCon.IP",
-			"Smart Home",
+			"pool control",
+			"pool-digital",
+			"pool controller",
 			"home automation",
-			"ProCon.IP",
-			"pool controller"
+			"Smart Home"
 		],
 		"license": "MIT",
 		"platform": "Javascript/Node.js",

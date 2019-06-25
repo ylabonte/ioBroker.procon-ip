@@ -9,10 +9,9 @@ class AbstractService {
         this._password = config.password;
         this._basicAuth = config.basicAuth;
     }
-    // public get baseUrl(): string {
-    //     return this._baseUrl;
-    // }
-    //
+    get baseUrl() {
+        return this._baseUrl;
+    }
     // public get requestHeaders(): object {
     //     // if (this._basicAuth) {
     //     //     this.setHttpHeader("Authorization", `Basic ${this.base64Credentials}`)
@@ -20,11 +19,20 @@ class AbstractService {
     //
     //     return this._requestHeaders;
     // }
-    //
-    // public get url(): string {
-    //     return new URL(this.baseUrl + this._endpoint).href;
-    // }
-    //
+    /**
+     * @throws TypeError [ERR_INVALID_URL]: Invalid URL
+     */
+    get url() {
+        console.log("baseUrl", this.baseUrl);
+        console.log("_endpoint", this._endpoint);
+        try {
+            return new URL(`${this.baseUrl}/${this._endpoint}`).href;
+        }
+        catch (e) {
+            console.error(e);
+            return this._endpoint;
+        }
+    }
     // public setHttpHeader(name: string, value: string) {
     //     this._requestHeaders.set(name, value);
     // }
@@ -34,8 +42,8 @@ class AbstractService {
     // }
     get axiosRequestConfig() {
         const config = {
-            baseURL: this._baseUrl,
-            url: this._endpoint,
+            // baseURL: this._baseUrl,
+            url: this.url,
             method: this._method,
             headers: this._requestHeaders
         };

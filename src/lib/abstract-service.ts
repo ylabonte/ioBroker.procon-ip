@@ -40,8 +40,18 @@ export abstract class AbstractService {
     //     return this._requestHeaders;
     // }
 
+    /**
+     * @throws TypeError [ERR_INVALID_URL]: Invalid URL
+     */
     public get url(): string {
-        return new URL(this.baseUrl + this._endpoint).href;
+        console.log("baseUrl", this.baseUrl);
+        console.log("_endpoint", this._endpoint);
+        try {
+            return new URL(`${this.baseUrl}/${this._endpoint}`).href;
+        } catch (e) {
+            console.error(e);
+            return this._endpoint;
+        }
     }
 
     // public setHttpHeader(name: string, value: string) {
