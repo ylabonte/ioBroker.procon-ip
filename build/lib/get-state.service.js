@@ -33,7 +33,7 @@ class GetStateService extends abstract_service_1.AbstractService {
     }
     autoUpdate() {
         this.update();
-        if (this.next === null) {
+        if (this.next === undefined) {
             this.next = Number(setTimeout(() => {
                 this.next = undefined;
                 this.autoUpdate();
@@ -41,13 +41,14 @@ class GetStateService extends abstract_service_1.AbstractService {
         }
     }
     update() {
-        this.getData().then((data) => {
-            this.data.parseCsv(data.data);
+        this.getData().then((response) => {
+            this.data.parseCsv(response.data);
             this._hasData = true;
             //@todo Hide error view
-            this._updateCallback();
-        }, (_) => {
+            this._updateCallback(this.data);
+        }, (e) => {
             this._hasData = false;
+            console.log(e);
             //@todo Show the error view
         });
     }

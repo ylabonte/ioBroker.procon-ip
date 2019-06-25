@@ -44,10 +44,11 @@ export abstract class AbstractService {
      * @throws TypeError [ERR_INVALID_URL]: Invalid URL
      */
     public get url(): string {
-        console.log("baseUrl", this.baseUrl);
-        console.log("_endpoint", this._endpoint);
         try {
-            return new URL(`${this.baseUrl}/${this._endpoint}`).href;
+            return new URL(
+                (this.baseUrl.endsWith("/") ? this.baseUrl : `${this.baseUrl}/`) +
+                    (this._endpoint.startsWith("/") ? this._endpoint.substr(1) : this._endpoint)
+            ).href;
         } catch (e) {
             console.error(e);
             return this._endpoint;

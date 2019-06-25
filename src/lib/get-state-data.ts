@@ -178,19 +178,22 @@ export class GetStateData {
 
     private categorize() {
         Object.keys(this.categories).forEach((category) => {
+            let catId = 1;
             this.categories[category] = this.expandSlice(this.categories[category]);
-            this.getDataObjectsByCategory(category).forEach((item, id) => {
-                item.category = category;
-                item.categoryId = id + 1;
+            this.categories[category].forEach((id: number) => {
+                if (this.objects[id] !== undefined) {
+                    this.objects[id].categoryId = catId++;
+                    this.objects[id].category = category;
+                }
             });
         });
     }
 
-    private expandSlice(input: any[]): number[] {
+    private expandSlice(input: number[][]): number[] {
         const output = new Array<number>();
         input.forEach((def) => {
-            if (Number.isInteger(def)) {
-                output.push(def);
+            if (Number.isInteger(Number(def))) {
+                output.push(Number(def));
             }
             if (Array.isArray(def)) {
                 def.map((subDef) => Number(subDef));

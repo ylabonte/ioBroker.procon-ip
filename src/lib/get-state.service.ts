@@ -23,7 +23,7 @@ export class GetStateService extends AbstractService {
 
     private _updateInterval: number;
 
-    private _updateCallback: () => void;
+    private _updateCallback: (data: GetStateData) => any;
 
     public constructor(config: ioBroker.AdapterConfig) {
         super(config);
@@ -45,7 +45,7 @@ export class GetStateService extends AbstractService {
         return typeof this.next === "number";
     }
 
-    public start(callable: () => void) {
+    public start(callable: (data: GetStateData) => any) {
         this._updateCallback = callable;
         this.autoUpdate();
     }
@@ -57,7 +57,7 @@ export class GetStateService extends AbstractService {
 
     public autoUpdate() {
         this.update();
-        if (this.next === null) {
+        if (this.next === undefined) {
             this.next = Number(setTimeout(() => {
                 this.next = undefined;
                 this.autoUpdate();
@@ -66,14 +66,15 @@ export class GetStateService extends AbstractService {
     }
 
     public update() {
-        this.getData().then((data) => {
-            this.data.parseCsv(data.data);
+        this.getData().then((response) => {
+            this.data.parseCsv(response.data);
             this._hasData = true;
             //@todo Hide error view
-            this._updateCallback();
+            this._updateCallback(this.data);
         },
-        (_) => {
+        (e) => {
             this._hasData = false;
+            console.log(e);
             //@todo Show the error view
         });
     }

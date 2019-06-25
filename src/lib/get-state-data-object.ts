@@ -9,7 +9,6 @@ export class GetStateDataObject {
     public value!: string | number;
     public displayValue!: string;
     public unit!: string;
-    public html!: string;
     public category!: string;
     public categoryId!: number;
     public active!: boolean;
@@ -23,7 +22,6 @@ export class GetStateDataObject {
         this.id = index;
         this.label = name;
         this.displayValue = "";
-        this.html = "";
         this.unit = unit;
         this.offset = Number(offset);
         this.gain = Number(gain);
@@ -50,8 +48,5 @@ export class GetStateDataObject {
             default:
                 this.displayValue = `${Number(this.value).toFixed(2)} ${this.unit}`;
         }
-
-        // Set html optimized display value.
-        this.html = this.displayValue.replace(" ", "&nbsp;");
     }
 }

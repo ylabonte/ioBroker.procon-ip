@@ -39,23 +39,32 @@ class ProconIp extends utils.Adapter {
             this.log.info("config controllerUrl: " + this.config.controllerUrl);
             this.log.info("config basicAuth: " + this.config.basicAuth);
             this.log.info("config username: " + this.config.username);
-            this.log.info("config password: " + this.config.password);
+            this.log.debug("config password: " + this.config.password);
             this.log.info("config updateInterval: " + this.config.updateInterval);
             this.getStateService = new get_state_service_1.GetStateService(this.config);
             this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
-            this.getStateService.getData().then((response) => {
-                this.getStateService.data.parseCsv(response.data);
-                this.getStateService.data.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS).forEach((obj) => {
-                    this.addRelay(obj).then(() => {
-                        this.log.info(`Addded relay: ${obj.label}`);
-                    }).catch((error) => {
-                        this.log.error(error);
+            this.log.info(`GetStateService url: ${this.getStateService.url}`);
+            this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
+            this.getStateService.start((data) => {
+                this.log.info("updateStates");
+                this.setObjects(data);
+                data.objects.forEach((obj) => {
+                    this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.value).catch((e) => {
+                        this.log.error(`Failed setting state for '${obj.label}': ${e}`);
                     });
                 });
-                this.getStateService.start(this.updateStates);
-            }).catch((error) => {
-                this.log.error(error);
             });
+            // this.getStateService.getData().then((response) => {
+            //     this.log.info("Got data from GetStateService");
+            //     this.log.info(response.data);
+            //     this.getStateService.data.parseCsv(response.data);
+            //     this.log.info(`Parsed data from GetStateService: Got ${this.getStateService.data.objects.length} objects`);
+            //     this.log.info(JSON.stringify(this.getStateService.data));
+            //     const test = this.getStateService.data.getDataObjectsByCategory("relays");
+            //     this.log.info(`Got ${test.length} relays and their states`);
+            // }).catch((error) => {
+            //     this.log.error(error);
+            // });
             /*
             For every state in the system there has to be also an object of type state
             Here a simple template for a boolean variable named "testVariable"
@@ -145,53 +154,34 @@ class ProconIp extends utils.Adapter {
     // 		}
     // 	}
     // }
-    updateStates() {
-        this.getStateService.data.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS).forEach((obj) => {
-            this.addRelay(obj).then(() => {
-                this.log.info(`Addded relay: ${obj.label}`);
-            }).catch((error) => {
-                this.log.error(error);
-            });
-        });
-    }
-    addRelay(obj) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.setObjectAsync(`relay${obj.categoryId}.name`, {
+    setObjects(data) {
+        // Object.keys(data.categories).forEach((category) => {
+        //     this.setObjectAsync(`${this.name}.${this.instance}.${category}`, {
+        //         type: "group",
+        //         common: {
+        //             name: category,
+        //             type: "object",
+        //             read: true,
+        //             write: false,
+        //         },
+        //         native: {},
+        //     }).catch((e) => {
+        //         this.log.error(`Failed setting group object '${category}': ${e}`);
+        //     });
+        // });
+        data.objects.forEach((obj) => {
+            this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
                 type: "state",
                 common: {
-                    name: `relay${obj.categoryId}.name`,
+                    name: obj.label,
                     type: "string",
-                    role: "indicator",
                     read: true,
-                    write: false,
+                    write: obj.category in [get_state_data_1.GetStateCategory.RELAYS, get_state_data_1.GetStateCategory.EXTERNAL_RELAYS]
                 },
-                native: {},
+                native: obj,
+            }).catch((e) => {
+                this.log.error(`Failed setting object '${obj.label}': ${e}`);
             });
-            yield this.setStateAsync(`relay${obj.categoryId}.name`, { val: obj.label, ack: true });
-            yield this.setObjectAsync(`relay${obj.categoryId}.auto`, {
-                type: "state",
-                common: {
-                    name: `relay${obj.categoryId}.auto`,
-                    type: "boolean",
-                    role: "indicator",
-                    read: true,
-                    write: true,
-                },
-                native: {},
-            });
-            yield this.setStateAsync(`relay${obj.categoryId}.auto`, { val: this.relayDataInterpreter.isAuto(obj), ack: true });
-            yield this.setObjectAsync(`relay${obj.categoryId}.state`, {
-                type: "state",
-                common: {
-                    name: `relay${obj.categoryId}.state`,
-                    type: "boolean",
-                    role: "indicator",
-                    read: true,
-                    write: true,
-                },
-                native: {},
-            });
-            yield this.setStateAsync(`relay${obj.categoryId}.state`, { val: this.relayDataInterpreter.isOn(obj), ack: true });
         });
     }
 }
