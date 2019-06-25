@@ -22,7 +22,7 @@ export abstract class AbstractService {
 
     protected constructor(config: ioBroker.AdapterConfig) {
         this._requestHeaders = {};
-        this._baseUrl = config.baseUrl;
+        this._baseUrl = config.controllerUrl;
         this._username = config.username;
         this._password = config.password;
         this._basicAuth = config.basicAuth;
