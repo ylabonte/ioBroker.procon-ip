@@ -45,10 +45,14 @@ class ProconIp extends utils.Adapter {
             this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
             this.log.info(`GetStateService url: ${this.getStateService.url}`);
             this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
+            let firstUpdate = true;
             this.getStateService.start((data) => {
                 this.log.info("updateStates");
-                this.setSysInfo(data.sysInfo);
-                this.setObjects(data.objects);
+                if (firstUpdate) {
+                    this.setSysInfo(data.sysInfo);
+                    this.setObjects(data.objects);
+                    firstUpdate = false;
+                }
                 data.objects.forEach((obj) => {
                     this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.value).catch((e) => {
                         this.log.error(`Failed setting state for '${obj.label}': ${e}`);
