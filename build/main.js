@@ -22,8 +22,8 @@ class ProconIp extends utils.Adapter {
     constructor(options = {}) {
         super(Object.assign({}, options, { name: "procon-ip" }));
         this.on("ready", this.onReady.bind(this));
-        this.on("objectChange", this.onObjectChange.bind(this));
-        this.on("stateChange", this.onStateChange.bind(this));
+        // this.on("objectChange", this.onObjectChange.bind(this));
+        // this.on("stateChange", this.onStateChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
         this.on("unload", this.onUnload.bind(this));
         this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter();
@@ -47,7 +47,8 @@ class ProconIp extends utils.Adapter {
             this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
             this.getStateService.start((data) => {
                 this.log.info("updateStates");
-                this.setObjects(data);
+                this.setSysInfo(data.sysInfo);
+                this.setObjects(data.objects);
                 data.objects.forEach((obj) => {
                     this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.value).catch((e) => {
                         this.log.error(`Failed setting state for '${obj.label}': ${e}`);
@@ -117,29 +118,27 @@ class ProconIp extends utils.Adapter {
     /**
      * Is called if a subscribed object changes
      */
-    onObjectChange(id, obj) {
-        if (obj) {
-            // The object was changed
-            this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-        }
-        else {
-            // The object was deleted
-            this.log.info(`object ${id} deleted`);
-        }
-    }
+    // private onObjectChange(id: string, obj: ioBroker.Object | null | undefined): void {
+    //     if (obj) {
+    //         // The object was changed
+    //         this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
+    //     } else {
+    //         // The object was deleted
+    //         this.log.info(`object ${id} deleted`);
+    //     }
+    // }
     /**
      * Is called if a subscribed state changes
      */
-    onStateChange(id, state) {
-        if (state) {
-            // The state was changed
-            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        }
-        else {
-            // The state was deleted
-            this.log.info(`state ${id} deleted`);
-        }
-    }
+    // private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
+    //     if (state) {
+    //         // The state was changed
+    //         this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+    //     } else {
+    //         // The state was deleted
+    //         this.log.info(`state ${id} deleted`);
+    //     }
+    // }
     // /**
     //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
     //  * Using this method requires "common.message" property to be set to true in io-package.json
@@ -154,7 +153,35 @@ class ProconIp extends utils.Adapter {
     // 		}
     // 	}
     // }
-    setObjects(data) {
+    /**
+     * Set/update sysinfo
+     */
+    setSysInfo(data) {
+        this.log.info(JSON.stringify(data.toArrayOfObjects()));
+        data.toArrayOfObjects().forEach((sysInfo) => {
+            this.setObjectAsync(`${this.name}.${this.instance}.${sysInfo.key}`, {
+                type: "info",
+                common: {
+                    name: sysInfo.key,
+                    type: "string",
+                    read: true,
+                    write: false
+                },
+                native: sysInfo,
+            }).then(() => {
+                this.setStateAsync(`${this.name}.${this.instance}.${sysInfo.key}`, sysInfo.value).catch((e) => {
+                    this.log.error(`Failed setting sysInfo object state '${sysInfo.key}': ${e}`);
+                });
+            }).catch((e) => {
+                this.log.error(`Failed setting sysInfo object '${sysInfo.key}': ${e}`);
+            });
+        });
+    }
+    /**
+     * Set/update objects (not their states!)
+     * @param data
+     */
+    setObjects(objects) {
         // Object.keys(data.categories).forEach((category) => {
         //     this.setObjectAsync(`${this.name}.${this.instance}.${category}`, {
         //         type: "group",
@@ -169,7 +196,7 @@ class ProconIp extends utils.Adapter {
         //         this.log.error(`Failed setting group object '${category}': ${e}`);
         //     });
         // });
-        data.objects.forEach((obj) => {
+        objects.forEach((obj) => {
             this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
                 type: "state",
                 common: {
