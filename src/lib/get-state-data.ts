@@ -11,7 +11,7 @@ export enum GetStateCategory {
     DIGITAL_INPUT = "digitalInput",
     EXTERNAL_RELAYS = "externalRelays",
     CANISTER = "canister",
-    CANISTER_CONSUMPTION = "canisterConsumptions"
+    CANISTER_CONSUMPTION = "canisterConsumptions",
 }
 
 export class GetStateData {
@@ -97,8 +97,8 @@ export class GetStateData {
             this.objects.filter((obj, idx) => indices.indexOf(idx) >= 0);
     }
 
-    public getDataObject(id: number) {
-        return this.objects[id];
+    public getDataObject(id: number): GetStateDataObject {
+        return this.objects[id] ? this.objects[id] : new GetStateDataObject(id, "", "", "", "", "");
     }
 
     public getDataObjectsByCategory(category: string, activeOnly = false): GetStateDataObject[] {

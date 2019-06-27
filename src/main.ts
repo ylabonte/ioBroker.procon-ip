@@ -40,7 +40,7 @@ class ProconIp extends utils.Adapter {
     private getStateService!: GetStateService;
     private usrcfgCgiService!: UsrcfgCgiService;
     private _objectsCreated: boolean = false;
-    private _stateData: GetStateData|undefined;
+    private _stateData: GetStateData;
 
     public constructor(options: Partial<ioBroker.AdapterOptions> = {}) {
         super({
@@ -53,6 +53,7 @@ class ProconIp extends utils.Adapter {
         // this.on("objectChange", this.onObjectChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
         this.relayDataInterpreter = new RelayDataInterpreter();
+        this._stateData = new GetStateData();
     }
 
     /**
@@ -85,20 +86,26 @@ class ProconIp extends utils.Adapter {
 
             // Set sys info states
             data.sysInfo.toArrayOfObjects().forEach((info) => {
-                if (!this._stateData || info.value !== this._stateData.sysInfo[info.key]) {
+                this.log.info(`Checking sys info state ${info.key} for updates: ${this._stateData.sysInfo[info.key]} <=> ${info.value}`);
+                if (info.value !== this._stateData.sysInfo[info.key]) {
+                    this.log.info(`Updating sys info state ${info.key}: ${info.value}`);
                     this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
                         this.log.error(`Failed setting state for '${info.key}': ${e}`);
                     });
                 }
             });
             data.objects.forEach((obj) => {
-                if (!this._stateData || obj.value !== this._stateData.getDataObject(obj.id).value) {
+                this.log.info(`Checking object ${obj.label} for state update: ${this._stateData.getDataObject(obj.id).value} <=> ${obj.value}`);
+                if (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value) {
                     this.log.info(`Updating state of '${obj.label}'`);
-                    if (obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]) {
+                    if ([GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS].indexOf(obj.category as GetStateCategory) >= 0) {
                         this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, this.relayDataInterpreter.isAuto(obj), true).catch((e) => {
                             this.log.error(`Failed setting auto for '${obj.label}': ${e}`);
                         });
-                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.state`, this.relayDataInterpreter.isOn(obj), true).catch((e) => {
+                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, this.relayDataInterpreter.isOn(obj), true).catch((e) => {
+                            this.log.error(`Failed setting auto for '${obj.label}': ${e}`);
+                        });
+                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.state`, obj.value, true).catch((e) => {
                             this.log.error(`Failed setting state for '${obj.label}': ${e}`);
                         });
                     } else {
@@ -235,7 +242,7 @@ class ProconIp extends utils.Adapter {
     // }
 
     /**
-     * Set/update sysinfo
+     * Set/update system information
      */
     public setSysInfo(data: GetStateDataSysInfo) {
         this.log.info(JSON.stringify(data.toArrayOfObjects()));
@@ -245,6 +252,7 @@ class ProconIp extends utils.Adapter {
                 common: {
                     name: sysInfo.key,
                     type: "string",
+                    role: "state",
                     read: true,
                     write: false
                 },
@@ -278,7 +286,7 @@ class ProconIp extends utils.Adapter {
         // });
 
         objects.forEach((obj) => {
-            if (obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]) {
+            if ([GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS].indexOf(obj.category as GetStateCategory) >= 0) {
                 console.log(`${obj.label} seems to by some kind of relay ('${obj.category}')`);
                 this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
                     type: "state",
@@ -291,7 +299,22 @@ class ProconIp extends utils.Adapter {
                     },
                     native: obj,
                 }).then(() => {
-                    this.log.info(`Object auto '${obj.label}' has been set`);
+                    this.log.info(`Object onOff '${obj.label}' has been set`);
+                }).catch((e) => {
+                    this.log.error(`Failed setting object '${obj.label}': ${e}`);
+                });
+                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
+                    type: "state",
+                    common: {
+                        name: obj.label,
+                        type: "boolean",
+                        role: "switch.power",
+                        read: true,
+                        write: obj.active
+                    },
+                    native: obj,
+                }).then(() => {
+                    this.log.info(`Object state '${obj.label}' has been set`);
                 }).catch((e) => {
                     this.log.error(`Failed setting object '${obj.label}': ${e}`);
                 });
@@ -300,8 +323,8 @@ class ProconIp extends utils.Adapter {
                     common: {
                         name: obj.label,
                         type: "boolean",
-                        role: "switch.power",
-                        read: true,
+                        role: "state",
+                        read: false,
                         write: obj.active
                     },
                     native: obj,

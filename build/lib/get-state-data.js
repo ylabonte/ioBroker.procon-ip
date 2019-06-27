@@ -68,7 +68,7 @@ class GetStateData {
             this.objects.filter((obj, idx) => indices.indexOf(idx) >= 0);
     }
     getDataObject(id) {
-        return this.objects[id];
+        return this.objects[id] ? this.objects[id] : new get_state_data_object_1.GetStateDataObject(id, "", "", "", "", "");
     }
     getDataObjectsByCategory(category, activeOnly = false) {
         return this.categories.hasOwnProperty(category) ?
