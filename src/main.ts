@@ -93,6 +93,7 @@ class ProconIp extends utils.Adapter {
             });
             data.objects.forEach((obj) => {
                 if (!this._stateData || obj.value !== this._stateData.getDataObject(obj.id).value) {
+                    this.log.info(`Updating state of '${obj.label}'`);
                     if (obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]) {
                         this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, this.relayDataInterpreter.isAuto(obj), true).catch((e) => {
                             this.log.error(`Failed setting auto for '${obj.label}': ${e}`);
@@ -248,10 +249,8 @@ class ProconIp extends utils.Adapter {
                     write: false
                 },
                 native: sysInfo,
-            // }).then(() => {
-            //     this.setStateAsync(`${this.name}.${this.instance}.${sysInfo.key}`, sysInfo.value).catch((e) => {
-            //         this.log.error(`Failed setting sysInfo object state '${sysInfo.key}': ${e}`);
-            //     });
+            }).then(() => {
+                this.log.info(`Sys info object '${sysInfo.key}' has been set`);
             }).catch((e) => {
                 this.log.error(`Failed setting sysInfo object '${sysInfo.key}': ${e}`);
             });
@@ -280,15 +279,19 @@ class ProconIp extends utils.Adapter {
 
         objects.forEach((obj) => {
             if (obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]) {
+                console.log(`${obj.label} seems to by some kind of relay ('${obj.category}')`);
                 this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
                     type: "state",
                     common: {
                         name: obj.label,
                         type: "boolean",
+                        role: "switch.auto",
                         read: true,
                         write: obj.active
                     },
                     native: obj,
+                }).then(() => {
+                    this.log.info(`Object auto '${obj.label}' has been set`);
                 }).catch((e) => {
                     this.log.error(`Failed setting object '${obj.label}': ${e}`);
                 });
@@ -297,10 +300,13 @@ class ProconIp extends utils.Adapter {
                     common: {
                         name: obj.label,
                         type: "boolean",
+                        role: "switch.power",
                         read: true,
                         write: obj.active
                     },
                     native: obj,
+                }).then(() => {
+                    this.log.info(`Object state '${obj.label}' has been set`);
                 }).catch((e) => {
                     this.log.error(`Failed setting object '${obj.label}': ${e}`);
                 });
@@ -310,10 +316,13 @@ class ProconIp extends utils.Adapter {
                     common: {
                         name: obj.label,
                         type: "boolean",
+                        role: "value",
                         read: true,
                         write: false
                     },
                     native: obj,
+                }).then(() => {
+                    this.log.info(`Object '${obj.label}' has been set`);
                 }).catch((e) => {
                     this.log.error(`Failed setting object '${obj.label}': ${e}`);
                 });
