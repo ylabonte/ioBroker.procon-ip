@@ -93,9 +93,18 @@ class ProconIp extends utils.Adapter {
             });
             data.objects.forEach((obj) => {
                 if (!this._stateData || obj.value !== this._stateData.getDataObject(obj.id).value) {
-                    this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.value, true).catch((e) => {
-                        this.log.error(`Failed setting state for '${obj.label}': ${e}`);
-                    });
+                    if (obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]) {
+                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, this.relayDataInterpreter.isAuto(obj), true).catch((e) => {
+                            this.log.error(`Failed setting auto for '${obj.label}': ${e}`);
+                        });
+                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.state`, this.relayDataInterpreter.isOn(obj), true).catch((e) => {
+                            this.log.error(`Failed setting state for '${obj.label}': ${e}`);
+                        });
+                    } else {
+                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.displayValue, true).catch((e) => {
+                            this.log.error(`Failed setting state for '${obj.label}': ${e}`);
+                        });
+                    }
                 }
             });
 
@@ -270,18 +279,45 @@ class ProconIp extends utils.Adapter {
         // });
 
         objects.forEach((obj) => {
-            this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
-                type: "state",
-                common: {
-                    name: obj.label,
-                    type: "string",
-                    read: true,
-                    write: obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]
-                },
-                native: obj,
-            }).catch((e) => {
-                this.log.error(`Failed setting object '${obj.label}': ${e}`);
-            });
+            if (obj.category in [GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS]) {
+                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
+                    type: "state",
+                    common: {
+                        name: obj.label,
+                        type: "boolean",
+                        read: true,
+                        write: obj.active
+                    },
+                    native: obj,
+                }).catch((e) => {
+                    this.log.error(`Failed setting object '${obj.label}': ${e}`);
+                });
+                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.state`, {
+                    type: "state",
+                    common: {
+                        name: obj.label,
+                        type: "boolean",
+                        read: true,
+                        write: obj.active
+                    },
+                    native: obj,
+                }).catch((e) => {
+                    this.log.error(`Failed setting object '${obj.label}': ${e}`);
+                });
+            } else {
+                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
+                    type: "state",
+                    common: {
+                        name: obj.label,
+                        type: "boolean",
+                        read: true,
+                        write: false
+                    },
+                    native: obj,
+                }).catch((e) => {
+                    this.log.error(`Failed setting object '${obj.label}': ${e}`);
+                });
+            }
         });
     }
 
