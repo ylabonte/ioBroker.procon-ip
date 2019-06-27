@@ -21,11 +21,12 @@ const get_state_data_1 = require("./lib/get-state-data");
 class ProconIp extends utils.Adapter {
     constructor(options = {}) {
         super(Object.assign({}, options, { name: "procon-ip" }));
+        this._objectsCreated = false;
         this.on("ready", this.onReady.bind(this));
-        // this.on("objectChange", this.onObjectChange.bind(this));
-        // this.on("stateChange", this.onStateChange.bind(this));
-        // this.on("message", this.onMessage.bind(this));
         this.on("unload", this.onUnload.bind(this));
+        this.on("stateChange", this.onStateChange.bind(this));
+        // this.on("objectChange", this.onObjectChange.bind(this));
+        // this.on("message", this.onMessage.bind(this));
         this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter();
     }
     /**
@@ -45,19 +46,29 @@ class ProconIp extends utils.Adapter {
             this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
             this.log.info(`GetStateService url: ${this.getStateService.url}`);
             this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
-            let firstUpdate = true;
             this.getStateService.start((data) => {
-                this.log.info("updateStates");
-                if (firstUpdate) {
+                // Set objects once
+                if (!this._objectsCreated) {
                     this.setSysInfo(data.sysInfo);
                     this.setObjects(data.objects);
-                    firstUpdate = false;
+                    this._objectsCreated = true;
                 }
-                data.objects.forEach((obj) => {
-                    this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.value).catch((e) => {
-                        this.log.error(`Failed setting state for '${obj.label}': ${e}`);
-                    });
+                // Set sys info states
+                data.sysInfo.toArrayOfObjects().forEach((info) => {
+                    if (!this._stateData || info.value !== this._stateData.sysInfo[info.key]) {
+                        this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
+                            this.log.error(`Failed setting state for '${info.key}': ${e}`);
+                        });
+                    }
                 });
+                data.objects.forEach((obj) => {
+                    if (!this._stateData || obj.value !== this._stateData.getDataObject(obj.id).value) {
+                        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.value, true).catch((e) => {
+                            this.log.error(`Failed setting state for '${obj.label}': ${e}`);
+                        });
+                    }
+                });
+                this._stateData = data;
             });
             // this.getStateService.getData().then((response) => {
             //     this.log.info("Got data from GetStateService");
@@ -134,15 +145,32 @@ class ProconIp extends utils.Adapter {
     /**
      * Is called if a subscribed state changes
      */
-    // private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
-    //     if (state) {
-    //         // The state was changed
-    //         this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-    //     } else {
-    //         // The state was deleted
-    //         this.log.info(`state ${id} deleted`);
-    //     }
-    // }
+    onStateChange(id, state) {
+        if (state && !state.ack) {
+            this.getObjectAsync(id).then((obj) => {
+                if (obj) {
+                    if (this.relayDataInterpreter.isAuto(obj.native.id)) {
+                        this.log.info(`Switching ${obj.native.label}: auto`);
+                        this.usrcfgCgiService.setAuto(obj.native);
+                    }
+                    else if (this.relayDataInterpreter.isOn(obj.native.id)) {
+                        this.log.info(`Switching ${obj.native.label}: on`);
+                        this.usrcfgCgiService.setOn(obj.native);
+                    }
+                    else {
+                        this.log.info(`Switching ${obj.native.label}: off`);
+                        this.usrcfgCgiService.setOff(obj.native);
+                    }
+                }
+            });
+            // The state was changed
+            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+        }
+        else {
+            // The state was deleted
+            this.log.info(`state ${id} deleted`);
+        }
+    }
     // /**
     //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
     //  * Using this method requires "common.message" property to be set to true in io-package.json
@@ -172,10 +200,6 @@ class ProconIp extends utils.Adapter {
                     write: false
                 },
                 native: sysInfo,
-            }).then(() => {
-                this.setStateAsync(`${this.name}.${this.instance}.${sysInfo.key}`, sysInfo.value).catch((e) => {
-                    this.log.error(`Failed setting sysInfo object state '${sysInfo.key}': ${e}`);
-                });
             }).catch((e) => {
                 this.log.error(`Failed setting sysInfo object '${sysInfo.key}': ${e}`);
             });
