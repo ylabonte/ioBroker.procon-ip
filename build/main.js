@@ -166,7 +166,7 @@ class ProconIp extends utils.Adapter {
             // The state was changed
             this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
         }
-        else {
+        else if (!state) {
             // The state was deleted
             this.log.info(`state ${id} deleted`);
         }
