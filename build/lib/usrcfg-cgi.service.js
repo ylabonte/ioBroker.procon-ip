@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = require("./abstract-service");
-const relay_data_interpreter_1 = require("./relay-data-interpreter");
 const axios_1 = require("axios");
 var SetStateValue;
 (function (SetStateValue) {
@@ -30,34 +29,45 @@ class UsrcfgCgiService extends abstract_service_1.AbstractService {
     }
     setState(relay, state) {
         let data = undefined;
-        let desiredValue;
+        // let desiredValue: number;
         switch (state) {
-            case SetStateValue.ON:
-                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOn(relay);
-                desiredValue = relay_data_interpreter_1.RelayStateBitMask.manual | relay_data_interpreter_1.RelayStateBitMask.on;
-                break;
-            case SetStateValue.OFF:
-                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOff(relay);
-                desiredValue = relay_data_interpreter_1.RelayStateBitMask.manual | ~relay_data_interpreter_1.RelayStateBitMask.on;
-                break;
             case SetStateValue.AUTO:
                 data = this.relayDataInterpreter.evaluate(this.getStateService.data).setAuto(relay);
-                desiredValue = relay.raw & ~relay_data_interpreter_1.RelayStateBitMask.manual;
+                // desiredValue = relay.raw & ~RelayStateBitMask.manual;
+                break;
+            case SetStateValue.ON:
+                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOn(relay);
+                // desiredValue = RelayStateBitMask.manual | RelayStateBitMask.on;
+                break;
+            case SetStateValue.OFF:
+            default:
+                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOff(relay);
+                // desiredValue = RelayStateBitMask.manual | ~RelayStateBitMask.on;
                 break;
         }
         if (data !== undefined) {
-            this.send(data).then((response) => {
-                console.log(response);
-                if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
-                    this.getStateService.data.objects[relay.id].set(relay.id, relay.label, relay.unit, relay.offset.toString(), relay.gain.toString(), desiredValue.toString());
-                    // this.getStateService.update();
-                }
-                else {
-                    console.error(`(${response.status}: ${response.statusText}) Error sending relay control command:`, response.data);
-                }
-            }).catch((error) => {
+            this.send(data).catch((error) => {
                 console.error(error);
             });
+            // .then((response) => {
+            //     console.log(response.data);
+            //     if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
+            //     // if (response.status === 200) {
+            //         this.getStateService.data.objects[relay.id].set(
+            //             relay.id,
+            //             relay.label,
+            //             relay.unit,
+            //             relay.offset.toString(),
+            //             relay.gain.toString(),
+            //             desiredValue.toString()
+            //         );
+            //         this.getStateService.update();
+            //     } else {
+            //         console.error(`(${response.status}: ${response.statusText}) Error sending relay control command:`, response.data);
+            //     }
+            // }).catch((error) => {
+            //     console.error(error);
+            // });
         }
     }
     send(bitTupel) {

@@ -56,7 +56,7 @@ class ProconIp extends utils.Adapter {
                 }
                 // Set sys info states
                 data.sysInfo.toArrayOfObjects().forEach((info) => {
-                    this.log.info(`Checking sys info state ${info.key} for updates: ${this._stateData.sysInfo[info.key]} <=> ${info.value}`);
+                    // this.log.info(`Checking sys info state ${info.key} for updates: ${this._stateData.sysInfo[info.key]} <=> ${info.value}`);
                     if (info.value !== this._stateData.sysInfo[info.key]) {
                         this.log.info(`Updating sys info state ${info.key}: ${info.value}`);
                         this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
@@ -65,7 +65,7 @@ class ProconIp extends utils.Adapter {
                     }
                 });
                 data.objects.forEach((obj) => {
-                    this.log.info(`Checking object ${obj.label} for state update: ${this._stateData.getDataObject(obj.id).value} <=> ${obj.value}`);
+                    // this.log.info(`Checking object ${obj.label} for state update: ${this._stateData.getDataObject(obj.id).value} <=> ${obj.value}`);
                     if (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value) {
                         this.log.info(`Updating state of '${obj.label}'`);
                         if ([get_state_data_1.GetStateCategory.RELAYS, get_state_data_1.GetStateCategory.EXTERNAL_RELAYS].indexOf(obj.category) >= 0) {

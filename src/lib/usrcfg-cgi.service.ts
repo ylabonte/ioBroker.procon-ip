@@ -43,41 +43,46 @@ export class UsrcfgCgiService extends AbstractService {
 
     private setState(relay: GetStateDataObject, state: SetStateValue|number) {
         let data: [number, number]|undefined = undefined;
-        let desiredValue: number;
+        // let desiredValue: number;
         switch (state) {
-            case SetStateValue.ON:
-                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOn(relay);
-                desiredValue = RelayStateBitMask.manual | RelayStateBitMask.on;
-                break;
-            case SetStateValue.OFF:
-                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOff(relay);
-                desiredValue = RelayStateBitMask.manual | ~RelayStateBitMask.on;
-                break;
             case SetStateValue.AUTO:
                 data = this.relayDataInterpreter.evaluate(this.getStateService.data).setAuto(relay);
-                desiredValue = relay.raw & ~RelayStateBitMask.manual;
+                // desiredValue = relay.raw & ~RelayStateBitMask.manual;
+                break;
+            case SetStateValue.ON:
+                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOn(relay);
+                // desiredValue = RelayStateBitMask.manual | RelayStateBitMask.on;
+                break;
+            case SetStateValue.OFF:
+            default:
+                data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOff(relay);
+                // desiredValue = RelayStateBitMask.manual | ~RelayStateBitMask.on;
                 break;
         }
 
         if (data !== undefined) {
-            this.send(data).then((response) => {
-                console.log(response);
-                if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
-                    this.getStateService.data.objects[relay.id].set(
-                        relay.id,
-                        relay.label,
-                        relay.unit,
-                        relay.offset.toString(),
-                        relay.gain.toString(),
-                        desiredValue.toString()
-                    );
-                    // this.getStateService.update();
-                } else {
-                    console.error(`(${response.status}: ${response.statusText}) Error sending relay control command:`, response.data);
-                }
-            }).catch((error) => {
+            this.send(data).catch((error) => {
                 console.error(error);
             });
+            // .then((response) => {
+            //     console.log(response.data);
+            //     if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
+            //     // if (response.status === 200) {
+            //         this.getStateService.data.objects[relay.id].set(
+            //             relay.id,
+            //             relay.label,
+            //             relay.unit,
+            //             relay.offset.toString(),
+            //             relay.gain.toString(),
+            //             desiredValue.toString()
+            //         );
+            //         this.getStateService.update();
+            //     } else {
+            //         console.error(`(${response.status}: ${response.statusText}) Error sending relay control command:`, response.data);
+            //     }
+            // }).catch((error) => {
+            //     console.error(error);
+            // });
         }
     }
 
