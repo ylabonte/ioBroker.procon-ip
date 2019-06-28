@@ -5,13 +5,12 @@
 [![Downloads](https://img.shields.io/npm/dm/iobroker.procon-ip.svg)](https://www.npmjs.com/package/iobroker.procon-ip)
 [![Dependency Status](https://img.shields.io/david/ylabonte/iobroker.procon-ip.svg)](https://david-dm.org/ylabonte/iobroker.procon-ip)
 [![Known Vulnerabilities](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip/badge.svg)](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip)
+[![Travis-CI](http://img.shields.io/travis/ylabonte/ioBroker.procon-ip/master.svg)](https://travis-ci.org/ylabonte/ioBroker.procon-ip)
 
 [![NPM](https://nodei.co/npm/iobroker.procon-ip.png?downloads=true)](https://nodei.co/npm/iobroker.procon-ip/)
 
-**Tests:**: [![Travis-CI](http://img.shields.io/travis/ylabonte/ioBroker.procon-ip/master.svg)](https://travis-ci.org/ylabonte/ioBroker.procon-ip)
 
 ## ProCon.IP pool control adapter for ioBroker
-
 ioBroker adapter for basic support of the ProCon.IP pool control unit. It is intended for integration with your voice 
 assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).
 
@@ -21,12 +20,16 @@ therefore becomes some kind of 'production ready'. 😉
 ## Changelog
 
 ### 0.0.1
-* initial release
+* initial release (outstanding)
+
+## Development
+This adapter is based on the [TypeScript adapter template]().
+
 
 ## License
 MIT License
 
-Copyright (c) 2019 Author
+Copyright (c) 2019 Yannic Labonte <yannic.labonte@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

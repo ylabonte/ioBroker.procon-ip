@@ -149,8 +149,10 @@ class ProconIp extends utils.Adapter {
         // });
 
         // in this template all states changes inside the adapters namespace are subscribed
-        this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
-        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+        this.subscribeStates(`${this.name}.${this.instance}.relays.*.auto`);
+        this.subscribeStates(`${this.name}.${this.instance}.relays.*.state`);
+        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.auto`);
+        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.state`);
 
         /*
         setState examples
@@ -203,31 +205,61 @@ class ProconIp extends utils.Adapter {
      * Is called if a subscribed state changes
      */
     private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
-        if (state && !state.ack) {
-            this.getObjectAsync(id).then((obj) => {
-                if (obj) {
-                    // The RelayStateDataInterpreter expects a GetStateDataObject. We use the native object, but update
-                    // the raw value first, because that's what's evaluated to determine the `isAuto` and `isOn` states.
-                    obj.native.raw = state.val;
-                    if (this.relayDataInterpreter.isAuto(obj.native as GetStateDataObject)) {
-                        this.log.info(`Switching ${obj.native.label}: auto`);
-                        this.usrcfgCgiService.setAuto(obj.native as GetStateDataObject);
-                    } else if (this.relayDataInterpreter.isOn(obj.native as GetStateDataObject)) {
-                        this.log.info(`Switching ${obj.native.label}: on`);
-                        this.usrcfgCgiService.setOn(obj.native as GetStateDataObject);
-                    } else {
-                        this.log.info(`Switching ${obj.native.label}: off`);
-                        this.usrcfgCgiService.setOff(obj.native as GetStateDataObject);
-                    }
-                }
-            }).catch((e) => {
-                this.log.error(`Failed setting relay state (${id}): ${e}`);
-            });
-            // The state was changed
-            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        } else if (!state) {
+        if (!state) {
             // The state was deleted
             this.log.info(`state ${id} deleted`);
+            return;
+        }
+        if (state.ack) {
+            // The state is already acknowledged -> no need to change anything
+            return;
+        }
+
+        try {
+            if (id.endsWith(".auto")) {
+                this.relayToggleAuto(id, state);
+            } else if (id.endsWith(".onOff")) {
+                this.relayToggleOnOff(id, state);
+            }
+        } catch (e) {
+            this.log.info(e);
+        }
+    }
+
+    public async relayToggleAuto(objectId: string, state: ioBroker.State) {
+        const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, "onOff"));
+        if (!onOffState) {
+            throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
+        }
+        const obj = await this.getObjectAsync(objectId);
+        if (!obj) {
+            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
+        }
+
+        if (!!state.val) {
+            this.log.info(`Switching ${obj.native.label}: auto mode`);
+            this.usrcfgCgiService.setAuto(obj.native as GetStateDataObject);
+        } else if (!!onOffState.val) {
+            this.log.info(`Switching ${obj.native.label}: on`);
+            this.usrcfgCgiService.setOn(obj.native as GetStateDataObject);
+        } else {
+            this.log.info(`Switching ${obj.native.label}: off`);
+            this.usrcfgCgiService.setOff(obj.native as GetStateDataObject);
+        }
+    }
+
+    public async relayToggleOnOff(objectId: string, state: ioBroker.State) {
+        const obj = await this.getObjectAsync(objectId);
+        if (!obj) {
+            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
+        }
+
+        if (!!state.val) {
+            this.log.info(`Switching ${obj.native.label}: on`);
+            this.usrcfgCgiService.setOn(obj.native as GetStateDataObject);
+        } else {
+            this.log.info(`Switching ${obj.native.label}: off`);
+            this.usrcfgCgiService.setOff(obj.native as GetStateDataObject);
         }
     }
 

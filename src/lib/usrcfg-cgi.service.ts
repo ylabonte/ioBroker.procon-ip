@@ -1,8 +1,8 @@
-import {AbstractService, IServiceConfig} from "./abstract-service";
+import {AbstractService} from "./abstract-service";
 import {GetStateService} from "./get-state.service";
 import {GetStateData} from "./get-state-data";
 import {GetStateDataObject} from "./get-state-data-object";
-import {RelayDataInterpreter, RelayStateBitMask} from "./relay-data-interpreter";
+import {RelayDataInterpreter} from "./relay-data-interpreter";
 import axios, {AxiosPromise, Method} from "axios";
 
 export enum SetStateValue {
