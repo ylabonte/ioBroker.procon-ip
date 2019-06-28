@@ -42,9 +42,9 @@ export class GetStateDataObject {
                     (Number(this.value) >> 8) + ":" + ((Number(this.value) & 0xFF) < 10 ? 0 : "") + "" +
                     (Number(this.value) & 0xFF);
                 break;
-            case "pH":
-                this.displayValue = `${this.unit} ${this.value}`;
-                break;
+            // case "pH":
+            //     this.displayValue = `${this.unit} ${this.value}`;
+            //     break;
             case "--":
                 this.displayValue = String(this.value);
                 break;

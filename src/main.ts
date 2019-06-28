@@ -116,7 +116,7 @@ class ProconIp extends utils.Adapter {
                 }
             });
 
-            this._stateData = data;
+            this._stateData = new GetStateData(data.raw);
         });
 
         // this.getStateService.getData().then((response) => {
@@ -149,7 +149,8 @@ class ProconIp extends utils.Adapter {
         // });
 
         // in this template all states changes inside the adapters namespace are subscribed
-        this.subscribeStates("*");
+        this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
+        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
 
         /*
         setState examples
@@ -205,10 +206,11 @@ class ProconIp extends utils.Adapter {
         if (state && !state.ack) {
             this.getObjectAsync(id).then((obj) => {
                 if (obj) {
-                    if (this.relayDataInterpreter.isAuto(obj.native.id)) {
+                    obj.native.value = state.val;
+                    if (this.relayDataInterpreter.isAuto(obj.native as GetStateDataObject)) {
                         this.log.info(`Switching ${obj.native.label}: auto`);
                         this.usrcfgCgiService.setAuto(obj.native as GetStateDataObject);
-                    } else if (this.relayDataInterpreter.isOn(obj.native.id)) {
+                    } else if (this.relayDataInterpreter.isOn(obj.native as GetStateDataObject)) {
                         this.log.info(`Switching ${obj.native.label}: on`);
                         this.usrcfgCgiService.setOn(obj.native as GetStateDataObject);
                     } else {
@@ -216,6 +218,8 @@ class ProconIp extends utils.Adapter {
                         this.usrcfgCgiService.setOff(obj.native as GetStateDataObject);
                     }
                 }
+            }).catch((e) => {
+                this.log.error(`Failed setting relay state (${id}): ${e}`);
             });
             // The state was changed
             this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);

@@ -1,0 +1,7 @@
+{
+    "Controller Base-URL": "URL der Poolsteuerung",
+    "Use basic auth": "Authentifizierung benutzen (HTTP Basic Auth)",
+    "Username": "Benutzername",
+    "Password": "Passwort",
+    "Update interval (ms)": "Update-Interval (ms)"
+}
