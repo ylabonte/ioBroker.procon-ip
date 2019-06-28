@@ -116,10 +116,12 @@ class ProconIp extends utils.Adapter {
             //     native: {},
             // });
             // in this template all states changes inside the adapters namespace are subscribed
-            this.subscribeStates(`${this.name}.${this.instance}.relays.*.auto`);
-            this.subscribeStates(`${this.name}.${this.instance}.relays.*.state`);
-            this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.auto`);
-            this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.state`);
+            this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
+            // this.subscribeStates(`${this.name}.${this.instance}.relays.*.auto`);
+            // this.subscribeStates(`${this.name}.${this.instance}.relays.*.state`);
+            this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+            // this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.auto`);
+            // this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.state`);
             /*
             setState examples
             you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
@@ -178,14 +180,16 @@ class ProconIp extends utils.Adapter {
         }
         try {
             if (id.endsWith(".auto")) {
+                this.log.info(`${id}: Toggle auto`);
                 this.relayToggleAuto(id, state);
             }
             else if (id.endsWith(".onOff")) {
+                this.log.info(`${id}: Toggle on/off`);
                 this.relayToggleOnOff(id, state);
             }
         }
         catch (e) {
-            this.log.info(e);
+            this.log.error(e);
         }
     }
     relayToggleAuto(objectId, state) {

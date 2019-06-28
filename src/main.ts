@@ -149,10 +149,12 @@ class ProconIp extends utils.Adapter {
         // });
 
         // in this template all states changes inside the adapters namespace are subscribed
-        this.subscribeStates(`${this.name}.${this.instance}.relays.*.auto`);
-        this.subscribeStates(`${this.name}.${this.instance}.relays.*.state`);
-        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.auto`);
-        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.state`);
+        this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
+        // this.subscribeStates(`${this.name}.${this.instance}.relays.*.auto`);
+        // this.subscribeStates(`${this.name}.${this.instance}.relays.*.state`);
+        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+        // this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.auto`);
+        // this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*.state`);
 
         /*
         setState examples
@@ -217,12 +219,14 @@ class ProconIp extends utils.Adapter {
 
         try {
             if (id.endsWith(".auto")) {
+                this.log.info(`${id}: Toggle auto`);
                 this.relayToggleAuto(id, state);
             } else if (id.endsWith(".onOff")) {
+                this.log.info(`${id}: Toggle on/off`);
                 this.relayToggleOnOff(id, state);
             }
         } catch (e) {
-            this.log.info(e);
+            this.log.error(e);
         }
     }
 
