@@ -168,7 +168,9 @@ class ProconIp extends utils.Adapter {
         if (state && !state.ack) {
             this.getObjectAsync(id).then((obj) => {
                 if (obj) {
-                    obj.native.value = state.val;
+                    // The RelayStateDataInterpreter expects a GetStateDataObject. We use the native object, but update
+                    // the raw value first, because that's what's evaluated to determine the `isAuto` and `isOn` states.
+                    obj.native.raw = state.val;
                     if (this.relayDataInterpreter.isAuto(obj.native)) {
                         this.log.info(`Switching ${obj.native.label}: auto`);
                         this.usrcfgCgiService.setAuto(obj.native);
