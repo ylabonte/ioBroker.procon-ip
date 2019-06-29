@@ -70,8 +70,8 @@ class ProconIp extends utils.Adapter {
         this.log.debug("config password: " + this.config.password);
         this.log.info("config updateInterval: " + this.config.updateInterval);
 
-        this.getStateService = new GetStateService(this.config);
-        this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.getStateService, this.relayDataInterpreter);
+        this.getStateService = new GetStateService(this.config, this.log);
+        this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
 
         this.log.info(`GetStateService url: ${this.getStateService.url}`);
         this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);

@@ -21,8 +21,8 @@ export class UsrcfgCgiService extends AbstractService {
 
     private relayDataInterpreter: RelayDataInterpreter;
 
-    public constructor(config: ioBroker.AdapterConfig, getStateService: GetStateService, relayDataInterpreter: RelayDataInterpreter) {
-        super(config);
+    public constructor(config: ioBroker.AdapterConfig, logger: ioBroker.Logger, getStateService: GetStateService, relayDataInterpreter: RelayDataInterpreter) {
+        super(config, logger);
         this.relayDataInterpreter = relayDataInterpreter;
         this.getStateService = getStateService;
         this.stateData = this.getStateService.data;
@@ -61,28 +61,18 @@ export class UsrcfgCgiService extends AbstractService {
         }
 
         if (data !== undefined) {
-            this.send(data).catch((error) => {
-                console.error(error);
+            this.send(data).then((response) => {
+                this.log.info(`usrcfg.cgi response: ${JSON.stringify(response.data)}`);
+                this.log.info(`usrcfg.cgi status: (${response.status}) ${response.statusText}`);
+                // if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
+                if (response.status === 200) {
+                    this.getStateService.update();
+                } else {
+                    this.log.error(`(${response.status}: ${response.statusText}) Error sending relay control command: ${response.data}`);
+                }
+            }).catch((error) => {
+                this.log.error(error);
             });
-            // .then((response) => {
-            //     console.log(response.data);
-            //     if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
-            //     // if (response.status === 200) {
-            //         this.getStateService.data.objects[relay.id].set(
-            //             relay.id,
-            //             relay.label,
-            //             relay.unit,
-            //             relay.offset.toString(),
-            //             relay.gain.toString(),
-            //             desiredValue.toString()
-            //         );
-            //         this.getStateService.update();
-            //     } else {
-            //         console.error(`(${response.status}: ${response.statusText}) Error sending relay control command:`, response.data);
-            //     }
-            // }).catch((error) => {
-            //     console.error(error);
-            // });
         }
     }
 
@@ -92,6 +82,7 @@ export class UsrcfgCgiService extends AbstractService {
             ENA: bitTupel.join(","),
             MANUAL: "1"
         };
+        this.log.info(JSON.stringify(requestConfig));
 
         return axios.request(requestConfig);
     }

@@ -25,8 +25,8 @@ export class GetStateService extends AbstractService {
 
     private _updateCallback: (data: GetStateData) => any;
 
-    public constructor(config: ioBroker.AdapterConfig) {
-        super(config);
+    public constructor(config: ioBroker.AdapterConfig, logger: ioBroker.Logger) {
+        super(config, logger);
         this.data = new GetStateData();
         this._updateInterval = config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
@@ -69,13 +69,11 @@ export class GetStateService extends AbstractService {
         this.getData().then((response) => {
             this.data.parseCsv(response.data);
             this._hasData = true;
-            //@todo Hide error view
             this._updateCallback(this.data);
         },
         (e) => {
             this._hasData = false;
-            console.log(e);
-            //@todo Show the error view
+            this.log.error(e);
         });
     }
 

@@ -18,14 +18,15 @@ export abstract class AbstractService {
 
     protected _requestHeaders: any;
 
-    protected const = AbstractService;
+    protected log: ioBroker.Logger;
 
-    protected constructor(config: ioBroker.AdapterConfig) {
+    protected constructor(config: ioBroker.AdapterConfig, logger: ioBroker.Logger) {
         this._requestHeaders = {};
         this._baseUrl = config.controllerUrl;
         this._username = config.username;
         this._password = config.password;
         this._basicAuth = config.basicAuth;
+        this.log = logger;
     }
 
     public get baseUrl(): string {

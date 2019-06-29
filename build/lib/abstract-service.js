@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class AbstractService {
-    constructor(config) {
-        this.const = AbstractService;
+    constructor(config, logger) {
         this._requestHeaders = {};
         this._baseUrl = config.controllerUrl;
         this._username = config.username;
         this._password = config.password;
         this._basicAuth = config.basicAuth;
+        this.log = logger;
     }
     get baseUrl() {
         return this._baseUrl;

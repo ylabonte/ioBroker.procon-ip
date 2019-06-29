@@ -4,8 +4,8 @@ const axios_1 = require("axios");
 const abstract_service_1 = require("./abstract-service");
 const get_state_data_1 = require("./get-state-data");
 class GetStateService extends abstract_service_1.AbstractService {
-    constructor(config) {
-        super(config);
+    constructor(config, logger) {
+        super(config, logger);
         this._endpoint = "/GetState.csv";
         this._method = "get";
         this._hasData = false;
@@ -44,12 +44,10 @@ class GetStateService extends abstract_service_1.AbstractService {
         this.getData().then((response) => {
             this.data.parseCsv(response.data);
             this._hasData = true;
-            //@todo Hide error view
             this._updateCallback(this.data);
         }, (e) => {
             this._hasData = false;
-            console.log(e);
-            //@todo Show the error view
+            this.log.error(e);
         });
     }
     getData() {
