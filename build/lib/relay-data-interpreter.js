@@ -17,6 +17,9 @@ var RelayStateBitMask;
     // autoOn = 1
 })(RelayStateBitMask = exports.RelayStateBitMask || (exports.RelayStateBitMask = {}));
 class RelayDataInterpreter {
+    constructor(logger) {
+        this.log = logger;
+    }
     evaluate(stateData) {
         const relays = stateData.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS);
         this.byteState = [255, 0];
@@ -28,7 +31,10 @@ class RelayDataInterpreter {
             if (this.isOn(relay)) {
                 this.byteState[1] |= relay.bitMask;
             }
+            this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
         });
+        this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
+        this.log.info(`byteState: ${this.byteState.join(",")}`);
         return this;
     }
     isOn(relay) {

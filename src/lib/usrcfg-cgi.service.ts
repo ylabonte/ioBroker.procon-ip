@@ -2,7 +2,7 @@ import {AbstractService} from "./abstract-service";
 import {GetStateService} from "./get-state.service";
 import {GetStateData} from "./get-state-data";
 import {GetStateDataObject} from "./get-state-data-object";
-import {RelayDataInterpreter} from "./relay-data-interpreter";
+import {RelayDataInterpreter, RelayStateBitMask} from "./relay-data-interpreter";
 import axios, {AxiosPromise, Method} from "axios";
 
 export enum SetStateValue {
@@ -29,54 +29,60 @@ export class UsrcfgCgiService extends AbstractService {
         this._requestHeaders["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8";
     }
 
-    public setOn(relayData: GetStateDataObject) {
-        this.setState(relayData, SetStateValue.ON);
+    public async setOn(relayData: GetStateDataObject): Promise<number> {
+        return this.setState(relayData, SetStateValue.ON);
     }
 
-    public setOff(relayData: GetStateDataObject) {
-        this.setState(relayData, SetStateValue.OFF);
+    public async setOff(relayData: GetStateDataObject): Promise<number> {
+        return this.setState(relayData, SetStateValue.OFF);
     }
 
-    public setAuto(relayData: GetStateDataObject) {
-        this.setState(relayData, SetStateValue.AUTO);
+    public async setAuto(relayData: GetStateDataObject): Promise<number> {
+        return this.setState(relayData, SetStateValue.AUTO);
     }
 
-    private setState(relay: GetStateDataObject, state: SetStateValue|number) {
+    private async setState(relay: GetStateDataObject, state: SetStateValue|number): Promise<number> {
         let data: [number, number]|undefined = undefined;
-        // let desiredValue: number;
+        let desiredValue: number;
         switch (state) {
             case SetStateValue.AUTO:
                 data = this.relayDataInterpreter.evaluate(this.getStateService.data).setAuto(relay);
-                // desiredValue = relay.raw & ~RelayStateBitMask.manual;
+                desiredValue = relay.raw & ~RelayStateBitMask.manual;
                 break;
             case SetStateValue.ON:
                 data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOn(relay);
-                // desiredValue = RelayStateBitMask.manual | RelayStateBitMask.on;
+                desiredValue = RelayStateBitMask.manual | RelayStateBitMask.on;
                 break;
             case SetStateValue.OFF:
             default:
                 data = this.relayDataInterpreter.evaluate(this.getStateService.data).setOff(relay);
-                // desiredValue = RelayStateBitMask.manual | ~RelayStateBitMask.on;
+                desiredValue = RelayStateBitMask.manual | ~RelayStateBitMask.on;
                 break;
         }
 
-        if (data !== undefined) {
+        this.log.info(`usrcfg.cgi data: ${JSON.stringify(data)}`);
+        return new Promise<number>((resolve, reject) => {
+            if (data === undefined) {
+                return reject("Cannot determine request data for relay switching");
+            }
+
             this.send(data).then((response) => {
                 this.log.info(`usrcfg.cgi response: ${JSON.stringify(response.data)}`);
                 this.log.info(`usrcfg.cgi status: (${response.status}) ${response.statusText}`);
                 // if (["continue", "done"].indexOf(response.data.toLowerCase()) >= 0) {
                 if (response.status === 200) {
                     this.getStateService.update();
+                    resolve(desiredValue);
                 } else {
-                    this.log.error(`(${response.status}: ${response.statusText}) Error sending relay control command: ${response.data}`);
+                    reject(`(${response.status}: ${response.statusText}) Error sending relay control command: ${response.data}`);
                 }
-            }).catch((error) => {
-                this.log.error(error);
+            }).catch((e) => {
+                reject(e)
             });
-        }
+        });
     }
 
-    private send(bitTupel: [number, number]): AxiosPromise {
+    private async send(bitTupel: [number, number]): /*Axios*/Promise<{data: string; status: number; statusText: string}> {
         const requestConfig = this.axiosRequestConfig;
         requestConfig.data = {
             ENA: bitTupel.join(","),
@@ -84,6 +90,12 @@ export class UsrcfgCgiService extends AbstractService {
         };
         this.log.info(JSON.stringify(requestConfig));
 
-        return axios.request(requestConfig);
+        return new Promise((resolve, reject) => {
+            if (requestConfig.data.ENA.search("-") >= 0) {
+                reject("fuck it! why negative numbers?!");
+            }
+            resolve({data: "", status: 200, statusText: "OK"});
+        });
+        // return axios.request(requestConfig);
     }
 }

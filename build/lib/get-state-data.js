@@ -71,8 +71,7 @@ class GetStateData {
         return this.objects[id] ? this.objects[id] : new get_state_data_object_1.GetStateDataObject(id, "", "", "", "", "");
     }
     getDataObjectsByCategory(category, activeOnly = false) {
-        return this.categories.hasOwnProperty(category) ?
-            [] : this.getDataObjects(this.categories[category], activeOnly);
+        return this.getDataObjects(this.categories[category], activeOnly);
     }
     getChlorineDosageControlId() {
         return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.chlorineDosageRelais);

@@ -39,6 +39,7 @@ class ProconIp extends utils.Adapter {
     private relayDataInterpreter!: RelayDataInterpreter;
     private getStateService!: GetStateService;
     private usrcfgCgiService!: UsrcfgCgiService;
+    private forceUpdate: number[];
     private _objectsCreated: boolean = false;
     private _stateData: GetStateData;
 
@@ -52,7 +53,7 @@ class ProconIp extends utils.Adapter {
         this.on("stateChange", this.onStateChange.bind(this));
         // this.on("objectChange", this.onObjectChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
-        this.relayDataInterpreter = new RelayDataInterpreter();
+        this.forceUpdate = new Array<number>();
         this._stateData = new GetStateData();
     }
 
@@ -70,6 +71,7 @@ class ProconIp extends utils.Adapter {
         this.log.debug("config password: " + this.config.password);
         this.log.info("config updateInterval: " + this.config.updateInterval);
 
+        this.relayDataInterpreter = new RelayDataInterpreter(this.log);
         this.getStateService = new GetStateService(this.config, this.log);
         this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
 
@@ -88,7 +90,7 @@ class ProconIp extends utils.Adapter {
             data.sysInfo.toArrayOfObjects().forEach((info) => {
                 // this.log.info(`Checking sys info state ${info.key} for updates: ${this._stateData.sysInfo[info.key]} <=> ${info.value}`);
                 if (info.value !== this._stateData.sysInfo[info.key]) {
-                    this.log.info(`Updating sys info state ${info.key}: ${info.value}`);
+                    this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
                     this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
                         this.log.error(`Failed setting state for '${info.key}': ${e}`);
                     });
@@ -96,8 +98,9 @@ class ProconIp extends utils.Adapter {
             });
             data.objects.forEach((obj) => {
                 // this.log.info(`Checking object ${obj.label} for state update: ${this._stateData.getDataObject(obj.id).value} <=> ${obj.value}`);
-                if (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value) {
-                    this.log.info(`Updating state of '${obj.label}'`);
+                const force = this.forceUpdate.indexOf(obj.id);
+                if (force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
+                    this.log.debug(`Updating state of '${obj.label}'`);
                     if ([GetStateCategory.RELAYS, GetStateCategory.EXTERNAL_RELAYS].indexOf(obj.category as GetStateCategory) >= 0) {
                         this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, this.relayDataInterpreter.isAuto(obj), true).catch((e) => {
                             this.log.error(`Failed setting auto for '${obj.label}': ${e}`);
@@ -112,6 +115,9 @@ class ProconIp extends utils.Adapter {
                         this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.displayValue, true).catch((e) => {
                             this.log.error(`Failed setting state for '${obj.label}': ${e}`);
                         });
+                    }
+                    if (this.forceUpdate[force]) {
+                        delete this.forceUpdate[force];
                     }
                 }
             });
@@ -217,53 +223,63 @@ class ProconIp extends utils.Adapter {
             return;
         }
 
-        try {
-            if (id.endsWith(".auto")) {
-                this.log.info(`${id}: Toggle auto`);
-                this.relayToggleAuto(id, state);
-            } else if (id.endsWith(".onOff")) {
-                this.log.info(`${id}: Toggle on/off`);
-                this.relayToggleOnOff(id, state);
-            }
-        } catch (e) {
-            this.log.error(e);
+        if (id.endsWith(".auto")) {
+            this.log.info(`${id}: Toggle auto`);
+            this.relayToggleAuto(id, state).then((response) => {
+                this.log.info(JSON.stringify(response));
+            }).catch((e) => {
+                this.log.error(e);
+            });
+        } else if (id.endsWith(".onOff")) {
+            this.log.info(`${id}: Toggle on/off`);
+            this.relayToggleOnOff(id, state).then((response) => {
+                this.log.info(JSON.stringify(response));
+            }).catch((e) => {
+                this.log.error(e);
+            });
         }
     }
 
     public async relayToggleAuto(objectId: string, state: ioBroker.State) {
-        const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, "onOff"));
+        const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, ".onOff"));
         if (!onOffState) {
             throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
         }
+
         const obj = await this.getObjectAsync(objectId);
         if (!obj) {
             throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
         }
 
+        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
+        this.forceUpdate.push(getStateDataObject.id);
         if (!!state.val) {
             this.log.info(`Switching ${obj.native.label}: auto mode`);
-            this.usrcfgCgiService.setAuto(obj.native as GetStateDataObject);
+            await this.usrcfgCgiService.setAuto(getStateDataObject);
         } else if (!!onOffState.val) {
             this.log.info(`Switching ${obj.native.label}: on`);
-            this.usrcfgCgiService.setOn(obj.native as GetStateDataObject);
+            await this.usrcfgCgiService.setOn(getStateDataObject);
         } else {
             this.log.info(`Switching ${obj.native.label}: off`);
-            this.usrcfgCgiService.setOff(obj.native as GetStateDataObject);
+            await this.usrcfgCgiService.setOff(getStateDataObject);
         }
     }
 
     public async relayToggleOnOff(objectId: string, state: ioBroker.State) {
         const obj = await this.getObjectAsync(objectId);
+        this.log.info("got object");
         if (!obj) {
             throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
         }
 
+        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
+        this.forceUpdate.push(getStateDataObject.id);
         if (!!state.val) {
             this.log.info(`Switching ${obj.native.label}: on`);
-            this.usrcfgCgiService.setOn(obj.native as GetStateDataObject);
+            await this.usrcfgCgiService.setOn(getStateDataObject);
         } else {
             this.log.info(`Switching ${obj.native.label}: off`);
-            this.usrcfgCgiService.setOff(obj.native as GetStateDataObject);
+            await this.usrcfgCgiService.setOff(getStateDataObject);
         }
     }
 
@@ -337,7 +353,7 @@ class ProconIp extends utils.Adapter {
                         type: "boolean",
                         role: "switch.auto",
                         read: true,
-                        write: obj.active
+                        write: true
                     },
                     native: obj,
                 }).then(() => {
@@ -352,7 +368,8 @@ class ProconIp extends utils.Adapter {
                         type: "boolean",
                         role: "switch.power",
                         read: true,
-                        write: obj.active
+                        // write: true
+                        write: !this.getStateService.data.isDosageControl(obj.id)
                     },
                     native: obj,
                 }).then(() => {
@@ -366,8 +383,9 @@ class ProconIp extends utils.Adapter {
                         name: obj.label,
                         type: "boolean",
                         role: "state",
-                        read: false,
-                        write: obj.active
+                        read: true,
+                        // write: true
+                        write: !this.getStateService.data.isDosageControl(obj.id)
                     },
                     native: obj,
                 }).then(() => {

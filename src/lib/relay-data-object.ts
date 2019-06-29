@@ -3,7 +3,7 @@ import {GetStateDataObject} from "./get-state-data-object";
 export class RelayDataObject extends GetStateDataObject {
     public constructor(data: GetStateDataObject) {
         super(data.id, data.label, data.unit, data.offset.toString(), data.gain.toString(), data.raw.toString());
-        // Object.keys(data).forEach((key) => { this[key] = data[key]; });
+        Object.keys(data).forEach((key) => { this[key] = data[key]; });
     }
 
     /**
@@ -12,5 +12,6 @@ export class RelayDataObject extends GetStateDataObject {
      */
     public get bitMask(): number {
         return 1 << (this.categoryId - 1);
+        // return Math.pow(2, this.categoryId - 1);
     }
 }

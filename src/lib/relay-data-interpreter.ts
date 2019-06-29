@@ -18,6 +18,11 @@ export enum RelayStateBitMask {
 
 export class RelayDataInterpreter {
     public byteState!: [number, number];
+    private log: ioBroker.Logger;
+
+    public constructor(logger: ioBroker.Logger) {
+        this.log = logger;
+    }
 
     public evaluate(stateData: GetStateData): RelayDataInterpreter {
         const relays = stateData.getDataObjectsByCategory(GetStateCategory.RELAYS);
@@ -30,8 +35,10 @@ export class RelayDataInterpreter {
             if (this.isOn(relay)) {
                 this.byteState[1] |= relay.bitMask;
             }
+            this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
         });
-
+        this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
+        this.log.info(`byteState: ${this.byteState.join(",")}`);
         return this;
     }
 

@@ -1,6 +1,6 @@
-import {of} from "rxjs";
-
 export class GetStateDataObject {
+    [key: string]: any;
+
     public id!: number;
     public label!: string;
     public raw!: number;

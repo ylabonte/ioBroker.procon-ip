@@ -102,8 +102,7 @@ export class GetStateData {
     }
 
     public getDataObjectsByCategory(category: string, activeOnly = false): GetStateDataObject[] {
-        return this.categories.hasOwnProperty(category) ?
-            [] : this.getDataObjects(this.categories[category], activeOnly);
+        return this.getDataObjects(this.categories[category as GetStateCategory], activeOnly);
     }
 
     public getChlorineDosageControlId(): number {
