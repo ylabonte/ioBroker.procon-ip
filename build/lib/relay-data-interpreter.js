@@ -24,17 +24,19 @@ class RelayDataInterpreter {
         const relays = stateData.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS);
         this.byteState = [255, 0];
         relays.forEach((data) => {
+            this.log.info(JSON.stringify(data));
             const relay = new relay_data_object_1.RelayDataObject(data);
+            this.log.info(JSON.stringify(relay));
             if (this.isAuto(relay)) {
                 this.byteState[0] &= ~relay.bitMask;
             }
             if (this.isOn(relay)) {
                 this.byteState[1] |= relay.bitMask;
             }
-            // this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
+            this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
         });
-        // this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
-        // this.log.info(`byteState: ${this.byteState.join(",")}`);
+        this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
+        this.log.info(`byteState: ${this.byteState.join(",")}`);
         return this;
     }
     isOn(relay) {
