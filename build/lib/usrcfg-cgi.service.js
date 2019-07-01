@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = require("./abstract-service");
 const relay_data_interpreter_1 = require("./relay-data-interpreter");
+const axios_1 = require("axios");
 var SetStateValue;
 (function (SetStateValue) {
     SetStateValue[SetStateValue["ON"] = 1] = "ON";
@@ -83,21 +84,19 @@ class UsrcfgCgiService extends abstract_service_1.AbstractService {
         });
     }
     send(bitTupel) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const requestConfig = this.axiosRequestConfig;
-            requestConfig.data = {
-                ENA: bitTupel.join(","),
-                MANUAL: "1"
-            };
-            this.log.info(JSON.stringify(requestConfig));
-            return new Promise((resolve, reject) => {
-                if (requestConfig.data.ENA.search("-") >= 0) {
-                    reject("fuck it! why negative numbers?!");
-                }
-                resolve({ data: "", status: 200, statusText: "OK" });
-            });
-            // return axios.request(requestConfig);
-        });
+        const requestConfig = this.axiosRequestConfig;
+        requestConfig.data = {
+            ENA: bitTupel.join(","),
+            MANUAL: "1"
+        };
+        this.log.info(JSON.stringify(requestConfig));
+        // return new Promise((resolve, reject) => {
+        //     if (requestConfig.data.ENA.search("-") >= 0) {
+        //         reject("fuck it! why negative numbers?!");
+        //     }
+        //     resolve({data: "", status: 200, statusText: "OK"});
+        // });
+        return axios_1.default.request(requestConfig);
     }
 }
 exports.UsrcfgCgiService = UsrcfgCgiService;

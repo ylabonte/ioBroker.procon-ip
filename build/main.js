@@ -184,7 +184,7 @@ class ProconIp extends utils.Adapter {
             return;
         }
         if (id.endsWith(".auto")) {
-            this.log.info(`${id}: Toggle auto`);
+            // this.log.info(`${id}: Toggle auto`);
             this.relayToggleAuto(id, state).then((response) => {
                 this.log.info(JSON.stringify(response));
             }).catch((e) => {
@@ -192,7 +192,7 @@ class ProconIp extends utils.Adapter {
             });
         }
         else if (id.endsWith(".onOff")) {
-            this.log.info(`${id}: Toggle on/off`);
+            // this.log.info(`${id}: Toggle on/off`);
             this.relayToggleOnOff(id, state).then((response) => {
                 this.log.info(JSON.stringify(response));
             }).catch((e) => {

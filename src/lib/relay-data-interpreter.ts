@@ -35,10 +35,10 @@ export class RelayDataInterpreter {
             if (this.isOn(relay)) {
                 this.byteState[1] |= relay.bitMask;
             }
-            this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
+            // this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
         });
-        this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
-        this.log.info(`byteState: ${this.byteState.join(",")}`);
+        // this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
+        // this.log.info(`byteState: ${this.byteState.join(",")}`);
         return this;
     }
 

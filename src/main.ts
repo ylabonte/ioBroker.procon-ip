@@ -224,14 +224,14 @@ class ProconIp extends utils.Adapter {
         }
 
         if (id.endsWith(".auto")) {
-            this.log.info(`${id}: Toggle auto`);
+            // this.log.info(`${id}: Toggle auto`);
             this.relayToggleAuto(id, state).then((response) => {
                 this.log.info(JSON.stringify(response));
             }).catch((e) => {
                 this.log.error(e);
             });
         } else if (id.endsWith(".onOff")) {
-            this.log.info(`${id}: Toggle on/off`);
+            // this.log.info(`${id}: Toggle on/off`);
             this.relayToggleOnOff(id, state).then((response) => {
                 this.log.info(JSON.stringify(response));
             }).catch((e) => {
