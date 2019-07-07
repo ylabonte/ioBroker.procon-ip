@@ -358,8 +358,9 @@ class ProconIp extends utils.Adapter {
                 type: "boolean",
                 role: "switch.power",
                 read: true,
-                // write: true
-                write: !this.getStateService.data.isDosageControl(obj.id)
+                write: !this.getStateService.data.isDosageControl(obj.id),
+                smartName: obj.label,
+                smartType: "SWITCH",
             },
             native: obj,
         }).then(() => {

@@ -56,7 +56,7 @@ class ProconIp extends utils.Adapter {
                 }
                 // Set sys info states
                 data.sysInfo.toArrayOfObjects().forEach((info) => {
-                    // this.log.info(`Checking sys info state ${info.key} for updates: ${this._stateData.sysInfo[info.key]} <=> ${info.value}`);
+                    // Only update when value has changed
                     if (info.value !== this._stateData.sysInfo[info.key]) {
                         this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
                         this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
@@ -66,6 +66,7 @@ class ProconIp extends utils.Adapter {
                 });
                 // Set object states
                 data.objects.forEach((obj) => {
+                    // Only update when value has changed or update is forced (on state change)
                     const force = this.forceUpdate.indexOf(obj.id);
                     if (force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
                         this.setDataState(obj);
@@ -317,8 +318,9 @@ class ProconIp extends utils.Adapter {
                 type: "boolean",
                 role: "switch.power",
                 read: true,
-                // write: true
-                write: !this.getStateService.data.isDosageControl(obj.id)
+                write: !this.getStateService.data.isDosageControl(obj.id),
+                smartName: obj.label,
+                smartType: "SWITCH",
             },
             native: obj,
         }).then(() => {
