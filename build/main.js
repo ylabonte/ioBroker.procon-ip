@@ -82,7 +82,10 @@ class ProconIp extends utils.Adapter {
                             });
                         }
                         else {
-                            this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, obj.displayValue, true).catch((e) => {
+                            this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.state`, obj.value, true).catch((e) => {
+                                this.log.error(`Failed setting state for '${obj.label}': ${e}`);
+                            });
+                            this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.displayValue`, obj.displayValue, true).catch((e) => {
                                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
                             });
                         }
@@ -353,7 +356,22 @@ class ProconIp extends utils.Adapter {
                 });
             }
             else {
-                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
+                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.state`, {
+                    type: "state",
+                    common: {
+                        name: obj.label,
+                        type: "boolean",
+                        role: "value",
+                        read: true,
+                        write: false
+                    },
+                    native: obj,
+                }).then(() => {
+                    this.log.info(`Object '${obj.label}' has been set`);
+                }).catch((e) => {
+                    this.log.error(`Failed setting object '${obj.label}': ${e}`);
+                });
+                this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.displayValue`, {
                     type: "state",
                     common: {
                         name: obj.label,
