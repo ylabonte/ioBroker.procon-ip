@@ -52,4 +52,8 @@ export class GetStateDataObject {
                 this.displayValue = `${Number(this.value).toFixed(2)} ${this.unit}`;
         }
     }
+
+    public forFields(callback: (field: string) => any) {
+        Object.keys(this).forEach(callback);
+    }
 }
