@@ -223,7 +223,9 @@ class ProconIp extends utils.Adapter {
      */
     setObjects(objects) {
         objects.forEach((obj) => {
-            this.setDataObject(obj);
+            this.setDataObject(obj).catch((e) => {
+                this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
+            });
         });
     }
     setDataObject(obj) {
@@ -239,23 +241,18 @@ class ProconIp extends utils.Adapter {
             //     },
             //     native: obj,
             // });
-            for (const field in Object.keys(obj)) {
+            for (const field of Object.keys(obj)) {
+                console.log(`set object iterating field ${obj.label}.${field}`);
                 let role = "value";
-                let type = "state";
                 switch (field) {
                     case "id":
-                    case "category":
-                    case "categoryId":
-                        type = "meta";
-                        role = "value";
-                        break;
-                    case "label":
-                        type = "info";
-                        role = "text";
-                        break;
                     case "active":
-                        type = "info";
+                    case "categoryId":
                         role = "indicator";
+                        break;
+                    case "category":
+                    case "label":
+                        role = "text";
                         break;
                     case "offset":
                         role = "value.offset";
@@ -267,15 +264,17 @@ class ProconIp extends utils.Adapter {
                         role = "value.raw";
                         break;
                     case "unit":
-                        type = "info";
                         role = "value.unit";
+                        break;
+                    case "displayValue":
+                        role = "value.display";
                         break;
                     default:
                         continue;
                 }
                 try {
                     yield this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
-                        type: type,
+                        type: "state",
                         common: {
                             name: obj.label,
                             type: typeof obj[field],
@@ -330,7 +329,8 @@ class ProconIp extends utils.Adapter {
         });
     }
     setDataState(obj) {
-        for (const field in Object.keys(obj)) {
+        for (const field of Object.keys(obj)) {
+            console.log(`set state iterating field ${obj.label}.${field}`);
             this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, obj[field], true).catch((e) => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
             });
