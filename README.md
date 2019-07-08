@@ -20,10 +20,13 @@ therefore becomes some kind of 'production ready'. 😉
 ## Changelog
 
 ### 0.0.1
-* initial release (outstanding)
+* initial release with following features:
+  * All information from `GetState.csv` as readonly states
+  * Writable states for all relays to toggle auto/manual
+  * Writable states for relays not configured for dosage control to toggle on/off 
 
 ## Development
-This adapter is based on the [TypeScript adapter template]().
+This adapter is based on the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript).
 
 
 ## License
