@@ -77,18 +77,18 @@ class ProconIp extends utils.Adapter {
         this.log.info(`GetStateService url: ${this.getStateService.url}`);
         this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
 
+        let firstRun = true;
         this.getStateService.start((data: GetStateData) => {
             // Set objects once
-            if (!this._objectsCreated) {
+            if (firstRun) {
                 this.setSysInfo(data.sysInfo);
                 this.setObjects(data.objects);
-                this._objectsCreated = true;
             }
 
             // Set sys info states
             data.sysInfo.toArrayOfObjects().forEach((info) => {
                 // Only update when value has changed
-                if (info.value !== this._stateData.sysInfo[info.key]) {
+                if (firstRun || info.value !== this._stateData.sysInfo[info.key]) {
                     this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
                     this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
                         this.log.error(`Failed setting state for '${info.key}': ${e}`);
@@ -100,7 +100,7 @@ class ProconIp extends utils.Adapter {
             data.objects.forEach((obj) => {
                 // Only update when value has changed or update is forced (on state change)
                 const force = this.forceUpdate.indexOf(obj.id);
-                if (force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
+                if (firstRun || force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
                     this.setDataState(obj);
                     if (this.forceUpdate[force]) {
                         delete this.forceUpdate[force];
@@ -109,6 +109,7 @@ class ProconIp extends utils.Adapter {
             });
 
             this._stateData = new GetStateData(data.raw);
+            firstRun = false;
         });
 
         this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
@@ -237,11 +238,11 @@ class ProconIp extends utils.Adapter {
         this.log.info(JSON.stringify(data.toArrayOfObjects()));
         data.toArrayOfObjects().forEach((sysInfo) => {
             this.setObjectAsync(`${this.name}.${this.instance}.${sysInfo.key}`, {
-                type: "info",
+                type: "state",
                 common: {
                     name: sysInfo.key,
                     type: "string",
-                    role: "state",
+                    role: "info",
                     read: true,
                     write: false
                 },
