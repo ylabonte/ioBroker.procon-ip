@@ -280,10 +280,11 @@ class ProconIp extends utils.Adapter {
         //     native: obj,
         // });
         for (const field of Object.keys(obj)) {
-            console.log(`set object iterating field ${obj.label}.${field}`);
             let role = "value";
 
             switch (field) {
+                case "value":
+                    break;
                 case "id":
                 case "active":
                 case "categoryId":
@@ -371,7 +372,6 @@ class ProconIp extends utils.Adapter {
 
     public setDataState(obj: GetStateDataObject) {
         for (const field of Object.keys(obj)) {
-            console.log(`set state iterating field ${obj.label}.${field}`);
             this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, obj[field], true).catch((e) => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
             });

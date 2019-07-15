@@ -20,20 +20,25 @@ therefore becomes some kind of 'production ready'. 😉
 ## Changelog
 
 ### 0.1.0 (outstanding)
-* First *stable* release
-    * Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
-    * Reduce logging output
-    * Remove code residues from the template
+First *stable* release:
+* Add documentation (basic installation and setup instructions)
+* Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
+* Remove code residues from the template
+
+### 0.0.3
+Bugfix release:
+* Fix missing `value` states
+* Reduce logging output
 
 ### 0.0.2
-* Bugfix release
-    * Fix sys info state values
+Bugfix release:
+* Fix sys info state values
 
 ### 0.0.1
-* Initial release with following features:
-    * All information from `GetState.csv` as readonly states
-    * Writable states for all relays to toggle auto/manual
-    * Writable states for relays not configured for dosage control to toggle on/off 
+Initial release with following features:
+* All information from `GetState.csv` as readonly states
+* Writable states for all relays to toggle auto/manual
+* Writable states for relays not configured for dosage control to toggle on/off 
 
 ## Development
 This adapter is based on the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript).

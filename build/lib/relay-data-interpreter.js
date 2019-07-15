@@ -33,10 +33,7 @@ class RelayDataInterpreter {
             if (this.isOn(relay)) {
                 this.byteState[1] |= relay.bitMask;
             }
-            this.log.info(`relay${relay.categoryId} bitMask: ${relay.bitMask}`);
         });
-        this.log.info(`byteState: ${JSON.stringify(this.byteState)}`);
-        this.log.info(`byteState: ${this.byteState.join(",")}`);
         return this;
     }
     isOn(relay) {
@@ -52,21 +49,21 @@ class RelayDataInterpreter {
         return !this.isManual(relay);
     }
     setOn(relay) {
-        console.log(this.byteState);
+        this.log.debug(`Relay byte sate: ${JSON.stringify(this.byteState)}`);
         const relayObject = new relay_data_object_1.RelayDataObject(relay);
         this.byteState[0] |= relayObject.bitMask;
         this.byteState[1] |= relayObject.bitMask;
         return this.byteState;
     }
     setOff(relay) {
-        console.log(this.byteState);
+        this.log.debug(`Relay byte sate: ${JSON.stringify(this.byteState)}`);
         const relayObject = new relay_data_object_1.RelayDataObject(relay);
         this.byteState[0] |= relayObject.bitMask;
         this.byteState[1] &= ~relayObject.bitMask;
         return this.byteState;
     }
     setAuto(relay) {
-        console.log(this.byteState);
+        this.log.debug(`Relay byte sate: ${JSON.stringify(this.byteState)}`);
         const relayObject = new relay_data_object_1.RelayDataObject(relay);
         this.byteState[0] &= ~relayObject.bitMask;
         this.byteState[1] &= ~relayObject.bitMask;
