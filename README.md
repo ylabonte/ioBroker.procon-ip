@@ -17,13 +17,27 @@ assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit wi
 Further documentation and german translation will follow, when the adapter really implements its major functionality and
 therefore becomes some kind of 'production ready'. 😉
 
-## Changelog
 
-### 0.1.0 (outstanding)
+## Roadmap
+
+### 0.1.0 (next planned release)
 First *stable* release:
 * Add documentation (basic installation and setup instructions)
 * Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
 * Remove code residues from the template
+
+### 1.0.0
+Full featured release
+* Add connectivity indication for adapter overview
+* Add connectivity status in tab view
+
+
+## Changelog
+
+### 0.0.4
+Security release:
+* Update `lodash` (pinning version `4.17.14`)
+* Update other indirect and direct dependencies
 
 ### 0.0.3
 Bugfix release:
@@ -39,6 +53,7 @@ Initial release with following features:
 * All information from `GetState.csv` as readonly states
 * Writable states for all relays to toggle auto/manual
 * Writable states for relays not configured for dosage control to toggle on/off 
+
 
 ## Development
 This adapter is based on the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript).
