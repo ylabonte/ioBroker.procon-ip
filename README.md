@@ -23,13 +23,16 @@ therefore becomes some kind of 'production ready'. 😉
 ### 0.1.0 (next planned release)
 First *stable* release:
 * Add documentation (basic installation and setup instructions)
-* Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
 * Remove code residues from the template
+* Optimize Cloud Adapter
+    * Pre-defined smartName attributes for active relays and temperature sensors
 
 ### 1.0.0
-Full featured release
+Full featured release:
+* Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
 * Add connectivity indication for adapter overview
 * Add connectivity status in tab view
+* English and German installation and setup documentation
 
 
 ## Changelog
