@@ -309,29 +309,33 @@ class ProconIp extends utils.Adapter {
     }
     setRelayDataObject(obj) {
         const isLight = new RegExp("light|bulb|licht|leucht", "i").test(obj.label);
-        const smartOnOff = obj.active && !this.getStateService.data.isDosageControl(obj.id) ? {
-            smartName: {
-                de: obj.label,
-                en: obj.label,
-                smartType: isLight ? "LIGHT" : "SWITCH"
-            }
-        } : {};
-        const smartAuto = obj.active ? {
-            smartName: {
+        const commonAuto = {
+            name: obj.label,
+            type: "boolean",
+            role: "switch",
+            read: true,
+            write: true,
+            smartName: obj.active ? {
                 de: `${obj.label} auto`,
                 en: `${obj.label} auto`,
                 smartType: isLight ? "LIGHT" : "SWITCH"
-            }
-        } : {};
+            } : {}
+        };
+        const commonOnOff = {
+            name: obj.label,
+            type: "boolean",
+            role: "switch",
+            read: true,
+            write: !this.getStateService.data.isDosageControl(obj.id),
+            smartName: obj.active && !this.getStateService.data.isDosageControl(obj.id) ? {
+                de: obj.label,
+                en: obj.label,
+                smartType: isLight ? "LIGHT" : "SWITCH"
+            } : {}
+        };
         this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
             type: "state",
-            common: {
-                name: obj.label,
-                type: "boolean",
-                role: "switch",
-                read: true,
-                write: true
-            } + smartAuto,
+            common: commonAuto,
             native: obj,
         }).then(() => {
             this.log.info(`set auto/manual switch for '${obj.label}'`);
@@ -340,13 +344,7 @@ class ProconIp extends utils.Adapter {
         });
         this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
             type: "state",
-            common: {
-                name: obj.label,
-                type: "boolean",
-                role: "switch",
-                read: true,
-                write: !this.getStateService.data.isDosageControl(obj.id)
-            } + smartOnOff,
+            common: commonOnOff,
             native: obj,
         }).then(() => {
             this.log.info(`set onOff switch for '${obj.label}'`);
