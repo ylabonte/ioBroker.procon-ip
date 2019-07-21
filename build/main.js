@@ -243,33 +243,48 @@ class ProconIp extends utils.Adapter {
             //     native: obj,
             // });
             for (const field of Object.keys(obj)) {
-                let role = "value";
+                const common = {
+                    name: obj.label,
+                    type: typeof obj[field],
+                    role: "value",
+                    read: true,
+                    write: false
+                };
                 switch (field) {
                     case "value":
+                        if (obj.category == get_state_data_1.GetStateCategory.TEMPERATURES) {
+                            common.smartName = {
+                                de: obj.label,
+                                en: obj.label,
+                                smartType: "THERMOSTAT"
+                            };
+                        }
+                        common.role = "level.temperature";
+                        common.unit = `°${obj.unit}`;
                         break;
                     case "id":
                     case "active":
                     case "categoryId":
-                        role = "indicator";
+                        common.role = "indicator";
                         break;
                     case "category":
                     case "label":
-                        role = "text";
+                        common.role = "text";
                         break;
                     case "offset":
-                        role = "value.offset";
+                        common.role = "value.offset";
                         break;
                     case "gain":
-                        role = "value.gain";
+                        common.role = "value.gain";
                         break;
                     case "raw":
-                        role = "value.raw";
+                        common.role = "value.raw";
                         break;
                     case "unit":
-                        role = "value.unit";
+                        common.role = "value.unit";
                         break;
                     case "displayValue":
-                        role = "value.display";
+                        common.role = "value.display";
                         break;
                     default:
                         continue;
@@ -277,13 +292,7 @@ class ProconIp extends utils.Adapter {
                 try {
                     yield this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
                         type: "state",
-                        common: {
-                            name: obj.label,
-                            type: typeof obj[field],
-                            role: role,
-                            read: true,
-                            write: false
-                        },
+                        common: common,
                         native: obj,
                     });
                 }
@@ -297,15 +306,30 @@ class ProconIp extends utils.Adapter {
         });
     }
     setRelayDataObject(obj) {
+        const isLight = new RegExp("light|bulb|licht|leucht", "i").test(obj.label);
+        const smartOnOff = {
+            smartName: {
+                de: obj.label,
+                en: obj.label,
+                smartType: isLight ? "LIGHT" : "SWITCH"
+            }
+        };
+        const smartAuto = obj.active ? {
+            smartName: {
+                de: `${obj.label} auto`,
+                en: `${obj.label} auto`,
+                smartType: isLight ? "LIGHT" : "SWITCH"
+            }
+        } : {};
         this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
             type: "state",
             common: {
                 name: obj.label,
                 type: "boolean",
-                role: "switch.auto",
+                role: "switch",
                 read: true,
                 write: true
-            },
+            } + smartAuto,
             native: obj,
         }).then(() => {
             this.log.info(`set auto/manual switch for '${obj.label}'`);
@@ -317,12 +341,10 @@ class ProconIp extends utils.Adapter {
             common: {
                 name: obj.label,
                 type: "boolean",
-                role: "switch.power",
+                role: "switch",
                 read: true,
-                write: !this.getStateService.data.isDosageControl(obj.id),
-                smartName: obj.label,
-                smartType: "SWITCH",
-            },
+                write: !this.getStateService.data.isDosageControl(obj.id)
+            } + smartOnOff,
             native: obj,
         }).then(() => {
             this.log.info(`set onOff switch for '${obj.label}'`);
