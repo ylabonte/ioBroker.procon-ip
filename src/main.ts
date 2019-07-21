@@ -291,14 +291,16 @@ class ProconIp extends utils.Adapter {
             switch (field) {
                 case "value":
                     if (obj.category == GetStateCategory.TEMPERATURES) {
-                        common.smartName = {
-                            de: obj.label,
-                            en: obj.label,
-                            smartType: "THERMOSTAT"
-                        };
+                        common.role = "level.temperature";
+                        common.unit = `°${obj.unit}`;
+                        if (obj.active) {
+                            common.smartName = {
+                                de: obj.label,
+                                en: obj.label,
+                                smartType: "THERMOSTAT"
+                            };
+                        }
                     }
-                    common.role = "level.temperature";
-                    common.unit = `°${obj.unit}`;
                     break;
                 case "id":
                 case "active":
@@ -346,13 +348,13 @@ class ProconIp extends utils.Adapter {
 
     public setRelayDataObject(obj: GetStateDataObject) {
         const isLight: boolean = new RegExp("light|bulb|licht|leucht", "i").test(obj.label);
-        const smartOnOff: any = {
+        const smartOnOff: any = obj.active && !this.getStateService.data.isDosageControl(obj.id) ? {
             smartName: {
                 de: obj.label,
                 en: obj.label,
                 smartType: isLight ? "LIGHT" : "SWITCH"
             }
-        };
+        } : {};
         const smartAuto: any = obj.active ? {
             smartName: {
                 de: `${obj.label} auto`,
