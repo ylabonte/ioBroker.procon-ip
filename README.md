@@ -20,22 +20,22 @@ therefore becomes some kind of 'production ready'. 😉
 
 ## Roadmap
 
-### 0.1.0 (next planned release)
-First *stable* release:
-* Add documentation (basic installation and setup instructions)
-* Remove code residues from the template
-* Optimize Cloud Adapter
-    * Pre-defined smartName attributes for active relays and temperature sensors
-
-### 1.0.0
+### 1.0.0 (next planned release)
 Full featured release:
+* Add documentation (basic installation and setup instructions)
 * Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
-* Add connectivity indication for adapter overview
+* Add proper connectivity indication for adapter overview
 * Add connectivity status in tab view
-* English and German installation and setup documentation
 
 
 ## Changelog
+
+### 0.1.0
+Functional update and minor fixes:
+* Fix object attributes regarding the cloud adapter
+* Optimization for the cloud adapter
+    * Pre-defined `smartName` attributes for active relays and temperature sensors
+    * Recognize relays with 'light', 'licht' or 'leucht' in its name as `smartType` _LIGHT_ 
 
 ### 0.0.4
 Security release:
