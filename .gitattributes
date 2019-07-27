@@ -1,2 +1,1 @@
-build/ linguist-generated
-test/*.js linguist-vendored
+build/** linguist-generated
