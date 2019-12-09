@@ -30,6 +30,10 @@ Full featured release:
 
 ## Changelog
 
+### 0.1.1
+Security update:
+* Update vulnerable eslint-utils
+
 ### 0.1.0
 Functional update and minor fixes:
 * Fix object attributes regarding the cloud adapter

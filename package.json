@@ -1,6 +1,6 @@
 {
   "name": "iobroker.procon-ip",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).",
   "author": {
     "name": "Yannic Labonte",
