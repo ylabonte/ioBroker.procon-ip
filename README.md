@@ -30,6 +30,11 @@ Full featured release:
 
 ## Changelog
 
+### 0.2.0
+Minor update:
+* Update npm dependencies
+* Group admin settings input fields in rows
+
 ### 0.1.1
 Security update:
 * Update vulnerable eslint-utils
