@@ -3,10 +3,11 @@
  * Created with @iobroker/create-adapter v1.15.1
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -20,7 +21,7 @@ const relay_data_interpreter_1 = require("./lib/relay-data-interpreter");
 const get_state_data_1 = require("./lib/get-state-data");
 class ProconIp extends utils.Adapter {
     constructor(options = {}) {
-        super(Object.assign({}, options, { name: "procon-ip" }));
+        super(Object.assign(Object.assign({}, options), { name: "procon-ip" }));
         this._objectsCreated = false;
         this.on("ready", this.onReady.bind(this));
         this.on("unload", this.onUnload.bind(this));
