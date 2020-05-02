@@ -1,102 +1,114 @@
 {
-	"common": {
-		"name": "procon-ip",
-		"version": "0.2.0",
-		"news": {
-			"0.0.1": {
-				"en": "initial release",
-				"de": "Erstveröffentlichung",
-				"ru": "Начальная версия",
-				"pt": "lançamento inicial",
-				"nl": "Eerste uitgave",
-				"fr": "Première version",
-				"it": "Versione iniziale",
-				"es": "Versión inicial",
-				"pl": "Pierwsze wydanie",
-				"zh-cn": "首次出版"
-			}
-		},
-		"title": "ProCon.IP Pool Control",
-		"titleLang": {
-			"en": "ProCon.IP Pool Control",
-			"de": "ProCon.IP Poolsteuerung",
-			"ru": "ProCon.IP управления бассейном",
-			"pt": "ProCon.IP controle de piscina",
-			"nl": "ProCon.IP zwembadregeling",
-			"fr": "ProCon.IP le contrôle de la piscine",
-			"it": "ProCon.IP controllo piscina",
-			"es": "ProCon.IP control de la piscina",
-			"pl": "ProCon.IP sterowanie basenem",
-			"zh-cn": "ProCon.IP 池控制"
-		},
-		"desc": {
-			"en": "Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).",
-			"de": "Adapter zur Basisunterstützung der ProCon.IP-Poolsteuerung. Bestimmt für die Integration mit Ihrem Sprachassistenten (z.B. über den Cloud-Adapter [`cloud`] für Alexa oder Yahka [`yahka`] für Apple HomeKit mit Siri).",
-			"ru": "Адаптер для базовой поддержки управления пулом ProCon.IP. Предназначен для интеграции с вашим голосовым помощником (например, через адаптер «cloud» для Alexa или «yahka» для Apple HomeKit с Siri).",
-			"pt": "Adaptador para suporte básico do controle de conjunto ProCon.IP. Destinado a integração com o seu assistente de voz (por exemplo, através do adaptador `cloud` para Alexa ou `yahka` para o Apple HomeKit com Siri).",
-			"nl": "Adapter voor basisondersteuning van de ProCon.IP-poolregeling. Bestemd voor integratie met je stemassistent (bijvoorbeeld via de `cloud`-adapter voor Alexa of `yahka` voor Apple HomeKit met Siri).",
-			"fr": "Adaptateur pour la prise en charge de base du contrôle de pool ProCon.IP. Destiné à l'intégration avec votre assistant vocal (par exemple via l'adaptateur `cloud` pour Alexa ou `yahka` pour Apple HomeKit avec Siri).",
-			"it": "Adattatore per il supporto di base del controllo del pool ProCon.IP. Destinato all'integrazione con il tuo assistente vocale (ad esempio tramite l'adattatore `cloud` per Alexa o `yahka` per Apple HomeKit con Siri).",
-			"es": "Adaptador para soporte básico del control de grupo ProCon.IP. Diseñado para la integración con su asistente de voz (por ejemplo, mediante el adaptador `cloud` para Alexa o `yahka` para Apple HomeKit con Siri)",
-			"pl": "Adapter do podstawowej obsługi kontroli puli ProCon.IP. Przeznaczony do integracji z asystentem głosowym (np. Przez adapter `cloud` dla Alexa lub `yahka` dla Apple HomeKit z Siri).",
-			"zh-cn": "适用于ProCon.IP池控件的基本支持的适配器。用于与语音助手集成（例如，通过用于Alexa的`cloud`适配器或用于带有Siri的Apple HomeKit的`yahka`）。"
-		},
-		"authors": [
-			"Yannic Labonte <yannic.labonte@gmail.com>"
-		],
-		"keywords": [
-			"ioBroker",
-			"ProCon.IP",
-			"pool control",
-			"pool-digital",
-			"pool controller",
-			"home automation",
-			"Smart Home"
-		],
-		"license": "MIT",
-		"platform": "Javascript/Node.js",
-		"main": "build/main.js",
-		"icon": "iobroker-procon-ip.png",
-		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/iobroker-procon-ip.png",
-		"readme": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/README.md",
-		"loglevel": "info",
-		"mode": "daemon",
-		"type": "household",
-		"compact": true,
-		"materialize": true,
-		"materializeTab": true,
-		"adminTab": {
-			"singleton": true,
-			"name": {
-				"en": "ProCon.IP Pool Controller",
-				"de": "ProCon.IP Poolsteuerung",
-				"ru": "ProCon.IP управления бассейном",
-				"pt": "ProCon.IP controle de piscina",
-				"nl": "ProCon.IP zwembadregeling",
-				"fr": "ProCon.IP le contrôle de la piscine",
-				"it": "ProCon.IP controllo piscina",
-				"es": "ProCon.IP control de la piscina",
-				"pl": "ProCon.IP sterowanie basenem",
-				"zh-cn": "ProCon.IP 池控制"
-			},
-			"link": "",
-			"fa-icon": "info"
-		},
-		"supportCustoms": true,
-		"dependencies": [
-			{
-				"js-controller": ">=1.4.2"
-			}
-		]
-	},
-	"native": {
-		"controllerUrl": "",
-		"basicAuth": true,
-		"username": "admin",
-		"password": "admin",
-		"updateInterval": 3000
-	},
-	"objects": [],
-	"instanceObjects": []
+    "common": {
+        "name": "procon-ip",
+        "version": "0.3.0",
+        "news": {
+            "0.2.0": {
+                "en": "news",
+                "de": "neues",
+                "ru": "новое",
+                "pt": "novidades",
+                "nl": "nieuws",
+                "fr": "nouvelles",
+                "it": "notizie",
+                "es": "noticias",
+                "pl": "nowości",
+                "zh-cn": "新"
+            },
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "ProCon.IP Pool Control",
+        "titleLang": {
+            "en": "ProCon.IP Pool Control",
+            "de": "ProCon.IP Poolsteuerung",
+            "ru": "ProCon.IP управления бассейном",
+            "pt": "ProCon.IP controle de piscina",
+            "nl": "ProCon.IP zwembadregeling",
+            "fr": "ProCon.IP le contrôle de la piscine",
+            "it": "ProCon.IP controllo piscina",
+            "es": "ProCon.IP control de la piscina",
+            "pl": "ProCon.IP sterowanie basenem",
+            "zh-cn": "ProCon.IP 池控制"
+        },
+        "desc": {
+            "en": "Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).",
+            "de": "Adapter zur Basisunterstützung der ProCon.IP-Poolsteuerung. Bestimmt für die Integration mit Ihrem Sprachassistenten (z.B. über den Cloud-Adapter [`cloud`] für Alexa oder Yahka [`yahka`] für Apple HomeKit mit Siri).",
+            "ru": "Адаптер для базовой поддержки управления пулом ProCon.IP. Предназначен для интеграции с вашим голосовым помощником (например, через адаптер «cloud» для Alexa или «yahka» для Apple HomeKit с Siri).",
+            "pt": "Adaptador para suporte básico do controle de conjunto ProCon.IP. Destinado a integração com o seu assistente de voz (por exemplo, através do adaptador `cloud` para Alexa ou `yahka` para o Apple HomeKit com Siri).",
+            "nl": "Adapter voor basisondersteuning van de ProCon.IP-poolregeling. Bestemd voor integratie met je stemassistent (bijvoorbeeld via de `cloud`-adapter voor Alexa of `yahka` voor Apple HomeKit met Siri).",
+            "fr": "Adaptateur pour la prise en charge de base du contrôle de pool ProCon.IP. Destiné à l'intégration avec votre assistant vocal (par exemple via l'adaptateur `cloud` pour Alexa ou `yahka` pour Apple HomeKit avec Siri).",
+            "it": "Adattatore per il supporto di base del controllo del pool ProCon.IP. Destinato all'integrazione con il tuo assistente vocale (ad esempio tramite l'adattatore `cloud` per Alexa o `yahka` per Apple HomeKit con Siri).",
+            "es": "Adaptador para soporte básico del control de grupo ProCon.IP. Diseñado para la integración con su asistente de voz (por ejemplo, mediante el adaptador `cloud` para Alexa o `yahka` para Apple HomeKit con Siri)",
+            "pl": "Adapter do podstawowej obsługi kontroli puli ProCon.IP. Przeznaczony do integracji z asystentem głosowym (np. Przez adapter `cloud` dla Alexa lub `yahka` dla Apple HomeKit z Siri).",
+            "zh-cn": "适用于ProCon.IP池控件的基本支持的适配器。用于与语音助手集成（例如，通过用于Alexa的`cloud`适配器或用于带有Siri的Apple HomeKit的`yahka`）。"
+        },
+        "authors": [
+            "Yannic Labonte <yannic.labonte@gmail.com>"
+        ],
+        "keywords": [
+            "ioBroker",
+            "ProCon.IP",
+            "pool control",
+            "pool-digital",
+            "pool controller",
+            "home automation",
+            "Smart Home"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "build/main.js",
+        "icon": "iobroker-procon-ip.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/iobroker-procon-ip.png",
+        "readme": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "household",
+        "compact": true,
+        "materialize": true,
+        "materializeTab": true,
+        "adminTab": {
+            "singleton": true,
+            "name": {
+                "en": "ProCon.IP Pool Controller",
+                "de": "ProCon.IP Poolsteuerung",
+                "ru": "ProCon.IP управления бассейном",
+                "pt": "ProCon.IP controle de piscina",
+                "nl": "ProCon.IP zwembadregeling",
+                "fr": "ProCon.IP le contrôle de la piscine",
+                "it": "ProCon.IP controllo piscina",
+                "es": "ProCon.IP control de la piscina",
+                "pl": "ProCon.IP sterowanie basenem",
+                "zh-cn": "ProCon.IP 池控制"
+            },
+            "link": "",
+            "fa-icon": "info"
+        },
+        "supportCustoms": true,
+        "dependencies": [
+            {
+                "js-controller": ">=1.4.2"
+            }
+        ]
+    },
+    "native": {
+        "controllerUrl": "",
+        "basicAuth": true,
+        "username": "admin",
+        "password": "admin",
+        "updateInterval": 3000
+    },
+    "objects": [],
+    "instanceObjects": []
 }
