@@ -34,16 +34,16 @@ declare global {
     }
 }
 
-class ProconIp extends utils.Adapter {
+export class ProconIp extends utils.Adapter {
 
     private relayDataInterpreter!: RelayDataInterpreter;
     private getStateService!: GetStateService;
     private usrcfgCgiService!: UsrcfgCgiService;
     private forceUpdate: number[];
-    private _objectsCreated: boolean = false;
     private _stateData: GetStateData;
+    private _objectsCreated = false;
 
-    public constructor(options: Partial<ioBroker.AdapterOptions> = {}) {
+    public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
             name: "procon-ip",
@@ -67,11 +67,11 @@ class ProconIp extends utils.Adapter {
         // this.config:
         this.log.info("config controllerUrl: " + this.config.controllerUrl);
         this.log.info("config basicAuth: " + this.config.basicAuth);
-        this.log.info("config username: " + this.config.username);
+        // this.log.info("config username: " + this.config.username);
         this.log.info("config updateInterval: " + this.config.updateInterval);
 
         this.relayDataInterpreter = new RelayDataInterpreter(this.log);
-        this.getStateService = new GetStateService(this.config, this.log);
+        this.getStateService = new GetStateService(this);
         this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
 
         this.log.info(`GetStateService url: ${this.getStateService.url}`);
@@ -114,6 +114,8 @@ class ProconIp extends utils.Adapter {
 
         this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
         this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+        this.setState("info.connection", true, true);
+        this.setState("info.Info.alive", true, true);
     }
 
     /**
@@ -122,6 +124,8 @@ class ProconIp extends utils.Adapter {
     private onUnload(callback: () => void): void {
         try {
             this.log.info("cleaned everything up...");
+            this.setState("info.connection", false, true);
+            this.setState("info.Info.alive", false, true);
             callback();
         } catch (e) {
             callback();
@@ -417,7 +421,7 @@ class ProconIp extends utils.Adapter {
 
 if (module.parent) {
     // Export the constructor in compact mode
-    module.exports = (options: Partial<ioBroker.AdapterOptions> | undefined) => new ProconIp(options);
+    module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new ProconIp(options);
 } else {
     // otherwise start the instance directly
     (() => new ProconIp())();

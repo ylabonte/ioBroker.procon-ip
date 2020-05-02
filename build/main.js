@@ -41,10 +41,10 @@ class ProconIp extends utils.Adapter {
             // this.config:
             this.log.info("config controllerUrl: " + this.config.controllerUrl);
             this.log.info("config basicAuth: " + this.config.basicAuth);
-            this.log.info("config username: " + this.config.username);
+            // this.log.info("config username: " + this.config.username);
             this.log.info("config updateInterval: " + this.config.updateInterval);
             this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter(this.log);
-            this.getStateService = new get_state_service_1.GetStateService(this.config, this.log);
+            this.getStateService = new get_state_service_1.GetStateService(this);
             this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
             this.log.info(`GetStateService url: ${this.getStateService.url}`);
             this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
@@ -81,6 +81,8 @@ class ProconIp extends utils.Adapter {
             });
             this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
             this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+            this.setState("info.connection", true, true);
+            this.setState("info.Info.alive", true, true);
         });
     }
     /**
@@ -89,6 +91,8 @@ class ProconIp extends utils.Adapter {
     onUnload(callback) {
         try {
             this.log.info("cleaned everything up...");
+            this.setState("info.connection", false, true);
+            this.setState("info.Info.alive", false, true);
             callback();
         }
         catch (e) {
@@ -372,6 +376,7 @@ class ProconIp extends utils.Adapter {
         });
     }
 }
+exports.ProconIp = ProconIp;
 if (module.parent) {
     // Export the constructor in compact mode
     module.exports = (options) => new ProconIp(options);

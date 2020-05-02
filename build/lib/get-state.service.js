@@ -4,15 +4,16 @@ const axios_1 = require("axios");
 const abstract_service_1 = require("./abstract-service");
 const get_state_data_1 = require("./get-state-data");
 class GetStateService extends abstract_service_1.AbstractService {
-    constructor(config, logger) {
-        super(config, logger);
+    constructor(adapter) {
+        super(adapter.config, adapter.log);
         this._endpoint = "/GetState.csv";
         this._method = "get";
         this._hasData = false;
         this.data = new get_state_data_1.GetStateData();
-        this._updateInterval = config.updateInterval;
+        this._adapter = adapter;
+        this._updateInterval = adapter.config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
-        this._updateCallback = () => { };
+        this._updateCallback = () => { return; };
     }
     getUpdateInterval() {
         return this._updateInterval;
@@ -29,23 +30,28 @@ class GetStateService extends abstract_service_1.AbstractService {
     }
     stop() {
         clearTimeout(this.next);
-        this.next = undefined;
+        delete this.next;
+        delete this._updateCallback;
     }
     autoUpdate() {
         this.update();
         if (this.next === undefined) {
             this.next = Number(setTimeout(() => {
-                this.next = undefined;
+                delete this.next;
                 this.autoUpdate();
             }, this.getUpdateInterval()));
         }
     }
     update() {
         this.getData().then((response) => {
+            this._adapter.setState("info.connection", true, true);
             this.data.parseCsv(response.data);
             this._hasData = true;
-            this._updateCallback(this.data);
+            if (this._updateCallback !== undefined) {
+                this._updateCallback(this.data);
+            }
         }, (e) => {
+            this._adapter.setState("info.connection", false, true);
             this._hasData = false;
             this.log.error(e);
         });

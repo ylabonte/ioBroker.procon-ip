@@ -1,6 +1,8 @@
+import * as utils from "@iobroker/adapter-core";
 import axios, {AxiosPromise, Method} from "axios";
 import {AbstractService, IServiceConfig} from "./abstract-service";
 import {GetStateData} from "./get-state-data";
+import { ProconIp } from "../main";
 
 export interface IGetStateServiceConfig extends IServiceConfig {
     baseUrl: string;
@@ -17,6 +19,8 @@ export class GetStateService extends AbstractService {
 
     public data: GetStateData;
 
+    private _adapter: utils.AdapterInstance;
+
     private _hasData = false;
 
     private next: number|undefined;
@@ -25,12 +29,13 @@ export class GetStateService extends AbstractService {
 
     private _updateCallback: (data: GetStateData) => any;
 
-    public constructor(config: ioBroker.AdapterConfig, logger: ioBroker.Logger) {
-        super(config, logger);
+    public constructor(adapter: ProconIp) {
+        super(adapter.config, adapter.log);
         this.data = new GetStateData();
-        this._updateInterval = config.updateInterval;
+        this._adapter = adapter;
+        this._updateInterval = adapter.config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
-        this._updateCallback = () => {};
+        this._updateCallback = () => { return; };
     }
 
     public getUpdateInterval(): number {
@@ -52,14 +57,15 @@ export class GetStateService extends AbstractService {
 
     public stop() {
         clearTimeout(this.next);
-        this.next = undefined;
+        delete this.next;
+        delete this._updateCallback;
     }
 
     public autoUpdate() {
         this.update();
         if (this.next === undefined) {
             this.next = Number(setTimeout(() => {
-                this.next = undefined;
+                delete this.next;
                 this.autoUpdate();
             }, this.getUpdateInterval()));
         }
@@ -67,11 +73,15 @@ export class GetStateService extends AbstractService {
 
     public update() {
         this.getData().then((response) => {
+            this._adapter.setState("info.connection", true, true);
             this.data.parseCsv(response.data);
             this._hasData = true;
-            this._updateCallback(this.data);
+            if (this._updateCallback !== undefined) {
+                this._updateCallback(this.data);
+            }
         },
         (e) => {
+            this._adapter.setState("info.connection", false, true);
             this._hasData = false;
             this.log.error(e);
         });
