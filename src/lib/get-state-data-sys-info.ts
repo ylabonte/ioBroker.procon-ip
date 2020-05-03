@@ -20,7 +20,7 @@ export class GetStateDataSysInfo {
         }
     }
 
-    public setValuesFromArray(data: string[][]) {
+    public setValuesFromArray(data: string[][]): void {
         this.version = data[0][1];
         this.uptime = Number(data[0][2]);
         this.resetRootCause = Number(data[0][3]);

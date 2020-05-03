@@ -42,7 +42,7 @@ export class GetStateService extends AbstractService {
         return this._updateInterval;
     }
 
-    public setUpdateInterval(milliseconds: number) {
+    public setUpdateInterval(milliseconds: number): void {
         this._updateInterval = milliseconds;
     }
 
@@ -50,18 +50,18 @@ export class GetStateService extends AbstractService {
         return typeof this.next === "number";
     }
 
-    public start(callable: (data: GetStateData) => any) {
+    public start(callable: (data: GetStateData) => any): void {
         this._updateCallback = callable;
         this.autoUpdate();
     }
 
-    public stop() {
+    public stop(): void {
         clearTimeout(this.next);
         delete this.next;
         delete this._updateCallback;
     }
 
-    public autoUpdate() {
+    public autoUpdate(): void {
         this.update();
         if (this.next === undefined) {
             this.next = Number(setTimeout(() => {
@@ -71,7 +71,7 @@ export class GetStateService extends AbstractService {
         }
     }
 
-    public update() {
+    public update(): void {
         this.getData().then((response) => {
             this._adapter.setState("info.connection", true, true);
             this.data.parseCsv(response.data);

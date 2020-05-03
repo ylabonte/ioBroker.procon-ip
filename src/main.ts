@@ -176,7 +176,7 @@ export class ProconIp extends utils.Adapter {
         }
     }
 
-    public async relayToggleAuto(objectId: string, state: ioBroker.State) {
+    public async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<void> {
         const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, ".onOff"));
         if (!onOffState) {
             throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
@@ -201,7 +201,7 @@ export class ProconIp extends utils.Adapter {
         }
     }
 
-    public async relayToggleOnOff(objectId: string, state: ioBroker.State) {
+    public async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {
         const obj = await this.getObjectAsync(objectId);
         this.log.info("got object");
         if (!obj) {
@@ -238,7 +238,7 @@ export class ProconIp extends utils.Adapter {
     /**
      * Set/update system information
      */
-    public setSysInfo(data: GetStateDataSysInfo) {
+    public setSysInfo(data: GetStateDataSysInfo): void {
         this.log.info(JSON.stringify(data.toArrayOfObjects()));
         data.toArrayOfObjects().forEach((sysInfo) => {
             this.setObjectAsync(`${this.name}.${this.instance}.${sysInfo.key}`, {
@@ -263,7 +263,7 @@ export class ProconIp extends utils.Adapter {
      * Set/update objects (not their states!)
      * @param data
      */
-    public setObjects(objects: GetStateDataObject[]) {
+    public setObjects(objects: GetStateDataObject[]): void {
         objects.forEach((obj) => {
             this.setDataObject(obj).catch((e) => {
                 this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
@@ -271,7 +271,7 @@ export class ProconIp extends utils.Adapter {
         });
     }
 
-    public async setDataObject(obj: GetStateDataObject) {
+    public async setDataObject(obj: GetStateDataObject): Promise<void> {
         // await this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
         //     type: "group",
         //     common: {
@@ -350,7 +350,7 @@ export class ProconIp extends utils.Adapter {
         }
     }
 
-    public setRelayDataObject(obj: GetStateDataObject) {
+    public setRelayDataObject(obj: GetStateDataObject): void {
         const isLight: boolean = new RegExp("light|bulb|licht|leucht", "i").test(obj.label);
         const commonAuto: any = {
             name: obj.label,
@@ -397,7 +397,7 @@ export class ProconIp extends utils.Adapter {
         });
     }
 
-    public setDataState(obj: GetStateDataObject) {
+    public setDataState(obj: GetStateDataObject): void {
         for (const field of Object.keys(obj)) {
             this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, obj[field], true).catch((e) => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
@@ -409,7 +409,7 @@ export class ProconIp extends utils.Adapter {
         }
     }
 
-    public setRelayDataState(obj: GetStateDataObject) {
+    public setRelayDataState(obj: GetStateDataObject): void {
         this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, this.relayDataInterpreter.isAuto(obj), true).catch((e) => {
             this.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
         });

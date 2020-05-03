@@ -106,15 +106,15 @@ export class GetStateData {
     }
 
     public getChlorineDosageControlId(): number {
-        return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.chlorineDosageRelais);
+        return Math.min(...this.categories.relays) + Number(this.sysInfo.chlorineDosageRelais);
     }
 
     public getPhMinusDosageControlId(): number {
-        return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.phMinusDosageRelais);
+        return Math.min(...this.categories.relays) + Number(this.sysInfo.phMinusDosageRelais);
     }
 
     public getPhPlusDosageControlId(): number {
-        return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.phPlusDosageRelais);
+        return Math.min(...this.categories.relays) + Number(this.sysInfo.phPlusDosageRelais);
     }
 
     public getChlorineDosageControl(): RelayDataObject {

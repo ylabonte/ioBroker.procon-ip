@@ -17,7 +17,7 @@ export class GetStateDataObject {
         this.set(index, name, unit, offset, gain, measure);
     }
 
-    public set(index: number, name: string, unit: string, offset: string, gain: string, measure: string) {
+    public set(index: number, name: string, unit: string, offset: string, gain: string, measure: string): void {
         // Set basic object values.
         this.id = index;
         this.label = name;
@@ -53,7 +53,7 @@ export class GetStateDataObject {
         }
     }
 
-    public forFields(callback: (field: string) => any) {
+    public forFields(callback: (field: string) => any): void {
         Object.keys(this).forEach(callback);
     }
 }
