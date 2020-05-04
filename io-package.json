@@ -146,7 +146,7 @@
         "readme": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/README.md",
         "loglevel": "info",
         "mode": "daemon",
-        "type": "household",
+        "type": "iot-systems",
         "connectionType": "local",
         "compact": true,
         "materialize": true,
