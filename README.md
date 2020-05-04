@@ -34,20 +34,20 @@ For now the adapter has been tested and developed in combination with the ProCon
 
 ## Roadmap
 
-### 1.0.0 (next planned release)
-Full featured release:
-* Add documentation (basic installation and setup instructions)
-* Show sys info in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
-* Add proper connectivity indication for adapter overview
-* Add connectivity status in tab view
+### 1.0.0
+A full featured release:
+* Add documentation (make the github wiki useful/helpful)
+* Show connection status including last refresh timestamp and sys info of the ProCon.IP in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
+* Automated tests regarding the functionality of the adapter (eg. unit tests)
 
 
 ## Changelog
 
 ### 0.3.0
-Security and functional update:
+Functional and security update:
 * Update dependencies including some reported as vulnerable
 * Add connection status indication for iobroker's instance tab
+* Add form validation for the configuration settings
 
 ### 0.2.0
 Minor update:
@@ -66,7 +66,7 @@ Functional update and minor fixes:
     * Recognize relays with 'light', 'licht' or 'leucht' in its name as `smartType` _LIGHT_ 
 
 ### 0.0.4
-Security release:
+Security update:
 * Update `lodash` (pinning version `4.17.14`)
 * Update other indirect and direct dependencies
 
