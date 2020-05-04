@@ -74,13 +74,13 @@ class GetStateData {
         return this.getDataObjects(this.categories[category], activeOnly);
     }
     getChlorineDosageControlId() {
-        return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.chlorineDosageRelais);
+        return Math.min(...this.categories.relays) + Number(this.sysInfo.chlorineDosageRelais);
     }
     getPhMinusDosageControlId() {
-        return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.phMinusDosageRelais);
+        return Math.min(...this.categories.relays) + Number(this.sysInfo.phMinusDosageRelais);
     }
     getPhPlusDosageControlId() {
-        return Math.min.apply(Math, this.categories.relays) + Number(this.sysInfo.phPlusDosageRelais);
+        return Math.min(...this.categories.relays) + Number(this.sysInfo.phPlusDosageRelais);
     }
     getChlorineDosageControl() {
         return new relay_data_object_1.RelayDataObject(this.getDataObject(this.getChlorineDosageControlId()));
