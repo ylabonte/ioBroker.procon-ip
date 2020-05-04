@@ -44,10 +44,10 @@
 						throw messages[id]['pattern'];
 					}
 				}
-				if ($(field).attr('min') && messages[id]['min'] && value >= $(field).attr('min')) {
+				if ($(field).attr('min') && messages[id]['min'] && parseInt(value) < $(field).attr('min')) {
 					throw messages[id]['min'];
 				}
-				if ($(field).attr('max') && messages[id]['max'] && value <= $(field).attr('max')) {
+				if ($(field).attr('max') && messages[id]['max'] && parseInt(value) > $(field).attr('max')) {
 					throw messages[id]['max'];
 				}
 			}
@@ -87,7 +87,7 @@
 				}
 				if (M) M.updateTextFields();
 			};
-			$('.value').on('change', doValidate).on('keyup', doValidate);
+			$('.value').on('change', doValidate).on('keyup', doValidate).trigger('change');
 		}
 		
 		// This will be called by the admin adapter when the user presses the save button
