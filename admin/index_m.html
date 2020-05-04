@@ -18,6 +18,41 @@
 	<script type="text/javascript" src="words.js"></script>
 
 	<script type="text/javascript">
+		// Validate an input field
+		function validate(field) {
+			const id = $(field).attr('id');
+			const messages = {
+				controllerUrl: {
+					required: _('Please enter a valid url including the \'http\' or \'https\'.'),
+					pattern: _('The url you have entered does not start with \'http://\' or \'https://\''),
+				},
+				updateInterval: {
+					required: _('Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).'),
+					min: _('Please keep the value above 100(ms).'),
+					max: _('Please choose a value smaller than 86400000(ms = 24h).'),
+				},
+			};
+
+			if (id in messages) {
+				const value = $(field).val();
+				if ($(field).attr('required') && messages[id]['required'] && !value) {
+					throw messages[id]['required'];
+				}
+				if ($(field).attr('pattern') && messages[id]['pattern']) {
+					const pattern = new RegExp($(field).attr('pattern'), 'i');
+					if (!pattern.test(value)) {
+						throw messages[id]['pattern'];
+					}
+				}
+				if ($(field).attr('min') && messages[id]['min'] && value >= $(field).attr('min')) {
+					throw messages[id]['min'];
+				}
+				if ($(field).attr('max') && messages[id]['max'] && value <= $(field).attr('max')) {
+					throw messages[id]['max'];
+				}
+			}
+		}
+
 		// This will be called by the admin adapter when the settings page loads
 		function load(settings, onChange) {
 			// example: select elements with id=key and class=value and insert value
@@ -28,34 +63,58 @@
 				if ($key.attr('type') === 'checkbox') {
 					// do not call onChange direct, because onChange could expect some arguments
 					$key.prop('checked', settings[id])
-						.on('change', () => onChange())
-						;
+					.on('change', () => onChange())
+					;
 				} else {
 					// do not call onChange direct, because onChange could expect some arguments
 					$key.val(settings[id])
-						.on('change', () => onChange())
-						.on('keyup', () => onChange())
-						;
+					.on('change', () => onChange())
+					.on('keyup', () => onChange())
+					;
 				}
 			});
 			onChange(false);
 			// reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
 			if (M) M.updateTextFields();
+			
+			const doValidate = (x) => {
+				const field = x.target;
+				try {
+					validate(field);
+					$(field).removeClass('invalid').siblings('span.helper-text').attr('data-error', '');
+				} catch (e) {
+					$(field).addClass('invalid').siblings('span.helper-text').attr('data-error', e);
+				}
+				if (M) M.updateTextFields();
+			};
+			$('.value').on('change', doValidate).on('keyup', doValidate);
 		}
-
+		
 		// This will be called by the admin adapter when the user presses the save button
 		function save(callback) {
-			// example: select elements with class=value and build settings object
-			var obj = {};
+			const obj = {};
+			let doSave = true;
 			$('.value').each(function () {
-				var $this = $(this);
-				if ($this.attr('type') === 'checkbox') {
-					obj[$this.attr('id')] = $this.prop('checked');
-				} else {
-					obj[$this.attr('id')] = $this.val();
+				try {
+					validate(this);
+					$(this).removeClass('invalid').siblings('span.helper-text').attr('data-error', '');
+					const $this = $(this);
+					if ($this.attr('type') === 'checkbox') {
+						obj[$this.attr('id')] = $this.prop('checked');
+					} else {
+						obj[$this.attr('id')] = $this.val();
+					}
+				} catch (e) {
+					$(this).addClass('invalid').siblings('span.helper-text').attr('data-error', e);
+					doSave = false;
 				}
 			});
-			callback(obj);
+
+			M.updateTextFields();
+
+			if (doSave) {
+				callback(obj);
+			}
 		}
 	</script>
 
@@ -73,8 +132,12 @@
 
 		<div class="row">
 			<div class="col s6 input-field">
-				<input type="text" class="value" id="controllerUrl" placeholder="http://<ProCon.IP address>">
+				<input type="url" class="value" id="controllerUrl" 
+					placeholder="http://&lt;ProCon.IP address&gt;"
+					pattern="^https?://.+"
+					required>
 				<label for="controllerUrl" class="translate">Controller Base-URL</label>
+				<span data-error="wrong" class="helper-text translate">Please enter a valid url including the 'http' or 'https'.</span>
 			</div>
 
 			<div class="col s6 input-field">
@@ -97,8 +160,11 @@
 
 		<div class="row">
 			<div class="col s6 input-field">
-				<input type="number" class="value" id="updateInterval" data-default="3000">
+				<input type="number" class="value" id="updateInterval" data-default="3000"
+					   min="100" max="86400000"
+					   required>
 				<label for="updateInterval" class="translate">Update interval (ms)</label>
+				<span class="helper-text translate">Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).</span>
 			</div>
 		</div>
 

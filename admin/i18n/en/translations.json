@@ -1,7 +1,12 @@
 {
     "Controller Base-URL": "Controller Base-URL",
-    "Use basic auth": "Use basic auth",
-    "Username": "Username",
     "Password": "Password",
-    "Update interval (ms)": "Update interval (ms)"
+    "Please choose a value smaller than 86400000(ms = 24h).": "Please choose a value smaller than 86400000(ms = 24h).",
+    "Please enter a valid url including the 'http' or 'https'.": "Please enter a valid url including the 'http' or 'https'.",
+    "Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).": "Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).",
+    "Please keep the value above 100(ms).": "Please keep the value above 100(ms).",
+    "The url you have entered does not start with 'http://' or 'https://'": "The url you have entered does not start with 'http://' or 'https://'",
+    "Update interval (ms)": "Update interval (ms)",
+    "Use basic auth": "Use basic auth",
+    "Username": "Username"
 }

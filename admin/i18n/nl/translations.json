@@ -1,7 +1,12 @@
 {
     "Controller Base-URL": "Controller Base-URL",
-    "Use basic auth": "Use basic auth",
-    "Username": "Username",
     "Password": "Password",
-    "Update interval (ms)": "Update interval (ms)"
+    "Please choose a value smaller than 86400000(ms = 24h).": "Kies een waarde kleiner dan 86400000 (ms = 24 uur).",
+    "Please enter a valid url including the 'http' or 'https'.": "Voer een geldige URL in, inclusief 'http' of 'https'.",
+    "Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).": "Houd het redelijk aannemelijk en blijf tussen 100 (ms) en 86400000 (ms = 24u).",
+    "Please keep the value above 100(ms).": "Houd de waarde boven 100 (ms).",
+    "The url you have entered does not start with 'http://' or 'https://'": "De url die je hebt ingevoerd begint niet met 'http: //' of 'https: //'",
+    "Update interval (ms)": "Update interval (ms)",
+    "Use basic auth": "Use basic auth",
+    "Username": "Username"
 }

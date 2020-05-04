@@ -1,7 +1,12 @@
 {
     "Controller Base-URL": "Controller Base-URL",
-    "Use basic auth": "Use basic auth",
-    "Username": "Username",
     "Password": "Password",
-    "Update interval (ms)": "Update interval (ms)"
+    "Please choose a value smaller than 86400000(ms = 24h).": "请选择小于86400000（ms = 24h）的值。",
+    "Please enter a valid url including the 'http' or 'https'.": "请输入有效的网址，包括“ http”或“ https”。",
+    "Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).": "请使其合理合理，并保持在100（ms）到86400000（ms = 24h）之间。",
+    "Please keep the value above 100(ms).": "请将该值保持在100（ms）以上。",
+    "The url you have entered does not start with 'http://' or 'https://'": "您输入的网址不是以“ http：//”或“ https：//”开头",
+    "Update interval (ms)": "Update interval (ms)",
+    "Use basic auth": "Use basic auth",
+    "Username": "Username"
 }

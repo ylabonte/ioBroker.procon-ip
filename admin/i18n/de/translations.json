@@ -1,7 +1,12 @@
 {
     "Controller Base-URL": "URL der Poolsteuerung",
-    "Use basic auth": "Authentifizierung benutzen (HTTP Basic Auth)",
-    "Username": "Benutzername",
     "Password": "Passwort",
-    "Update interval (ms)": "Update-Interval (ms)"
+    "Please choose a value smaller than 86400000(ms = 24h).": "Bitte wählen Sie einen Wert kleiner als 86400000 (ms = 24h).",
+    "Please enter a valid url including the 'http' or 'https'.": "Bitte geben Sie eine gültige URL ein, einschließlich \"http\" oder \"https\".",
+    "Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).": "Bitte halten Sie es einigermaßen plausibel und bleiben Sie zwischen 100 (ms) und 86400000 (ms = 24h).",
+    "Please keep the value above 100(ms).": "Bitte halten Sie den Wert über 100 (ms).",
+    "The url you have entered does not start with 'http://' or 'https://'": "Die von Ihnen eingegebene URL beginnt nicht mit \"http: //\" oder \"https: //\".",
+    "Update interval (ms)": "Update-Interval (ms)",
+    "Use basic auth": "Authentifizierung benutzen (HTTP Basic Auth)",
+    "Username": "Benutzername"
 }
