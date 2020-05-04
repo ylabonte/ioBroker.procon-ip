@@ -24,6 +24,8 @@ For more information see the following link (sorry it's only in german; haven't 
 * [pooldigital.de webshop](https://www.pooldigital.de/shop/poolsteuerungen/procon.ip/35/procon.ip-webbasierte-poolsteuerung-/-dosieranlage)
 * [pooldigital.de forum](http://forum.pooldigital.de/)
 
+**Just to be clear: I have nothing to do with the development, sellings, marketing or support of the pool control unit. I just developed a solution to integrate such with ioBroker to make my parent's home a bit smarter.**
+
 
 ### Details on the adapter
 The adapter uses the `/GetState.csv` API of the ProCon.IP to poll its values and another - not documented - API, that operates with bitwise commands to switch the relays. The second one is also used by the original web interfaces of the ProCon.IP. So there might be future firmware upgrades, that brake compatibilty with this adapter or at least it functionality of switching the relays. 
