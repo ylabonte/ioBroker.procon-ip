@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "0.3.0",
+        "version": "0.3.1",
         "news": {
-            "0.3.0":  {
+            "0.3.1":  {
                 "en": "Functional update with security aspects. See README.md for details.",
                 "de": "Funktionsaktualisierung mit Sicherheitsaspekten. Siehe README.md für Details.",
                 "ru": "Функциональное обновление с аспектами безопасности. Смотрите README.md для подробностей.",

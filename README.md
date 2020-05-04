@@ -45,7 +45,7 @@ A full featured release:
 
 ## Changelog
 
-### 0.3.0
+### 0.3.1
 Functional and security update:
 * Update dependencies including some reported as vulnerable
 * Add connection status indication for iobroker's instance tab
