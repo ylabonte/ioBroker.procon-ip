@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "0.3.1",
+        "version": "0.4.0",
         "news": {
+            "0.4.0": {
+                "en": "This release adds encryption to the ProCon.ip credentials, that are stored in ioBroker. It also should improve the http request/connection exception handling.",
+                "de": "Diese Version fügt den ProCon.ip-Anmeldeinformationen, die in ioBroker gespeichert sind, eine Verschlüsselung hinzu. Es sollte auch die Behandlung von http-Anforderungs- / Verbindungsausnahmen verbessern.",
+                "ru": "Этот выпуск добавляет шифрование к учетным данным ProCon.ip, которые хранятся в ioBroker. Это также должно улучшить обработку исключений http-запросов / соединений.",
+                "pt": "Esta versão adiciona criptografia às credenciais do ProCon.ip, armazenadas no ioBroker. Também deve melhorar o tratamento de exceções de solicitação / conexão http.",
+                "nl": "Deze release voegt encryptie toe aan de inloggegevens van ProCon.ip, die zijn opgeslagen in ioBroker. Het zou ook de afhandeling van uitzonderingen voor http-verzoeken / verbindingen moeten verbeteren.",
+                "fr": "Cette version ajoute un chiffrement aux informations d'identification ProCon.ip, qui sont stockées dans ioBroker. Il devrait également améliorer la gestion des exceptions de requête / connexion http.",
+                "it": "Questa versione aggiunge la crittografia alle credenziali ProCon.ip, che sono archiviate in ioBroker. Dovrebbe inoltre migliorare la gestione delle eccezioni di richiesta / connessione http.",
+                "es": "Esta versión agrega cifrado a las credenciales ProCon.ip, que se almacenan en ioBroker. También debería mejorar el manejo de excepciones de solicitud / conexión http.",
+                "pl": "Ta wersja dodaje szyfrowanie do poświadczeń ProCon.ip, które są przechowywane w ioBroker. Powinno to również poprawić obsługę żądań / wyjątków połączeń HTTP.",
+                "zh-cn": "此版本将加密添加到ProCon.ip凭据中，该凭据存储在ioBroker中。它还应该改善http请求/连接异常处理。"
+            },
             "0.3.1":  {
                 "en": "Functional update with security aspects. See README.md for details.",
                 "de": "Funktionsaktualisierung mit Sicherheitsaspekten. Siehe README.md für Details.",
