@@ -1,6 +1,6 @@
 {
   "name": "iobroker.procon-ip",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).",
   "author": {
     "name": "Yannic Labonte",
@@ -25,34 +25,35 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.2.1",
-    "axios": "^0.19.2"
+    "@iobroker/adapter-core": "^2.3.1",
+    "axios": "^0.19.2",
+    "crypto-js": "^4.0.0"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.2.0",
-    "@types/chai": "^4.2.8",
+    "@types/chai": "^4.2.11",
     "@types/chai-as-promised": "^7.1.2",
     "@types/gulp": "^4.0.6",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^13.13.2",
+    "@types/node": "^12.12.37",
     "@types/proxyquire": "^1.3.28",
     "@types/sinon": "^9.0.0",
-    "@types/sinon-chai": "^3.2.3",
+    "@types/sinon-chai": "^3.2.4",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^6.8.0",
     "gulp": "^4.0.2",
-    "mocha": "^7.1.1",
+    "mocha": "^7.1.2",
     "nyc": "^15.0.1",
     "proxyquire": "^2.1.3",
     "rimraf": "^3.0.2",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.4.0",
     "source-map-support": "^0.5.16",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.7.5"
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3"
   },
   "main": "build/main.js",
   "scripts": {
