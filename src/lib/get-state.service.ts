@@ -83,7 +83,7 @@ export class GetStateService extends AbstractService {
         (e) => {
             this._adapter.setState("info.connection", false, true);
             this._hasData = false;
-            this.log.error(e);
+            this.log.error(e.response);
         });
     }
 

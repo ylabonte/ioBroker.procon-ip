@@ -189,15 +189,19 @@ export class ProconIp extends utils.Adapter {
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
         this.forceUpdate.push(getStateDataObject.id);
-        if (!!state.val) {
-            this.log.info(`Switching ${obj.native.label}: auto mode`);
-            await this.usrcfgCgiService.setAuto(getStateDataObject);
-        } else if (!!onOffState.val) {
-            this.log.info(`Switching ${obj.native.label}: on`);
-            await this.usrcfgCgiService.setOn(getStateDataObject);
-        } else {
-            this.log.info(`Switching ${obj.native.label}: off`);
-            await this.usrcfgCgiService.setOff(getStateDataObject);
+        try {
+            if (!!state.val) {
+                this.log.info(`Switching ${obj.native.label}: auto mode`);
+                await this.usrcfgCgiService.setAuto(getStateDataObject);
+            } else if (!!onOffState.val) {
+                this.log.info(`Switching ${obj.native.label}: on`);
+                await this.usrcfgCgiService.setOn(getStateDataObject);
+            } else {
+                this.log.info(`Switching ${obj.native.label}: off`);
+                await this.usrcfgCgiService.setOff(getStateDataObject);
+            }
+        } catch (e) {
+            this.log.error(e);
         }
     }
 
@@ -210,12 +214,16 @@ export class ProconIp extends utils.Adapter {
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
         this.forceUpdate.push(getStateDataObject.id);
-        if (!!state.val) {
-            this.log.info(`Switching ${obj.native.label}: on`);
-            await this.usrcfgCgiService.setOn(getStateDataObject);
-        } else {
-            this.log.info(`Switching ${obj.native.label}: off`);
-            await this.usrcfgCgiService.setOff(getStateDataObject);
+        try {
+            if (!!state.val) {
+                this.log.info(`Switching ${obj.native.label}: on`);
+                await this.usrcfgCgiService.setOn(getStateDataObject);
+            } else {
+                this.log.info(`Switching ${obj.native.label}: off`);
+                await this.usrcfgCgiService.setOff(getStateDataObject);
+            }
+        } catch (e) {
+            this.log.error(e);
         }
     }
 
