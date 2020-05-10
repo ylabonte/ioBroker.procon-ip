@@ -11,9 +11,7 @@ import {RelayDataInterpreter} from "./lib/relay-data-interpreter";
 import {GetStateCategory, GetStateData} from "./lib/get-state-data";
 import {GetStateDataSysInfo} from "./lib/get-state-data-sys-info";
 import {GetStateDataObject} from "./lib/get-state-data-object";
-
-// Load your modules here, e.g.:
-// import * as fs from "fs";
+import * as crypto from "crypto-js";
 
 // Augment the adapter.config object with the actual types
 // TODO: delete this in the next version
@@ -21,7 +19,6 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace ioBroker {
         interface AdapterConfig {
-            // Define the shape of your options here (recommended)
             controllerUrl: string;
             basicAuth: boolean;
             username: string;
@@ -61,61 +58,75 @@ export class ProconIp extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
-        // Initialize your adapter here
-
-        // The adapters config (in the instance object everything under the attribute "native") is accessible via
-        // this.config:
-        this.log.info("config controllerUrl: " + this.config.controllerUrl);
-        this.log.info("config basicAuth: " + this.config.basicAuth);
-        // this.log.info("config username: " + this.config.username);
-        this.log.info("config updateInterval: " + this.config.updateInterval);
-
-        this.relayDataInterpreter = new RelayDataInterpreter(this.log);
-        this.getStateService = new GetStateService(this);
-        this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
-
-        this.log.info(`GetStateService url: ${this.getStateService.url}`);
-        this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
-
-        let firstRun = true;
-        this.getStateService.start((data: GetStateData) => {
-            // Set objects once
-            if (firstRun) {
-                this.setSysInfo(data.sysInfo);
-                this.setObjects(data.objects);
-            }
-
-            // Set sys info states
-            data.sysInfo.toArrayOfObjects().forEach((info) => {
-                // Only update when value has changed
-                if (firstRun || info.value !== this._stateData.sysInfo[info.key]) {
-                    this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                    this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
-                        this.log.error(`Failed setting state for '${info.key}': ${e}`);
-                    });
-                }
-            });
-
-            // Set object states
-            data.objects.forEach((obj) => {
-                // Only update when value has changed or update is forced (on state change)
-                const force = this.forceUpdate.indexOf(obj.id);
-                if (firstRun || force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
-                    this.setDataState(obj);
-                    if (this.forceUpdate[force]) {
-                        delete this.forceUpdate[force];
+        this.getForeignObject("system.config", (err: any, obj: any) => {
+            for (const setting in this.config) {
+                if (typeof this.config[setting] !== "boolean" && isNaN(this.config[setting]) &&
+                    (!this.supportsFeature || !this.supportsFeature("ADAPTER_AUTO_DECRYPT_NATIVE"))) {
+                    //noinspection JSUnresolvedVariable
+                    if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
+                        //noinspection JSUnresolvedVariable
+                        this.config[setting] = crypto.AES.decrypt(this.config[setting], obj.native.secret).toString(crypto.enc.Utf8);
+                    } else {
+                        //noinspection JSUnresolvedVariable
+                        this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
+                        this.config[setting] = crypto.AES.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu").toString(crypto.enc.Utf8);
                     }
                 }
+            }
+    
+            // The adapters config (in the instance object everything under the attribute "native") is accessible via
+            // this.config:
+            this.log.debug("config controllerUrl: " + this.config.controllerUrl);
+            this.log.debug("config basicAuth: " + this.config.basicAuth);
+            this.log.debug("config updateInterval: " + this.config.updateInterval);
+    
+            this.relayDataInterpreter = new RelayDataInterpreter(this.log);
+            this.getStateService = new GetStateService(this);
+            this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
+    
+            this.log.debug(`GetStateService url: ${this.getStateService.url}`);
+            this.log.debug(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
+    
+            let firstRun = true;
+            this.getStateService.start((data: GetStateData) => {
+                // Set objects once
+                if (firstRun) {
+                    this.setSysInfo(data.sysInfo);
+                    this.setObjects(data.objects);
+                }
+    
+                // Set sys info states
+                data.sysInfo.toArrayOfObjects().forEach((info) => {
+                    // Only update when value has changed
+                    if (firstRun || info.value !== this._stateData.sysInfo[info.key]) {
+                        this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
+                        this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
+                            this.log.error(`Failed setting state for '${info.key}': ${e}`);
+                        });
+                    }
+                });
+    
+                // Set object states
+                data.objects.forEach((obj) => {
+                    // Only update when value has changed or update is forced (on state change)
+                    const force = this.forceUpdate.indexOf(obj.id);
+                    if (firstRun || force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
+                        this.setDataState(obj);
+                        if (this.forceUpdate[force]) {
+                            delete this.forceUpdate[force];
+                        }
+                    }
+                });
+    
+                this._stateData = new GetStateData(data.raw);
+                firstRun = false;
             });
-
-            this._stateData = new GetStateData(data.raw);
-            firstRun = false;
+    
+            this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
+            this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+            this.setState("info.connection", true, true);
+            this.setState("info.Info.alive", true, true);
         });
-
-        this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
-        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
-        this.setState("info.connection", true, true);
-        this.setState("info.Info.alive", true, true);
     }
 
     /**
@@ -232,15 +243,15 @@ export class ProconIp extends utils.Adapter {
     //  * Using this method requires "common.message" property to be set to true in io-package.json
     //  */
     // private onMessage(obj: ioBroker.Message): void {
-    // 	if (typeof obj === "object" && obj.message) {
-    // 		if (obj.command === "send") {
-    // 			// e.g. send email or pushover or whatever
-    // 			this.log.info("send command");
+    //     if (typeof obj === "object" && obj.message) {
+    //         if (obj.command === "send") {
+    //             // e.g. send email or pushover or whatever
+    //             this.log.info("send command");
 
-    // 			// Send response in callback if required
-    // 			if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
-    // 		}
-    // 	}
+    //             // Send response in callback if required
+    //             if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
+    //         }
+    //     }
     // }
 
     /**

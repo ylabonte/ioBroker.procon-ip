@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.3.1",
+    "@types/crypto-js": "^3.1.45",
     "axios": "^0.19.2",
     "crypto-js": "^4.0.0"
   },
@@ -59,7 +60,7 @@
   "scripts": {
     "prebuild": "rimraf ./build",
     "build:ts": "tsc -p tsconfig.build.json",
-    "build": "npm run build:ts",
+    "build": "cp ./node_modules/crypto-js/crypto-js.js ./admin/. && npm run build:ts",
     "watch:ts": "tsc -p tsconfig.build.json --watch",
     "watch": "npm run watch:ts",
     "test:ts": "mocha --opts test/mocha.custom.opts",

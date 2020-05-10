@@ -19,6 +19,7 @@ const get_state_service_1 = require("./lib/get-state.service");
 const usrcfg_cgi_service_1 = require("./lib/usrcfg-cgi.service");
 const relay_data_interpreter_1 = require("./lib/relay-data-interpreter");
 const get_state_data_1 = require("./lib/get-state-data");
+const crypto = require("crypto-js");
 class ProconIp extends utils.Adapter {
     constructor(options = {}) {
         super(Object.assign(Object.assign({}, options), { name: "procon-ip" }));
@@ -36,53 +37,68 @@ class ProconIp extends utils.Adapter {
      */
     onReady() {
         return __awaiter(this, void 0, void 0, function* () {
-            // Initialize your adapter here
-            // The adapters config (in the instance object everything under the attribute "native") is accessible via
-            // this.config:
-            this.log.info("config controllerUrl: " + this.config.controllerUrl);
-            this.log.info("config basicAuth: " + this.config.basicAuth);
-            // this.log.info("config username: " + this.config.username);
-            this.log.info("config updateInterval: " + this.config.updateInterval);
-            this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter(this.log);
-            this.getStateService = new get_state_service_1.GetStateService(this);
-            this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
-            this.log.info(`GetStateService url: ${this.getStateService.url}`);
-            this.log.info(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
-            let firstRun = true;
-            this.getStateService.start((data) => {
-                // Set objects once
-                if (firstRun) {
-                    this.setSysInfo(data.sysInfo);
-                    this.setObjects(data.objects);
-                }
-                // Set sys info states
-                data.sysInfo.toArrayOfObjects().forEach((info) => {
-                    // Only update when value has changed
-                    if (firstRun || info.value !== this._stateData.sysInfo[info.key]) {
-                        this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                        this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
-                            this.log.error(`Failed setting state for '${info.key}': ${e}`);
-                        });
-                    }
-                });
-                // Set object states
-                data.objects.forEach((obj) => {
-                    // Only update when value has changed or update is forced (on state change)
-                    const force = this.forceUpdate.indexOf(obj.id);
-                    if (firstRun || force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
-                        this.setDataState(obj);
-                        if (this.forceUpdate[force]) {
-                            delete this.forceUpdate[force];
+            this.getForeignObject("system.config", (err, obj) => {
+                for (const setting in this.config) {
+                    if (typeof this.config[setting] !== "boolean" && isNaN(this.config[setting]) &&
+                        (!this.supportsFeature || !this.supportsFeature("ADAPTER_AUTO_DECRYPT_NATIVE"))) {
+                        //noinspection JSUnresolvedVariable
+                        if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
+                            //noinspection JSUnresolvedVariable
+                            this.config[setting] = crypto.AES.decrypt(this.config[setting], obj.native.secret).toString(crypto.enc.Utf8);
+                        }
+                        else {
+                            //noinspection JSUnresolvedVariable
+                            this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
+                            this.config[setting] = crypto.AES.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu").toString(crypto.enc.Utf8);
                         }
                     }
+                }
+                // The adapters config (in the instance object everything under the attribute "native") is accessible via
+                // this.config:
+                this.log.debug("config controllerUrl: " + this.config.controllerUrl);
+                this.log.debug("config basicAuth: " + this.config.basicAuth);
+                this.log.debug("config updateInterval: " + this.config.updateInterval);
+                this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter(this.log);
+                this.getStateService = new get_state_service_1.GetStateService(this);
+                this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
+                this.log.debug(`GetStateService url: ${this.getStateService.url}`);
+                this.log.debug(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
+                let firstRun = true;
+                this.getStateService.start((data) => {
+                    // Set objects once
+                    if (firstRun) {
+                        this.setSysInfo(data.sysInfo);
+                        this.setObjects(data.objects);
+                    }
+                    // Set sys info states
+                    data.sysInfo.toArrayOfObjects().forEach((info) => {
+                        // Only update when value has changed
+                        if (firstRun || info.value !== this._stateData.sysInfo[info.key]) {
+                            this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
+                            this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
+                                this.log.error(`Failed setting state for '${info.key}': ${e}`);
+                            });
+                        }
+                    });
+                    // Set object states
+                    data.objects.forEach((obj) => {
+                        // Only update when value has changed or update is forced (on state change)
+                        const force = this.forceUpdate.indexOf(obj.id);
+                        if (firstRun || force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
+                            this.setDataState(obj);
+                            if (this.forceUpdate[force]) {
+                                delete this.forceUpdate[force];
+                            }
+                        }
+                    });
+                    this._stateData = new get_state_data_1.GetStateData(data.raw);
+                    firstRun = false;
                 });
-                this._stateData = new get_state_data_1.GetStateData(data.raw);
-                firstRun = false;
+                this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
+                this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+                this.setState("info.connection", true, true);
+                this.setState("info.Info.alive", true, true);
             });
-            this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
-            this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
-            this.setState("info.connection", true, true);
-            this.setState("info.Info.alive", true, true);
         });
     }
     /**
@@ -153,17 +169,22 @@ class ProconIp extends utils.Adapter {
             }
             const getStateDataObject = this._stateData.getDataObject(obj.native.id);
             this.forceUpdate.push(getStateDataObject.id);
-            if (!!state.val) {
-                this.log.info(`Switching ${obj.native.label}: auto mode`);
-                yield this.usrcfgCgiService.setAuto(getStateDataObject);
+            try {
+                if (!!state.val) {
+                    this.log.info(`Switching ${obj.native.label}: auto mode`);
+                    yield this.usrcfgCgiService.setAuto(getStateDataObject);
+                }
+                else if (!!onOffState.val) {
+                    this.log.info(`Switching ${obj.native.label}: on`);
+                    yield this.usrcfgCgiService.setOn(getStateDataObject);
+                }
+                else {
+                    this.log.info(`Switching ${obj.native.label}: off`);
+                    yield this.usrcfgCgiService.setOff(getStateDataObject);
+                }
             }
-            else if (!!onOffState.val) {
-                this.log.info(`Switching ${obj.native.label}: on`);
-                yield this.usrcfgCgiService.setOn(getStateDataObject);
-            }
-            else {
-                this.log.info(`Switching ${obj.native.label}: off`);
-                yield this.usrcfgCgiService.setOff(getStateDataObject);
+            catch (e) {
+                this.log.error(e);
             }
         });
     }
@@ -176,13 +197,18 @@ class ProconIp extends utils.Adapter {
             }
             const getStateDataObject = this._stateData.getDataObject(obj.native.id);
             this.forceUpdate.push(getStateDataObject.id);
-            if (!!state.val) {
-                this.log.info(`Switching ${obj.native.label}: on`);
-                yield this.usrcfgCgiService.setOn(getStateDataObject);
+            try {
+                if (!!state.val) {
+                    this.log.info(`Switching ${obj.native.label}: on`);
+                    yield this.usrcfgCgiService.setOn(getStateDataObject);
+                }
+                else {
+                    this.log.info(`Switching ${obj.native.label}: off`);
+                    yield this.usrcfgCgiService.setOff(getStateDataObject);
+                }
             }
-            else {
-                this.log.info(`Switching ${obj.native.label}: off`);
-                yield this.usrcfgCgiService.setOff(getStateDataObject);
+            catch (e) {
+                this.log.error(e);
             }
         });
     }
@@ -191,14 +217,14 @@ class ProconIp extends utils.Adapter {
     //  * Using this method requires "common.message" property to be set to true in io-package.json
     //  */
     // private onMessage(obj: ioBroker.Message): void {
-    // 	if (typeof obj === "object" && obj.message) {
-    // 		if (obj.command === "send") {
-    // 			// e.g. send email or pushover or whatever
-    // 			this.log.info("send command");
-    // 			// Send response in callback if required
-    // 			if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
-    // 		}
-    // 	}
+    //     if (typeof obj === "object" && obj.message) {
+    //         if (obj.command === "send") {
+    //             // e.g. send email or pushover or whatever
+    //             this.log.info("send command");
+    //             // Send response in callback if required
+    //             if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
+    //         }
+    //     }
     // }
     /**
      * Set/update system information
