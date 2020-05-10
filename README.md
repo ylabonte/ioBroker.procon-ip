@@ -45,6 +45,13 @@ A full featured release:
 
 ## Changelog
 
+### 0.4.0
+Public release version:
+* Add encryption for configuration settings stored in ioBroker's internal db
+* Improve http request/connection error handling
+* Reduce logging output
+* Remove the unused admin tab
+
 ### 0.3.1
 Functional and security update:
 * Update dependencies including some reported as vulnerable

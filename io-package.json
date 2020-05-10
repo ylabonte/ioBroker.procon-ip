@@ -4,16 +4,16 @@
         "version": "0.4.0",
         "news": {
             "0.4.0": {
-                "en": "This release adds encryption to the ProCon.ip credentials, that are stored in ioBroker. It also should improve the http request/connection exception handling.",
-                "de": "Diese Version fügt den ProCon.ip-Anmeldeinformationen, die in ioBroker gespeichert sind, eine Verschlüsselung hinzu. Es sollte auch die Behandlung von http-Anforderungs- / Verbindungsausnahmen verbessern.",
-                "ru": "Этот выпуск добавляет шифрование к учетным данным ProCon.ip, которые хранятся в ioBroker. Это также должно улучшить обработку исключений http-запросов / соединений.",
-                "pt": "Esta versão adiciona criptografia às credenciais do ProCon.ip, armazenadas no ioBroker. Também deve melhorar o tratamento de exceções de solicitação / conexão http.",
-                "nl": "Deze release voegt encryptie toe aan de inloggegevens van ProCon.ip, die zijn opgeslagen in ioBroker. Het zou ook de afhandeling van uitzonderingen voor http-verzoeken / verbindingen moeten verbeteren.",
-                "fr": "Cette version ajoute un chiffrement aux informations d'identification ProCon.ip, qui sont stockées dans ioBroker. Il devrait également améliorer la gestion des exceptions de requête / connexion http.",
-                "it": "Questa versione aggiunge la crittografia alle credenziali ProCon.ip, che sono archiviate in ioBroker. Dovrebbe inoltre migliorare la gestione delle eccezioni di richiesta / connessione http.",
-                "es": "Esta versión agrega cifrado a las credenciales ProCon.ip, que se almacenan en ioBroker. También debería mejorar el manejo de excepciones de solicitud / conexión http.",
-                "pl": "Ta wersja dodaje szyfrowanie do poświadczeń ProCon.ip, które są przechowywane w ioBroker. Powinno to również poprawić obsługę żądań / wyjątków połączeń HTTP.",
-                "zh-cn": "此版本将加密添加到ProCon.ip凭据中，该凭据存储在ioBroker中。它还应该改善http请求/连接异常处理。"
+                "en": "This release adds encryption to the ProCon.ip credentials, that are stored in ioBroker. This will break your adapter configuration, which simply means you will have to re-enter your controller-url, username, password and click save. It also should improve the http request/connection error handling and remove the unused admin tab.",
+                "de": "Diese Version fügt den ProCon.ip-Anmeldeinformationen, die in ioBroker gespeichert sind, eine Verschlüsselung hinzu. Dadurch wird Ihre Adapterkonfiguration beschädigt, was einfach bedeutet, dass Sie Ihre Controller-URL, Ihren Benutzernamen und Ihr Kennwort erneut eingeben und auf Speichern klicken müssen. Es sollte auch die Behandlung von http-Anforderungs- / Verbindungsfehlern verbessern und die nicht verwendete Registerkarte \"Administrator\" entfernen.",
+                "ru": "Этот выпуск добавляет шифрование к учетным данным ProCon.ip, которые хранятся в ioBroker. Это нарушит конфигурацию вашего адаптера, а это просто означает, что вам придется повторно ввести URL-адрес контроллера, имя пользователя, пароль и нажать «Сохранить». Это также должно улучшить обработку запросов / ошибок http и удалить неиспользуемую вкладку администратора.",
+                "pt": "Esta versão adiciona criptografia às credenciais do ProCon.ip, armazenadas no ioBroker. Isso interromperá a configuração do adaptador, o que significa simplesmente que você precisará digitar novamente seu URL do controlador, nome de usuário, senha e clique em Salvar. Também deve melhorar a manipulação de erros de solicitação / conexão http e remover a guia de administração não utilizada.",
+                "nl": "Deze release voegt encryptie toe aan de inloggegevens van ProCon.ip, die zijn opgeslagen in ioBroker. Hierdoor wordt uw adapterconfiguratie verbroken, wat simpelweg betekent dat u uw controller-url, gebruikersnaam en wachtwoord opnieuw moet invoeren en op Opslaan moet klikken. Het zou ook de afhandeling van http-verzoeken / verbindingsfouten moeten verbeteren en het ongebruikte admin-tabblad moeten verwijderen.",
+                "fr": "Cette version ajoute un chiffrement aux informations d'identification ProCon.ip, qui sont stockées dans ioBroker. Cela cassera la configuration de votre adaptateur, ce qui signifie simplement que vous devrez ressaisir l'url de votre contrôleur, votre nom d'utilisateur, votre mot de passe et cliquer sur Enregistrer. Il devrait également améliorer la gestion des erreurs de demande / connexion http et supprimer l'onglet d'administration inutilisé.",
+                "it": "Questa versione aggiunge la crittografia alle credenziali ProCon.ip, che sono archiviate in ioBroker. Ciò interromperà la configurazione dell'adattatore, il che significa semplicemente che dovrai inserire nuovamente l'URL del controller, il nome utente, la password e fare clic su Salva. Dovrebbe inoltre migliorare la gestione degli errori di richiesta / connessione http e rimuovere la scheda di amministrazione non utilizzata.",
+                "es": "Esta versión agrega cifrado a las credenciales ProCon.ip, que se almacenan en ioBroker. Esto interrumpirá la configuración de su adaptador, lo que simplemente significa que tendrá que volver a ingresar su URL de controlador, nombre de usuario, contraseña y hacer clic en guardar. También debería mejorar el manejo de errores de solicitud / conexión http y eliminar la pestaña de administrador no utilizada.",
+                "pl": "Ta wersja dodaje szyfrowanie do poświadczeń ProCon.ip, które są przechowywane w ioBroker. Spowoduje to uszkodzenie konfiguracji adaptera, co oznacza po prostu, że musisz ponownie wprowadzić adres URL kontrolera, nazwę użytkownika, hasło i kliknąć przycisk Zapisz. Powinno to również poprawić obsługę żądania HTTP / błędu połączenia i usunąć nieużywaną kartę administratora.",
+                "zh-cn": "此版本将加密添加到ProCon.ip凭据中，该凭据存储在ioBroker中。这将破坏您的适配器配置，这仅意味着您将必须重新输入控制器URL，用户名，密码并单击“保存”。它还应改善http请求/连接错误处理并删除未使用的admin选项卡。"
             },
             "0.3.1":  {
                 "en": "Functional update with security aspects. See README.md for details.",
@@ -163,23 +163,7 @@
         "compact": true,
         "materialize": true,
         "materializeTab": true,
-        "adminTab": {
-            "singleton": true,
-            "name": {
-                "en": "ProCon.IP Pool Controller",
-                "de": "ProCon.IP Poolsteuerung",
-                "ru": "ProCon.IP управления бассейном",
-                "pt": "ProCon.IP controle de piscina",
-                "nl": "ProCon.IP zwembadregeling",
-                "fr": "ProCon.IP le contrôle de la piscine",
-                "it": "ProCon.IP controllo piscina",
-                "es": "ProCon.IP control de la piscina",
-                "pl": "ProCon.IP sterowanie basenem",
-                "zh-cn": "ProCon.IP 池控制"
-            },
-            "link": "",
-            "fa-icon": "info"
-        },
+        "adminTab": false,
         "supportCustoms": true,
         "dependencies": [
             {
