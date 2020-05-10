@@ -79,7 +79,7 @@ class UsrcfgCgiService extends abstract_service_1.AbstractService {
                         reject(`(${response.status}: ${response.statusText}) Error sending relay control command: ${response.data}`);
                     }
                 }).catch((e) => {
-                    reject(e);
+                    reject("response" in e ? e.response : e);
                 });
             });
         });
