@@ -68,4 +68,8 @@ export class GetStateDataSysInfo {
                 return false;
         }
     }
+
+    public isExtRelaysEnabled(): boolean {
+        return (this.configOtherEnable & 16) === 16;
+    }
 }
