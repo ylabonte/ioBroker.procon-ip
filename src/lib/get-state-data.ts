@@ -129,7 +129,7 @@ export class GetStateData {
         return new RelayDataObject(this.getDataObject(this.getPhPlusDosageControlId()));
     }
 
-    public isDosageControl(id: number) {
+    public isDosageControl(id: number): boolean {
         return [
             this.getChlorineDosageControlId(),
             this.getPhMinusDosageControlId(),
@@ -137,7 +137,7 @@ export class GetStateData {
         ].indexOf(id) >= 0;
     }
 
-    public parseCsv(csv: string) {
+    public parseCsv(csv: string): void {
         // Save raw input string.
         this.raw = csv;
         // Parse csv into 2-dimensional array of strings.
@@ -149,7 +149,7 @@ export class GetStateData {
         this.resolveObjects();
     }
 
-    private resolveObjects() {
+    private resolveObjects(): void {
         // Iterate data columns.
         this.active.length = 0;
         this.parsed[1].forEach((name, index) => {
@@ -175,7 +175,7 @@ export class GetStateData {
         this.categorize();
     }
 
-    private categorize() {
+    private categorize(): void {
         Object.keys(this.categories).forEach((category) => {
             let catId = 1;
             this.categories[category] = this.expandSlice(this.categories[category]);
