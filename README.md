@@ -12,7 +12,10 @@
 
 
 ## ProCon.IP pool control adapter for ioBroker
-ioBroker adapter for basic support of the ProCon.IP pool control unit. It is intended for integration with your favorit voice assistant(s) (eg. via the [`cloud`](https://github.com/ioBroker/ioBroker.cloud) or [`IoT`](https://github.com/ioBroker/ioBroker.iot) adapter for Alexa or [`yahka`](https://github.com/jensweigele/ioBroker.yahka) for Apple HomeKit with Siri) and/or further smart home integration and automation (eg. via individual scripts using ioBroker's javascript adapter).
+ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. It is intended for integration with your ioBroker home automation, eg. to build logic that involves other devices or simply to be paired with your favorit voice assistant(s):
+* You can use the [_cloud_](https://github.com/ioBroker/ioBroker.cloud) or [_IoT_](https://github.com/ioBroker/ioBroker.iot) adapter for Alexa (and also Google Home, I think) and
+* [_yahka_](https://github.com/jensweigele/ioBroker.yahka) as bridge to the Apple HomeKit to be reached by Siri or
+* use the [_javascript_](https://github.com/ioBroker/ioBroker.javascript) to build your own custom logic.
 
 
 ### What is the ProCon.IP pool control?
@@ -44,7 +47,21 @@ A full featured release:
 * Automated tests regarding the functionality of the adapter (eg. unit tests)
 
 
+## Development and participation
+Feel free to contact me, if you wish to participate in development or documentation of this adapter.
+
+Useful links for the approach will be
+* the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript) I had started from and
+* the [guide for adapter developers](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md).
+
+
 ## Changelog
+
+### 0.4.1
+Bugfix release:
+* Fix write actions to the appropriate states of external relays  
+  _This will add auto-recognition on whether the external relays are activated or not
+  and therefore decide on how to handle write actions to the corresponding relay state._
 
 ### 0.4.0
 Public release version:
@@ -94,14 +111,6 @@ Initial release with following features:
 * All information from `GetState.csv` as readonly states
 * Writable states for all relays to toggle auto/manual
 * Writable states for relays not configured for dosage control to toggle on/off 
-
-
-## Development and participation
-Feel free to contact me, if you wish to participate in development or documentation of this adapter.
-
-Useful links for the approach will be
-* the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript) I had started from and
-* the [guide for adapter developers](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md).
 
 
 ## License
