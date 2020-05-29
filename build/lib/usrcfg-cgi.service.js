@@ -88,7 +88,7 @@ class UsrcfgCgiService extends abstract_service_1.AbstractService {
         // private send(bitTupel: [number, number]): /*Axios*/Promise<{data: string; status: number; statusText: string}> {
         const requestConfig = this.axiosRequestConfig;
         requestConfig.data = `ENA=${encodeURIComponent(bitTupel.join(","))}&MANUAL=1`;
-        this.log.info(JSON.stringify(requestConfig));
+        this.log.debug(JSON.stringify(requestConfig));
         // return new Promise((resolve, reject) => {
         //     if (requestConfig.data.ENA.search("-") >= 0) {
         //         reject("fuck it! why negative numbers?!");

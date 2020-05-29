@@ -48,5 +48,8 @@ class GetStateDataSysInfo {
                 return false;
         }
     }
+    isExtRelaysEnabled() {
+        return (this.configOtherEnable & 16) === 16;
+    }
 }
 exports.GetStateDataSysInfo = GetStateDataSysInfo;

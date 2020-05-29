@@ -21,12 +21,17 @@ class RelayDataInterpreter {
         this.log = logger;
     }
     evaluate(stateData) {
-        const relays = stateData.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS);
-        this.byteState = [255, 0];
+        let relays = stateData.getDataObjectsByCategory(get_state_data_1.GetStateCategory.RELAYS);
+        if (stateData.sysInfo.isExtRelaysEnabled()) {
+            relays = relays.concat(stateData.getDataObjectsByCategory(get_state_data_1.GetStateCategory.EXTERNAL_RELAYS));
+            this.byteState = [65535, 0];
+        }
+        else {
+            this.byteState = [255, 0];
+        }
         relays.forEach((data) => {
-            this.log.info(JSON.stringify(data));
             const relay = new relay_data_object_1.RelayDataObject(data);
-            this.log.info(JSON.stringify(relay));
+            this.log.debug(JSON.stringify(relay));
             if (this.isAuto(relay)) {
                 this.byteState[0] &= ~relay.bitMask;
             }

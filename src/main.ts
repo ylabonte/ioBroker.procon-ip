@@ -94,7 +94,7 @@ export class ProconIp extends utils.Adapter {
                     this.setSysInfo(data.sysInfo);
                     this.setObjects(data.objects);
                 }
-    
+
                 // Set sys info states
                 data.sysInfo.toArrayOfObjects().forEach((info) => {
                     // Only update when value has changed

@@ -141,19 +141,13 @@ class ProconIp extends utils.Adapter {
             return;
         }
         if (id.endsWith(".auto")) {
-            // this.log.info(`${id}: Toggle auto`);
-            this.relayToggleAuto(id, state).then((response) => {
-                this.log.info(JSON.stringify(response));
-            }).catch((e) => {
-                this.log.error(e);
+            this.relayToggleAuto(id, state).catch((e) => {
+                this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
         }
         else if (id.endsWith(".onOff")) {
-            // this.log.info(`${id}: Toggle on/off`);
-            this.relayToggleOnOff(id, state).then((response) => {
-                this.log.info(JSON.stringify(response));
-            }).catch((e) => {
-                this.log.error(e);
+            this.relayToggleOnOff(id, state).catch((e) => {
+                this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
         }
     }
@@ -171,7 +165,7 @@ class ProconIp extends utils.Adapter {
             this.forceUpdate.push(getStateDataObject.id);
             try {
                 if (!!state.val) {
-                    this.log.info(`Switching ${obj.native.label}: auto mode`);
+                    this.log.info(`Switching ${obj.native.label}: auto`);
                     yield this.usrcfgCgiService.setAuto(getStateDataObject);
                 }
                 else if (!!onOffState.val) {
@@ -184,7 +178,7 @@ class ProconIp extends utils.Adapter {
                 }
             }
             catch (e) {
-                this.log.error(e);
+                this.log.error(`Error on switching operation: ${e}`);
             }
         });
     }
@@ -333,7 +327,8 @@ class ProconIp extends utils.Adapter {
                     this.log.error(`Failed setting object '${obj.label}': ${e}`);
                 }
             }
-            if ([get_state_data_1.GetStateCategory.RELAYS, get_state_data_1.GetStateCategory.EXTERNAL_RELAYS].indexOf(obj.category) >= 0) {
+            if (obj.category === get_state_data_1.GetStateCategory.RELAYS || (obj.category === get_state_data_1.GetStateCategory.EXTERNAL_RELAYS &&
+                this._stateData.sysInfo.isExtRelaysEnabled())) {
                 this.setRelayDataObject(obj);
             }
         });
@@ -389,7 +384,8 @@ class ProconIp extends utils.Adapter {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
             });
         }
-        if ([get_state_data_1.GetStateCategory.RELAYS, get_state_data_1.GetStateCategory.EXTERNAL_RELAYS].indexOf(obj.category) >= 0) {
+        if (obj.category === get_state_data_1.GetStateCategory.RELAYS || (obj.category === get_state_data_1.GetStateCategory.EXTERNAL_RELAYS &&
+            this._stateData.sysInfo.isExtRelaysEnabled())) {
             this.setRelayDataState(obj);
         }
     }

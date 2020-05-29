@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "0.4.0",
+        "version": "0.4.1",
         "news": {
+            "0.4.1": {
+                "en": "Bugfix release: Fix write actions to the appropriate states of external relays. This will add auto-recognition on whether the external relays are activated or not and therefore decide on how to handle write actions to the corresponding relay state.",
+                "de": "Bugfix Release: Schreibaktionen auf die entsprechenden Zustände externer Relais korrigieren. Dadurch wird die automatische Erkennung hinzugefügt, ob die externen Relais aktiviert sind oder nicht, und daher wird entschieden, wie Schreibaktionen in den entsprechenden Relaisstatus ausgeführt werden sollen.",
+                "ru": "Исправление ошибок: исправление действий записи в соответствующих состояниях внешних реле. Это добавит автоматическое распознавание того, активированы ли внешние реле или нет, и, следовательно, решит, как обрабатывать действия записи в соответствующее состояние реле.",
+                "pt": "Versão do bugfix: Corrija as ações de gravação nos estados apropriados dos relés externos. Isso adicionará o reconhecimento automático se os relés externos estão ativados ou não e, portanto, decidirá como lidar com as ações de gravação no estado correspondente do relé.",
+                "nl": "Bugfix-release: schrijfacties corrigeren naar de juiste status van externe relais. Dit voegt automatische herkenning toe over het feit of de externe relais zijn geactiveerd of niet en beslist daarom hoe schrijfacties moeten worden afgehandeld in de overeenkomstige relaistoestand.",
+                "fr": "Version de correction de bug: correction des actions d'écriture sur les états appropriés des relais externes. Cela ajoutera une reconnaissance automatique de l'activation ou non des relais externes et décidera donc comment gérer les actions d'écriture dans l'état de relais correspondant.",
+                "it": "Rilascio bugfix: correggi le azioni di scrittura negli stati appropriati dei relè esterni. Ciò aggiungerà il riconoscimento automatico sull'attivazione o meno dei relè esterni e quindi la decisione su come gestire le azioni di scrittura nello stato di relè corrispondente.",
+                "es": "Versión de corrección de errores: arregla las acciones de escritura en los estados apropiados de los relés externos. Esto agregará el reconocimiento automático de si los relés externos están activados o no y, por lo tanto, decidirá cómo manejar las acciones de escritura en el estado del relé correspondiente.",
+                "pl": "Wydanie poprawki: Napraw działania zapisu w odpowiednich stanach przekaźników zewnętrznych. Spowoduje to dodanie automatycznego rozpoznawania, czy przekaźniki zewnętrzne są aktywowane, czy też nie, a zatem decyduje, w jaki sposób obsługiwać operacje zapisu do odpowiedniego stanu przekaźnika.",
+                "zh-cn": "错误修正版本：将写操作修正为外部继电器的相应状态。这将增加对外部继电器是否已激活的自动识别，并因此决定如何处理对相应继电器状态的写操作。"
+            },
             "0.4.0": {
                 "en": "This release adds encryption to the ProCon.ip credentials, that are stored in ioBroker. This will break your adapter configuration, which simply means you will have to re-enter your controller-url, username, password and click save. It also should improve the http request/connection error handling and remove the unused admin tab.",
                 "de": "Diese Version fügt den ProCon.ip-Anmeldeinformationen, die in ioBroker gespeichert sind, eine Verschlüsselung hinzu. Dadurch wird Ihre Adapterkonfiguration beschädigt, was einfach bedeutet, dass Sie Ihre Controller-URL, Ihren Benutzernamen und Ihr Kennwort erneut eingeben und auf Speichern klicken müssen. Es sollte auch die Behandlung von http-Anforderungs- / Verbindungsfehlern verbessern und die nicht verwendete Registerkarte \"Administrator\" entfernen.",
