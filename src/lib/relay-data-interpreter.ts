@@ -25,12 +25,16 @@ export class RelayDataInterpreter {
     }
 
     public evaluate(stateData: GetStateData): RelayDataInterpreter {
-        const relays = stateData.getDataObjectsByCategory(GetStateCategory.RELAYS);
-        this.byteState = [255, 0];
+        let relays = stateData.getDataObjectsByCategory(GetStateCategory.RELAYS);
+        if (stateData.sysInfo.isExtRelaysEnabled()) {
+            relays = relays.concat(stateData.getDataObjectsByCategory(GetStateCategory.EXTERNAL_RELAYS));
+            this.byteState = [65535, 0];
+        } else {
+            this.byteState = [255, 0];
+        }
         relays.forEach((data: GetStateDataObject) => {
-            this.log.info(JSON.stringify(data));
             const relay = new RelayDataObject(data);
-            this.log.info(JSON.stringify(relay));
+            this.log.debug(JSON.stringify(relay));
             if (this.isAuto(relay)) {
                 this.byteState[0] &= ~relay.bitMask;
             }

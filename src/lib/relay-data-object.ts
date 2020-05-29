@@ -1,4 +1,5 @@
 import {GetStateDataObject} from "./get-state-data-object";
+import { GetStateCategory } from "./get-state-data";
 
 export class RelayDataObject extends GetStateDataObject {
     public constructor(data: GetStateDataObject) {
@@ -11,7 +12,10 @@ export class RelayDataObject extends GetStateDataObject {
      * @see UsrcfgCgiService
      */
     public get bitMask(): number {
-        return 1 << (this.categoryId - 1);
+        return 0x01 << (this.category as GetStateCategory === GetStateCategory.EXTERNAL_RELAYS ?
+            this.categoryId + 7 :
+            this.categoryId - 1
+        );
         // return Math.pow(2, this.categoryId - 1);
     }
 }
