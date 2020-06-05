@@ -16,6 +16,7 @@ ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. 
 * You can use the [_cloud_](https://github.com/ioBroker/ioBroker.cloud) or [_IoT_](https://github.com/ioBroker/ioBroker.iot) adapter for Alexa (and also Google Home, I think) and
 * [_yahka_](https://github.com/jensweigele/ioBroker.yahka) as bridge to the Apple HomeKit to be reached by Siri or
 * use the [_javascript_](https://github.com/ioBroker/ioBroker.javascript) to build your own custom logic.
+See the [wiki](https://github.com/ylabonte/ioBroker.procon-ip/wiki) for more information.
 
 
 ### What is the ProCon.IP pool control?
@@ -41,7 +42,7 @@ For now the adapter has been tested and developed in combination with the ProCon
 ## Roadmap
 
 ### 1.0.0
-A full featured release:
+**Stable release:**
 * Add documentation (make the github wiki useful/helpful)
 * Show connection status including last refresh timestamp and sys info of the ProCon.IP in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
 * Automated tests regarding the functionality of the adapter (eg. unit tests)

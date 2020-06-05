@@ -138,16 +138,16 @@
             "zh-cn": "ProCon.IP 池控制"
         },
         "desc": {
-            "en": "Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).",
-            "de": "Adapter zur Basisunterstützung der ProCon.IP-Poolsteuerung. Bestimmt für die Integration mit Ihrem Sprachassistenten (z.B. über den Cloud-Adapter [`cloud`] für Alexa oder Yahka [`yahka`] für Apple HomeKit mit Siri).",
-            "ru": "Адаптер для базовой поддержки управления пулом ProCon.IP. Предназначен для интеграции с вашим голосовым помощником (например, через адаптер «cloud» для Alexa или «yahka» для Apple HomeKit с Siri).",
-            "pt": "Adaptador para suporte básico do controle de conjunto ProCon.IP. Destinado a integração com o seu assistente de voz (por exemplo, através do adaptador `cloud` para Alexa ou `yahka` para o Apple HomeKit com Siri).",
-            "nl": "Adapter voor basisondersteuning van de ProCon.IP-poolregeling. Bestemd voor integratie met je stemassistent (bijvoorbeeld via de `cloud`-adapter voor Alexa of `yahka` voor Apple HomeKit met Siri).",
-            "fr": "Adaptateur pour la prise en charge de base du contrôle de pool ProCon.IP. Destiné à l'intégration avec votre assistant vocal (par exemple via l'adaptateur `cloud` pour Alexa ou `yahka` pour Apple HomeKit avec Siri).",
-            "it": "Adattatore per il supporto di base del controllo del pool ProCon.IP. Destinato all'integrazione con il tuo assistente vocale (ad esempio tramite l'adattatore `cloud` per Alexa o `yahka` per Apple HomeKit con Siri).",
-            "es": "Adaptador para soporte básico del control de grupo ProCon.IP. Diseñado para la integración con su asistente de voz (por ejemplo, mediante el adaptador `cloud` para Alexa o `yahka` para Apple HomeKit con Siri)",
-            "pl": "Adapter do podstawowej obsługi kontroli puli ProCon.IP. Przeznaczony do integracji z asystentem głosowym (np. Przez adapter `cloud` dla Alexa lub `yahka` dla Apple HomeKit z Siri).",
-            "zh-cn": "适用于ProCon.IP池控件的基本支持的适配器。用于与语音助手集成（例如，通过用于Alexa的`cloud`适配器或用于带有Siri的Apple HomeKit的`yahka`）。"
+            "en": "ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. It is intended for integration with your ioBroker home automation, eg. to build logic that involves other devices or simply to be paired with your favorit voice assistant(s).",
+            "de": "ioBroker-Adapter zur grundlegenden Unterstützung der ProCon.IP-Schwimmbadsteuereinheit. Es ist für die Integration in Ihre ioBroker-Hausautomation vorgesehen, z. um eine Logik zu erstellen, an der andere Geräte beteiligt sind, oder um einfach mit Ihren bevorzugten Sprachassistenten gekoppelt zu werden.",
+            "ru": "Адаптер ioBroker для базовой поддержки блока управления бассейном ProCon.IP. Он предназначен для интеграции с домашней системой автоматизации ioBroker, например. создать логику, которая включает в себя другие устройства или просто быть в паре с вашим голосовым помощником.",
+            "pt": "Adaptador ioBroker para suporte básico da unidade de controle de piscinas ProCon.IP. Ele se destina à integração com sua automação residencial ioBroker, por exemplo. para criar lógica que envolva outros dispositivos ou simplesmente para emparelhar-se com seus assistentes de voz favoritos.",
+            "nl": "ioBroker-adapter voor basisondersteuning van de ProCon.IP zwembadbesturing. Het is bedoeld voor integratie met uw ioBroker-domotica, bijv. om logica op te bouwen die andere apparaten omvat of gewoon om te worden gekoppeld aan uw favoriete stemassistent (en).",
+            "fr": "Adaptateur ioBroker pour le support de base de l'unité de contrôle de piscine ProCon.IP. Il est destiné à être intégré à votre domotique ioBroker, par exemple. pour construire une logique qui implique d'autres appareils ou simplement pour être jumelé avec vos assistants vocaux préférés.",
+            "it": "adattatore ioBroker per il supporto di base dell'unità di controllo della piscina ProCon.IP. È destinato all'integrazione con l'automazione domestica ioBroker, ad es. per costruire una logica che coinvolga altri dispositivi o semplicemente per essere accoppiato con i tuoi assistenti vocali preferiti.",
+            "es": "Adaptador ioBroker para soporte básico de la unidad de control de piscina ProCon.IP. Está destinado a la integración con su domótica ioBroker, por ejemplo. para construir una lógica que involucre otros dispositivos o simplemente para que se vincule con su (s) asistente (s) de voz favorito (s).",
+            "pl": "Adapter ioBroker do podstawowej obsługi jednostki sterującej basenu ProCon.IP. Jest przeznaczony do integracji z automatyką domową ioBroker, np. zbudować logikę, która obejmuje inne urządzenia lub po prostu sparować ze swoimi ulubionymi asystentami głosowymi.",
+            "zh-cn": "ioBroker适配器，用于ProCon.IP游泳池控制单元的基本支持。它旨在与您的ioBroker家庭自动化集成，例如。建立涉及其他设备的逻辑，或者仅与您喜欢的语音助手配对。"
         },
         "authors": [
             "Yannic Labonte <yannic.labonte@gmail.com>"
