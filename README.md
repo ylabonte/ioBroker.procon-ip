@@ -12,47 +12,102 @@
 
 
 ## ProCon.IP pool control adapter for ioBroker
-ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. It is intended for integration with your ioBroker home automation, eg. to build logic that involves other devices or simply to be paired with your favorit voice assistant(s):
-* You can use the [_cloud_](https://github.com/ioBroker/ioBroker.cloud) or [_IoT_](https://github.com/ioBroker/ioBroker.iot) adapter for Alexa (and also Google Home, I think) and
-* [_yahka_](https://github.com/jensweigele/ioBroker.yahka) as bridge to the Apple HomeKit to be reached by Siri or
-* use the [_javascript_](https://github.com/ioBroker/ioBroker.javascript) to build your own custom logic.
+ioBroker adapter for basic support of the ProCon.IP swimming pool control
+unit. It is intended for integration with your ioBroker home automation, eg.
+to build logic that involves other devices or simply to be paired with your
+favorit voice assistant(s):
+* You can use the [_cloud_](https://github.com/ioBroker/ioBroker.cloud) or
+  [_IoT_](https://github.com/ioBroker/ioBroker.iot) adapter for Alexa
+  (and also Google Home, I think) and
+* [_yahka_](https://github.com/jensweigele/ioBroker.yahka) as bridge to the
+  Apple HomeKit to be reached by Siri or
+* use the [_javascript_](https://github.com/ioBroker/ioBroker.javascript) to
+  build your own custom logic.
+
 See the [wiki](https://github.com/ylabonte/ioBroker.procon-ip/wiki) for more information.
 
 
 ### What is the ProCon.IP pool control?
 ![Picture from pooldigital.de](https://www.pooldigital.de/shop/media/image/66/47/a5/ProConIP1_720x600.png)
 
-The ProCon.IP pool control is a low budget network attached control unit for home swimming pools. With its software switched relays, it can control multiple pumps (for the pool filter and different dosage aspects) either simply planned per time schedule or depending on a reading/value from one of its many input channels for measurements (eg. i/o flow sensors, Dallas 1-Wire termometers, redox and pH electrodes). At least there is also the option to switch these relays on demand, which makes them also applicable for switching lights (or anything else you want) on/off.
-Not all of its functionality is reachable via API. In fact there is one documented API for reading (polling) values as CSV (`/GetState.csv`). In my memories there was another one for switching the relays on/off and on with timer. But I cannot find the second one anymore. So not even pretty, but functional: The ProCon.IP has two native web interfaces, which can be analyzed, to some kind of reverse engineer a given functionality (like switching the relays).
+The ProCon.IP pool control is a low budget network attached control unit for
+home swimming pools. With its software switched relays, it can control
+multiple pumps (for the pool filter and different dosage aspects) either
+simply planned per time schedule or depending on a reading/value from one of
+its many input channels for measurements (eg. i/o flow sensors, Dallas 1-Wire
+termometers, redox and pH electrodes). At least there is also the option to
+switch these relays on demand, which makes them also applicable for switching
+lights (or anything else you want) on/off.
+Not all of its functionality is reachable via API. In fact there is one
+documented API for reading (polling) values as CSV (`/GetState.csv`). In my
+memories there was another one for switching the relays on/off and on with
+timer. But I cannot find the second one anymore. So not even pretty, but
+functional: The ProCon.IP has two native web interfaces, which can be
+analyzed, to some kind of reverse engineer a given functionality (like
+switching the relays).
 
-For more information see the following link (sorry it's only in german; haven't found an english documentation/information so far):
+For more information see the following link (sorry it's only in german;
+haven't found an english documentation/information so far):
 * [pooldigital.de webshop](https://www.pooldigital.de/shop/poolsteuerungen/procon.ip/35/procon.ip-webbasierte-poolsteuerung-/-dosieranlage)
 * [pooldigital.de forum](http://forum.pooldigital.de/)
 
-**Just to be clear: I have nothing to do with the development, sellings, marketing or support of the pool control unit. I just developed a solution to integrate such with ioBroker to make my parent's home a bit smarter.**
+**Just to be clear: I have nothing to do with the development, sellings,
+marketing or support of the pool control unit. I just developed a solution
+to integrate such with ioBroker to make my parent's home a bit smarter.**
 
 
 ### Details on the adapter
-The adapter uses the `/GetState.csv` API of the ProCon.IP to poll its values and another - not documented - API, that operates with bitwise commands to switch the relays. The second one is also used by the original web interfaces of the ProCon.IP. So there might be future firmware upgrades, that brake compatibilty with this adapter or at least it functionality of switching the relays. 
+The adapter uses the `/GetState.csv` API of the ProCon.IP to poll its values
+and another - not documented - API, that operates with bitwise commands to
+switch the relays. The second one is also used by the original web interfaces
+of the ProCon.IP. So there might be future firmware upgrades, that brake
+compatibilty with this adapter or at least it functionality of switching the
+relays. 
 
 #### Compatiblity
-For now the adapter has been tested and developed in combination with the ProCon.IP firmware **revision 1.7.0.c**.
+For now the adapter has been tested and developed in combination with the
+ProCon.IP firmware **revision 1.7.0.c**.
 
 
 ## Roadmap
 
 ### 1.0.0
-**Stable release:**
-* Add documentation (make the github wiki useful/helpful)
-* Show connection status including last refresh timestamp and sys info of the ProCon.IP in tab view (can be activated by activating the corresponding menu entry in the admin adapter)
-* Automated tests regarding the functionality of the adapter (eg. unit tests)
+**Stable release:**  
+This should become the release candidate for the official ioBroker adapter
+repository. So as this is literally a milestone for this project, I have
+created such for the relevant issues to keep track of the progress and make
+this more transparent for you.
+
+* Fix all open [milestone issues](https://github.com/ylabonte/ioBroker.procon-ip/milestone/1)
+  regarding the ones resulted from the [adapter review](https://github.com/ioBroker/ioBroker.repositories/pull/756#issuecomment-646988248))
+* ~~Add documentation (make the github wiki useful/helpful)~~
+* ~~Show connection status including last refresh timestamp and sys info of
+  the ProCon.IP in tab view (can be activated by activating the corresponding
+  menu entry in the admin adapter)~~
+* ~~Automated tests regarding the functionality of the adapter (eg. unit
+  tests)~~
+
+**What happened the points above which are now striked through?**  
+Well, the documentation was already improved. Now it's up to you to extend the
+wiki or request me using issues to extend the wiki or README.md regarding a
+specific content.  
+The tab view thing seems rather interesting to me. If you would appreciate
+such a feature, just let me know...  
+The absence of automated tests regarding the functionality of the controller
+is quite unpleasant, but the focus is now clearly on becoming stable and
+writing good and useful tests for all of the existing code will cost a lot
+of time (in relation to the use regarding the complexity and target group of
+this software project) and might end in further refactoring. So it will be
+something for the future, but not anymore relevant for the 1.0.0 release.
 
 
 ## Development and participation
-Feel free to contact me, if you wish to participate in development or documentation of this adapter.
+Feel free to contact me, if you wish to participate in development or
+documentation of this adapter.
 
 Useful links for the approach will be
-* the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript) I had started from and
+* the [TypeScript adapter template](https://github.com/ioBroker/ioBroker.template/tree/master/TypeScript)
+  I had started from and
 * the [guide for adapter developers](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md).
 
 
@@ -111,7 +166,7 @@ Bugfix release:
 Initial release with following features:
 * All information from `GetState.csv` as readonly states
 * Writable states for all relays to toggle auto/manual
-* Writable states for relays not configured for dosage control to toggle on/off 
+* Writable states for relays not configured for dosage control to toggle on/off
 
 
 ## License
