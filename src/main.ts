@@ -309,7 +309,7 @@ export class ProconIp extends utils.Adapter {
             switch (field) {
                 case "value":
                     if (obj.category == GetStateCategory.TEMPERATURES) {
-                        common.role = "level.temperature";
+                        common.role = "value.temperature";
                         common.unit = `°${obj.unit}`;
                         if (obj.active) {
                             common.smartName = {
@@ -320,29 +320,14 @@ export class ProconIp extends utils.Adapter {
                         }
                     }
                     break;
-                case "id":
-                case "active":
-                case "categoryId":
-                    common.role = "indicator";
-                    break;
                 case "category":
                 case "label":
+                case "unit":
+                case "displayValue":
                     common.role = "text";
                     break;
-                case "offset":
-                    common.role = "value.offset";
-                    break;
-                case "gain":
-                    common.role = "value.gain";
-                    break;
-                case "raw":
-                    common.role = "value.raw";
-                    break;
-                case "unit":
-                    common.role = "value.unit";
-                    break;
-                case "displayValue":
-                    common.role = "value.display";
+                case "active":
+                    common.role = "indicator.working";
                     break;
                 default:
                     continue;
@@ -372,7 +357,7 @@ export class ProconIp extends utils.Adapter {
         const commonAuto: any = {
             name: obj.label,
             type: "boolean",
-            role: "switch",
+            role: "switch.mode.auto",
             read: true,
             write: true,
             smartName: obj.active ? {
@@ -384,7 +369,7 @@ export class ProconIp extends utils.Adapter {
         const commonOnOff: any = {
             name: obj.label,
             type: "boolean",
-            role: "switch",
+            role: isLight ? "switch.light" : "switch",
             read: true,
             write: !this.getStateService.data.isDosageControl(obj.id),
             smartName: obj.active && !this.getStateService.data.isDosageControl(obj.id) ? {
