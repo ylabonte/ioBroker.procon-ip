@@ -260,11 +260,11 @@ export class ProconIp extends utils.Adapter {
                 common: {
                     name: sysInfo.key,
                     type: "string",
-                    role: "info",
+                    role: "state",
                     read: true,
                     write: false
                 },
-                native: sysInfo,
+                native: {},
             }).then(() => {
                 this.log.info(`Sys info object '${sysInfo.key}' has been set`);
             }).catch((e) => {
@@ -290,12 +290,8 @@ export class ProconIp extends utils.Adapter {
         //     type: "group",
         //     common: {
         //         name: obj.label,
-        //         type: "boolean",
-        //         role: "state",
-        //         read: true,
-        //         write: false
         //     },
-        //     native: obj,
+        //     native: {},
         // });
         for (const field of Object.keys(obj)) {
             const common: any = {
