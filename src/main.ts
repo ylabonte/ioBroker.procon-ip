@@ -263,7 +263,7 @@ export class ProconIp extends utils.Adapter {
     public setSysInfo(data: GetStateDataSysInfo): void {
         this.log.info(JSON.stringify(data.toArrayOfObjects()));
         data.toArrayOfObjects().forEach((sysInfo) => {
-            this.setObjectAsync(`${this.name}.${this.instance}.${sysInfo.key}`, {
+            this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${sysInfo.key}`, {
                 type: "state",
                 common: {
                     name: sysInfo.key,
@@ -294,7 +294,7 @@ export class ProconIp extends utils.Adapter {
     }
 
     public async setDataObject(obj: GetStateDataObject): Promise<void> {
-        // await this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
+        // await this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
         //     type: "group",
         //     common: {
         //         name: obj.label,
@@ -338,7 +338,7 @@ export class ProconIp extends utils.Adapter {
             }
 
             try {
-                await this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
+                await this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
                     type: "state",
                     common: common,
                     native: obj,
@@ -383,7 +383,7 @@ export class ProconIp extends utils.Adapter {
             } : {}
         };
 
-        this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
+        this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
             type: "state",
             common: commonAuto,
             native: obj,
@@ -392,7 +392,7 @@ export class ProconIp extends utils.Adapter {
         }).catch((e) => {
             this.log.error(`Failed setting auto/manual switch for '${obj.label}': ${e}`);
         });
-        this.setObjectAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
+        this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
             type: "state",
             common: commonOnOff,
             native: obj,
