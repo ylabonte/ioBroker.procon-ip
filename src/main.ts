@@ -134,11 +134,12 @@ export class ProconIp extends utils.Adapter {
      */
     private onUnload(callback: () => void): void {
         try {
-            this.log.info("cleaned everything up...");
+            this.getStateService.stop();
             this.setState("info.connection", false, true);
             this.setState("info.Info.alive", false, true);
-            callback();
         } catch (e) {
+            this.log.error(`Failed to stop GetState service: ${e}`);
+        } finally {
             callback();
         }
     }
