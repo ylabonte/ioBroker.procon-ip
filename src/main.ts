@@ -11,7 +11,6 @@ import {RelayDataInterpreter} from "./lib/relay-data-interpreter";
 import {GetStateCategory, GetStateData} from "./lib/get-state-data";
 import {GetStateDataSysInfo} from "./lib/get-state-data-sys-info";
 import {GetStateDataObject} from "./lib/get-state-data-object";
-import * as crypto from "crypto-js";
 
 // Augment the adapter.config object with the actual types
 // TODO: delete this in the next version
@@ -54,6 +53,15 @@ export class ProconIp extends utils.Adapter {
         this._stateData = new GetStateData();
     }
 
+    private decrypt(value: string, key: string): string {
+        let result = "";
+        for (let i = 0; i < value.length; ++i) {
+            result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
+        }
+
+        return result;
+    }
+
     /**
      * Is called when databases are connected and adapter received configuration.
      */
@@ -65,11 +73,11 @@ export class ProconIp extends utils.Adapter {
                     //noinspection JSUnresolvedVariable
                     if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
                         //noinspection JSUnresolvedVariable
-                        this.config[setting] = crypto.AES.decrypt(this.config[setting], obj.native.secret).toString(crypto.enc.Utf8);
+                        this.config[setting] = this.decrypt(this.config[setting], obj.native.secret);
                     } else {
                         //noinspection JSUnresolvedVariable
                         this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
-                        this.config[setting] = crypto.AES.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu").toString(crypto.enc.Utf8);
+                        this.config[setting] = this.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
                     }
                 }
             }
