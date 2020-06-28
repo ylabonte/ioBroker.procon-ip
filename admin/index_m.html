@@ -56,21 +56,36 @@
             }
         }
 
-        function decrypt(cypherText) {
+        function fallback_decryption(value, key) {
             if (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE')) {
-                const decrypted = CryptoJS.AES.decrypt(cypherText, secret);
-                return decrypted.toString(CryptoJS.enc.Utf8);
+                if (value === undefined) {
+                    value = key;
+                    key = secret;
+                }
+                var result = '';
+                for (var i = 0; i < value.length; ++i) {
+                    result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
+                }
+                return result;
             }
 
-            return cypherText;
+            return value;
         }
 
-        function encrypt(plainText) {
+        function fallback_encryption(value, key) {
             if (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE')) {
-                return CryptoJS.AES.encrypt(plainText, secret).toString();
-           }
-
-            return plainText;
+                if (value === undefined) {
+                    value = key;
+                    key = secret;
+                }
+                var result = '';
+                for (var i = 0; i < value.length; ++i) {
+                    result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
+                }
+                return result;
+            }
+            
+            return value;
         }
 
         // This will be called by the admin adapter when the settings page loads
@@ -84,12 +99,10 @@
                     var id = $key.attr('id');
                     if ($key.attr('type') === 'checkbox') {
                         // do not call onChange direct, because onChange could expect some arguments
-                        $key.prop('checked', settings[id])
-                        .on('change', () => onChange());
+                        $key.prop('checked', settings[id]).on('change', () => onChange());
                     } else {
-                        if ($key.attr('type') !== 'number' &&
-                            (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))) {
-                            settings[id] = decrypt(settings[id]);
+                        if ($key.attr('type') !== 'number') {
+                            settings[id] = fallback_decryption(settings[id], secret);
                         }
                         // do not call onChange direct, because onChange could expect some arguments
                         $key.val(settings[id])
@@ -127,10 +140,10 @@
                     const $this = $(this);
                     if ($this.attr('type') === 'checkbox') {
                         obj[$this.attr('id')] = $this.prop('checked');
+                    } else if ($this.attr('type') === 'number') {
+                        obj[$this.attr('id')] = Number($this.val());
                     } else {
-                        obj[$this.attr('id')] = $this.attr('type') === 'number' ?
-                            $this.val() : 
-                            encrypt($this.val());
+                        obj[$this.attr('id')] = fallback_encryption($this.val(), secret);
                     }
                 } catch (e) {
                     $(this).addClass('invalid').siblings('span.helper-text').attr('data-error', e);

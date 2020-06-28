@@ -190,6 +190,16 @@
         "password": "admin",
         "updateInterval": 3000
     },
+    "encryptedNative": [
+        "controllerUrl",
+        "username",
+        "password"
+    ],
+    "protectedNative": [
+        "controllerUrl",
+        "username",
+        "password"
+    ],
     "objects": [],
     "instanceObjects": []
 }
