@@ -26,9 +26,7 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.3.1",
-    "@types/crypto-js": "^3.1.45",
-    "axios": "^0.19.2",
-    "crypto-js": "^4.0.0"
+    "axios": "^0.19.2"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.2.0",
