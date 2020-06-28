@@ -58,7 +58,7 @@
   "scripts": {
     "prebuild": "rimraf ./build",
     "build:ts": "tsc -p tsconfig.build.json",
-    "build": "cp ./node_modules/crypto-js/crypto-js.js ./admin/. && npm run build:ts",
+    "build": "npm run build:ts",
     "watch:ts": "tsc -p tsconfig.build.json --watch",
     "watch": "npm run watch:ts",
     "test:ts": "mocha --opts test/mocha.custom.opts",
