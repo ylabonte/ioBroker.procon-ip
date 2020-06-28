@@ -176,7 +176,7 @@
         "materialize": true,
         "materializeTab": true,
         "adminTab": false,
-        "supportCustoms": true,
+        "supportCustoms": false,
         "dependencies": [
             {
                 "js-controller": ">=2.2.0"
