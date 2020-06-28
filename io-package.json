@@ -186,8 +186,8 @@
     "native": {
         "controllerUrl": "",
         "basicAuth": true,
-        "username": "admin",
-        "password": "admin",
+        "username": "",
+        "password": "",
         "updateInterval": 3000
     },
     "encryptedNative": [
