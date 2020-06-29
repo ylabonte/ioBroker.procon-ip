@@ -38,6 +38,7 @@ export class ProconIp extends utils.Adapter {
     private forceUpdate: number[];
     private _stateData: GetStateData;
     private _objectsCreated = false;
+    private _bootstrapped = false;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -94,46 +95,47 @@ export class ProconIp extends utils.Adapter {
     
             this.log.debug(`GetStateService url: ${this.getStateService.url}`);
             this.log.debug(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
-    
-            let firstRun = true;
+
+            // Start the actual service
             this.getStateService.start((data: GetStateData) => {
                 // Set objects once
-                if (firstRun) {
+                if (!this._bootstrapped) {
                     this.setSysInfo(data.sysInfo);
                     this.setObjects(data.objects);
                 }
-
+        
                 // Set sys info states
                 data.sysInfo.toArrayOfObjects().forEach((info) => {
                     // Only update when value has changed
-                    if (firstRun || info.value !== this._stateData.sysInfo[info.key]) {
+                    if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
                         this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                        this.setStateAsync(`${this.name}.${this.instance}.${info.key}`, info.value, true).catch((e) => {
+                        this.setStateAsync(`${this.name}.${this.instance}.info.system.${info.key}`, info.value, true).catch((e) => {
                             this.log.error(`Failed setting state for '${info.key}': ${e}`);
                         });
                     }
                 });
-    
-                // Set object states
+
+                // Set actual sensor and actor/relay object states
                 data.objects.forEach((obj) => {
                     // Only update when value has changed or update is forced (on state change)
-                    const force = this.forceUpdate.indexOf(obj.id);
-                    if (firstRun || force >= 0 || (this._stateData.getDataObject(obj.id) && obj.value !== this._stateData.getDataObject(obj.id).value)) {
+                    const forceObjStateUpdate = this.forceUpdate.indexOf(obj.id);
+                    if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
+                        this._stateData.getDataObject(obj.id) && 
+                        obj.value !== this._stateData.getDataObject(obj.id).value)
+                    ) {
                         this.setDataState(obj);
-                        if (this.forceUpdate[force]) {
-                            delete this.forceUpdate[force];
+                        if (this.forceUpdate[forceObjStateUpdate]) {
+                            delete this.forceUpdate[forceObjStateUpdate];
                         }
                     }
                 });
-    
-                this._stateData = new GetStateData(data.raw);
-                firstRun = false;
+        
+                this._stateData = data;
+                this._bootstrapped = true;
             });
     
             this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
             this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
-            this.setState("info.connection", true, true);
-            this.setState("info.Info.alive", true, true);
         });
     }
 
@@ -142,9 +144,8 @@ export class ProconIp extends utils.Adapter {
      */
     private onUnload(callback: () => void): void {
         try {
+            // Stop the service loop (this also handles the info.connection state)
             this.getStateService.stop();
-            this.setState("info.connection", false, true);
-            this.setState("info.Info.alive", false, true);
         } catch (e) {
             this.log.error(`Failed to stop GetState service: ${e}`);
         } finally {
@@ -221,7 +222,6 @@ export class ProconIp extends utils.Adapter {
 
     public async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {
         const obj = await this.getObjectAsync(objectId);
-        this.log.info("got object");
         if (!obj) {
             throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
         }
@@ -262,8 +262,15 @@ export class ProconIp extends utils.Adapter {
      */
     public setSysInfo(data: GetStateDataSysInfo): void {
         this.log.info(JSON.stringify(data.toArrayOfObjects()));
+        this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
+            type: "channel",
+            common: {
+                name: "SysInfo"
+            },
+            native: {}
+        });
         data.toArrayOfObjects().forEach((sysInfo) => {
-            this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${sysInfo.key}`, {
+            this.setObjectNotExistsAsync(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
                 type: "state",
                 common: {
                     name: sysInfo.key,
@@ -286,7 +293,19 @@ export class ProconIp extends utils.Adapter {
      * @param data
      */
     public setObjects(objects: GetStateDataObject[]): void {
+        let lastObjCategory = "";
         objects.forEach((obj) => {
+            if (lastObjCategory !== obj.category) {
+                // Define each api object category as device
+                this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}`, {
+                    type: "channel",
+                    common: {
+                        name: obj.category,
+                    },
+                    native: {}
+                });
+                lastObjCategory = obj.category;
+            }
             this.setDataObject(obj).catch((e) => {
                 this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
             });
@@ -294,13 +313,13 @@ export class ProconIp extends utils.Adapter {
     }
 
     public async setDataObject(obj: GetStateDataObject): Promise<void> {
-        // await this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
-        //     type: "group",
-        //     common: {
-        //         name: obj.label,
-        //     },
-        //     native: {},
-        // });
+        this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
+            type: "channel",
+            common: {
+                name: obj.label,
+            },
+            native: {},
+        });
         for (const field of Object.keys(obj)) {
             const common: any = {
                 name: obj.label,
@@ -331,7 +350,7 @@ export class ProconIp extends utils.Adapter {
                     common.role = "text";
                     break;
                 case "active":
-                    common.role = "indicator.working";
+                    common.role = "indicator";
                     break;
                 default:
                     continue;
