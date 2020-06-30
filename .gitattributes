@@ -1,1 +1,2 @@
-build/** linguist-generated
+build/** linguist-generated=true
+crypto-js.js linguist-vendored=true
