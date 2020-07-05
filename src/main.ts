@@ -55,8 +55,20 @@ export class ProconIp extends utils.Adapter {
         this._stateData = new GetStateData();
     }
 
-    private decrypt(value: string, key: string): string {
-        // Fallback to legacy decryption if either value or key are not valid for the AES-192 
+    /**
+     * Decrypt strings using the same techniques as the js-controller >= 3.2.
+     * 
+     * It is just named _custom_ to avoid any potential for naming conflicts with the upcoming
+     * native encryption/decryption methods of the `adapter` object, that will be introduced
+     * with js-controller >= 3.1. 
+     * 
+     * Read more: https://github.com/ioBroker/ioBroker.js-controller/pull/887#issuecomment-633285095
+     * 
+     * @param value cipher text
+     * @param key secret
+     */
+    private customDecrypt(value: string, key: string): string {
+        // Fallback to legacy decryption if either value or key are not valid for the aes-192-cbc 
         // variant. See: https://github.com/ioBroker/ioBroker.js-controller/pull/887/files
         if (!value.startsWith(`$/aes-192-cbc:`) || !/^[0-9a-f]{48}$/.test(key)) {
             return this.legacyDecrypt(value, key);
@@ -103,11 +115,11 @@ export class ProconIp extends utils.Adapter {
                     //noinspection JSUnresolvedVariable
                     if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
                         //noinspection JSUnresolvedVariable
-                        this.config[setting] = this.decrypt(this.config[setting], obj.native.secret);
+                        this.config[setting] = this.customDecrypt(this.config[setting], obj.native.secret);
                     } else {
                         //noinspection JSUnresolvedVariable
                         this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
-                        this.config[setting] = this.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
+                        this.config[setting] = this.customDecrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
                     }
                 }
             }
