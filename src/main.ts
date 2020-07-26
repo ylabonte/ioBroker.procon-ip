@@ -11,7 +11,7 @@ import {RelayDataInterpreter} from "./lib/relay-data-interpreter";
 import {GetStateCategory, GetStateData} from "./lib/get-state-data";
 import {GetStateDataSysInfo} from "./lib/get-state-data-sys-info";
 import {GetStateDataObject} from "./lib/get-state-data-object";
-import * as crypto from "crypto";
+import {CryptoHelper} from "./lib/crypto-helper";
 
 // Augment the adapter.config object with the actual types
 // TODO: delete this in the next version
@@ -56,55 +56,6 @@ export class ProconIp extends utils.Adapter {
     }
 
     /**
-     * Decrypt strings using the same techniques as the js-controller >= 3.2.
-     * 
-     * It is just named _custom_ to avoid any potential for naming conflicts with the upcoming
-     * native encryption/decryption methods of the `adapter` object, that will be introduced
-     * with js-controller >= 3.1. 
-     * 
-     * Read more: https://github.com/ioBroker/ioBroker.js-controller/pull/887#issuecomment-633285095
-     * 
-     * @param value cipher text
-     * @param key secret
-     */
-    private customDecrypt(value: string, key: string): string {
-        // Fallback to legacy decryption if either value or key are not valid for the aes-192-cbc 
-        // variant. See: https://github.com/ioBroker/ioBroker.js-controller/pull/887/files
-        if (!value.startsWith(`$/aes-192-cbc:`) || !/^[0-9a-f]{48}$/.test(key)) {
-            return this.legacyDecrypt(value, key);
-        }
-
-        try {
-            const cipherParts = value.split(":");
-            const cipherSuite = "aes-192-cbc";
-            const cipherKey = Buffer.from(key, "hex");
-            const cipherIv = Buffer.from(cipherParts[1], "hex");
-            const cipherText = Buffer.from(cipherParts[2], "hex");
-            const decipher = crypto.createDecipheriv(cipherSuite, cipherKey, cipherIv);
-            
-            return Buffer.concat([
-                decipher.update(cipherText), 
-                decipher.final()]
-            ).toString();
-        } catch (e) {
-            this.log.warn("Error on decrypting a setting!");
-            this.log.info("Please visit settings and re-enter your connection parameters.");
-            this.log.debug(`Exact error was: ${e}`);
-        }
-
-        return "";
-    }
-
-    private legacyDecrypt(value: string, key: string): string {
-        let result = "";
-        for (let i = 0; i < value.length; ++i) {
-            result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
-        }
-
-        return result;
-    }
-
-    /**
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
@@ -115,11 +66,11 @@ export class ProconIp extends utils.Adapter {
                     //noinspection JSUnresolvedVariable
                     if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
                         //noinspection JSUnresolvedVariable
-                        this.config[setting] = this.customDecrypt(this.config[setting], obj.native.secret);
+                        this.config[setting] = CryptoHelper.decrypt(this.config[setting], obj.native.secret);
                     } else {
                         //noinspection JSUnresolvedVariable
                         this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
-                        this.config[setting] = this.customDecrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
+                        this.config[setting] = CryptoHelper.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
                     }
                 }
             }
