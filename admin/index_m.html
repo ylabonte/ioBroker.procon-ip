@@ -17,6 +17,7 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script type="text/javascript" src="words.js"></script>
     <script type="text/javascript" src="crypto-js.js"></script>
+    <script type="text/javascript" src="crypto-helper.js"></script>
 
     <script type="text/javascript">
         let secret;
@@ -56,44 +57,12 @@
             }
         }
 
-        function fallback_decryption(value, key) {
-            if (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE')) {
-                if (value === undefined) {
-                    value = key;
-                    key = secret;
-                }
-                var result = '';
-                for (var i = 0; i < value.length; ++i) {
-                    result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
-                }
-                return result;
-            }
-
-            return value;
-        }
-
-        function fallback_encryption(value, key) {
-            if (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE')) {
-                if (value === undefined) {
-                    value = key;
-                    key = secret;
-                }
-                var result = '';
-                for (var i = 0; i < value.length; ++i) {
-                    result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
-                }
-                return result;
-            }
-            
-            return value;
-        }
-
         // This will be called by the admin adapter when the settings page loads
         function load(settings, onChange) {
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
             socket.emit('getObject', 'system.config', (err, obj) => {
-                secret = (obj && obj.native ? obj.native.secret : '') || 'Jp#q|]-g/^.m7+xHeu';
+                secret = (obj && obj.native ? obj.native.secret : '') || '1234567890abcdef1234567890abcdef1234567890abcdef';
                 $('.value').each(function () {
                     var $key = $(this);
                     var id = $key.attr('id');
@@ -101,13 +70,13 @@
                         // do not call onChange direct, because onChange could expect some arguments
                         $key.prop('checked', settings[id]).on('change', () => onChange());
                     } else {
-                        if ($key.attr('type') !== 'number') {
-                            settings[id] = fallback_decryption(settings[id], secret);
+                        if ($key.attr('type') !== 'number'
+                            && (typeof supportsFeature !== 'function' 
+                                || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE') ) {
+                            settings[id] = cryptoHelper.decrypt(settings[id], secret);
                         }
                         // do not call onChange direct, because onChange could expect some arguments
-                        $key.val(settings[id])
-                        .on('change', () => onChange())
-                        .on('keyup', () => onChange());
+                        $key.val(settings[id]).on('change', () => onChange()).on('keyup', () => onChange());
                     }
                 });
 
@@ -143,7 +112,9 @@
                     } else if ($this.attr('type') === 'number') {
                         obj[$this.attr('id')] = Number($this.val());
                     } else {
-                        obj[$this.attr('id')] = fallback_encryption($this.val(), secret);
+                        obj[$this.attr('id')] = (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
+                            ? cryptoHelper.encrypt($this.val(), secret)
+                            : $this.val();
                     }
                 } catch (e) {
                     $(this).addClass('invalid').siblings('span.helper-text').attr('data-error', e);

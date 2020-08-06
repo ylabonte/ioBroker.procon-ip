@@ -70,7 +70,7 @@ export class ProconIp extends utils.Adapter {
                     } else {
                         //noinspection JSUnresolvedVariable
                         this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
-                        this.config[setting] = CryptoHelper.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
+                        this.config[setting] = CryptoHelper.decrypt(this.config[setting], "1234567890abcdef1234567890abcdef1234567890abcdef");
                     }
                 }
             }
