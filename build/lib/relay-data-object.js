@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RelayDataObject = void 0;
 const get_state_data_object_1 = require("./get-state-data-object");
 const get_state_data_1 = require("./get-state-data");
 class RelayDataObject extends get_state_data_object_1.GetStateDataObject {

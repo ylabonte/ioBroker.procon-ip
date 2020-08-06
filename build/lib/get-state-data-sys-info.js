@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetStateDataSysInfo = void 0;
 class GetStateDataSysInfo {
     constructor(data) {
         if (data) {

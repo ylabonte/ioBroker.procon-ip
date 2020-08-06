@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetStateDataObject = void 0;
 class GetStateDataObject {
     constructor(index, name, unit, offset, gain, measure) {
         this.set(index, name, unit, offset, gain, measure);

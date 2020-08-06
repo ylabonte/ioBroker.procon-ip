@@ -12,6 +12,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProconIp = void 0;
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
@@ -19,6 +20,7 @@ const get_state_service_1 = require("./lib/get-state.service");
 const usrcfg_cgi_service_1 = require("./lib/usrcfg-cgi.service");
 const relay_data_interpreter_1 = require("./lib/relay-data-interpreter");
 const get_state_data_1 = require("./lib/get-state-data");
+const crypto_helper_1 = require("./lib/crypto-helper");
 class ProconIp extends utils.Adapter {
     constructor(options = {}) {
         super(Object.assign(Object.assign({}, options), { name: "procon-ip" }));
@@ -32,13 +34,6 @@ class ProconIp extends utils.Adapter {
         this.forceUpdate = new Array();
         this._stateData = new get_state_data_1.GetStateData();
     }
-    decrypt(value, key) {
-        let result = "";
-        for (let i = 0; i < value.length; ++i) {
-            result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
-        }
-        return result;
-    }
     /**
      * Is called when databases are connected and adapter received configuration.
      */
@@ -51,12 +46,12 @@ class ProconIp extends utils.Adapter {
                         //noinspection JSUnresolvedVariable
                         if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
                             //noinspection JSUnresolvedVariable
-                            this.config[setting] = this.decrypt(this.config[setting], obj.native.secret);
+                            this.config[setting] = crypto_helper_1.CryptoHelper.decrypt(this.config[setting], obj.native.secret);
                         }
                         else {
                             //noinspection JSUnresolvedVariable
                             this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
-                            this.config[setting] = this.decrypt(this.config[setting], "Jp#q|]-g/^.m7+xHeu");
+                            this.config[setting] = crypto_helper_1.CryptoHelper.decrypt(this.config[setting], "1234567890abcdef1234567890abcdef1234567890abcdef");
                         }
                     }
                 }

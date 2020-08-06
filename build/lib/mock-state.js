@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GETSTATE = void 0;
 exports.GETSTATE = "\n" +
     "SYSINFO,1.7.0,17132,1,65536,99,257,4,4,5\n" +
     "Time,n.a.,n.a.,Filterdruck,Chlor,CPU Temp,Redox,pH,Pumpe,Absorber,Rücklauf,Aussen,n.a.,n.a.,n.a.,n.a.," +

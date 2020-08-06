@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetStateService = void 0;
 const axios_1 = require("axios");
 const abstract_service_1 = require("./abstract-service");
 const get_state_data_1 = require("./get-state-data");
