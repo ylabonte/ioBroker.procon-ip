@@ -40,8 +40,12 @@ class ProconIp extends utils.Adapter {
     onReady() {
         return __awaiter(this, void 0, void 0, function* () {
             this.getForeignObject("system.config", (err, obj) => {
+                const encryptedNative = [];
+                if (this.ioPack && this.ioPack.encryptedNative) {
+                    encryptedNative.concat(this.ioPack.encryptedNative);
+                }
                 for (const setting in this.config) {
-                    if (typeof this.config[setting] !== "boolean" && isNaN(this.config[setting]) &&
+                    if (encryptedNative.indexOf(setting) >= 0 &&
                         (!this.supportsFeature || !this.supportsFeature("ADAPTER_AUTO_DECRYPT_NATIVE"))) {
                         //noinspection JSUnresolvedVariable
                         if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
@@ -57,7 +61,6 @@ class ProconIp extends utils.Adapter {
                 }
                 // The adapters config (in the instance object everything under the attribute "native") is accessible via
                 // this.config:
-                this.log.debug("config controllerUrl: " + this.config.controllerUrl);
                 this.log.debug("config basicAuth: " + this.config.basicAuth);
                 this.log.debug("config updateInterval: " + this.config.updateInterval);
                 this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter(this.log);

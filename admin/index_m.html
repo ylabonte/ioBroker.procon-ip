@@ -20,7 +20,7 @@
     <script type="text/javascript" src="crypto-helper.js"></script>
 
     <script type="text/javascript">
-        let secret;
+        let secret, encryptedFields;
 
         // Validate an input field
         function validate(field) {
@@ -61,39 +61,45 @@
         function load(settings, onChange) {
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
-            socket.emit('getObject', 'system.config', (err, obj) => {
-                secret = (obj && obj.native ? obj.native.secret : '') || '1234567890abcdef1234567890abcdef1234567890abcdef';
-                $('.value').each(function () {
-                    var $key = $(this);
-                    var id = $key.attr('id');
-                    if ($key.attr('type') === 'checkbox') {
-                        // do not call onChange direct, because onChange could expect some arguments
-                        $key.prop('checked', settings[id]).on('change', () => onChange());
-                    } else {
-                        if ($key.attr('type') !== 'number'
-                            && (typeof supportsFeature !== 'function' 
-                                || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE') ) {
-                            settings[id] = cryptoHelper.decrypt(settings[id], secret);
+            socket.emit('getObject', 'system.adapter.procon-ip', (err, obj) => {
+                encryptedFields = (obj && obj.native && obj.native.encryptedNative)
+                    ? obj.native.encryptedNative
+                    : [];
+                socket.emit('getObject', 'system.config', (err, obj) => {
+                    secret = (obj && obj.native) ? obj.native.secret : '1234567890abcdef1234567890abcdef1234567890abcdef';
+                    $('.value').each(function () {
+                        var $key = $(this);
+                        var id = $key.attr('id');
+                        if ($key.attr('type') === 'checkbox') {
+                            // do not call onChange direct, because onChange could expect some arguments
+                            $key.prop('checked', settings[id]).on('change', () => onChange());
+                        } else {
+                            if (encryptedFields.indexOf(id) >= 0 && (
+                                typeof supportsFeature !== 'function' ||
+                                !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE')
+                            )) {
+                                settings[id] = cryptoHelper.decrypt(settings[id], secret);
+                            }
+                            // do not call onChange direct, because onChange could expect some arguments
+                            $key.val(settings[id]).on('change', () => onChange()).on('keyup', () => onChange());
                         }
-                        // do not call onChange direct, because onChange could expect some arguments
-                        $key.val(settings[id]).on('change', () => onChange()).on('keyup', () => onChange());
-                    }
-                });
-
-                // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
-                if (M) M.updateTextFields();
-                
-                const doValidate = (x) => {
-                    const field = x.target;
-                    try {
-                        validate(field);
-                        $(field).removeClass('invalid').siblings('span.helper-text').attr('data-error', '');
-                    } catch (e) {
-                        $(field).addClass('invalid').siblings('span.helper-text').attr('data-error', e);
-                    }
+                    });
+    
+                    // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
                     if (M) M.updateTextFields();
-                };
-                $('.value').on('change', doValidate).on('keyup', doValidate).trigger('change');
+                    
+                    const doValidate = (x) => {
+                        const field = x.target;
+                        try {
+                            validate(field);
+                            $(field).removeClass('invalid').siblings('span.helper-text').attr('data-error', '');
+                        } catch (e) {
+                            $(field).addClass('invalid').siblings('span.helper-text').attr('data-error', e);
+                        }
+                        if (M) M.updateTextFields();
+                    };
+                    $('.value').on('change', doValidate).on('keyup', doValidate).trigger('change');
+                });
             });
             onChange(false);
         }
@@ -112,9 +118,10 @@
                     } else if ($this.attr('type') === 'number') {
                         obj[$this.attr('id')] = Number($this.val());
                     } else {
-                        obj[$this.attr('id')] = (typeof supportsFeature !== 'function' || !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
-                            ? cryptoHelper.encrypt($this.val(), secret)
-                            : $this.val();
+                        obj[$this.attr('id')] = encryptedFields.indexOf($this.attr('id')) >= 0 && (
+                                typeof supportsFeature !== 'function' || 
+                                !supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE')
+                            ) ? cryptoHelper.encrypt($this.val(), secret) : $this.val();
                     }
                 } catch (e) {
                     $(this).addClass('invalid').siblings('span.helper-text').attr('data-error', e);

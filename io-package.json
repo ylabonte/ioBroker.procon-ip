@@ -195,13 +195,6 @@
             }
         ]
     },
-    "native": {
-        "controllerUrl": "",
-        "basicAuth": true,
-        "username": "",
-        "password": "",
-        "updateInterval": 3000
-    },
     "encryptedNative": [
         "controllerUrl",
         "username",
@@ -212,6 +205,13 @@
         "username",
         "password"
     ],
+    "native": {
+        "controllerUrl": "",
+        "basicAuth": true,
+        "username": "",
+        "password": "",
+        "updateInterval": 3000
+    },
     "objects": [],
     "instanceObjects": [
         {
