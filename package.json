@@ -1,6 +1,6 @@
 {
   "name": "iobroker.procon-ip",
-  "version": "0.4.1",
+  "version": "1.0.0",
   "description": "Adapter for basic support of the ProCon.IP pool control. Intended for integration with your voice assistant (eg. via the `cloud` adapter for Alexa or `yahka` for Apple HomeKit with Siri).",
   "author": {
     "name": "Yannic Labonte",
@@ -17,53 +17,58 @@
     "home automation",
     "Smart Home"
   ],
+  "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/ylabonte/ioBroker.procon-ip"
+  },
+  "bugs": {
+    "url": "https://github.com/ylabonte/ioBroker.procon-ip/issues"
   },
   "engines": {
     "node": ">=10"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.3.1",
-    "@types/crypto-js": "^3.1.45",
-    "axios": "^0.19.2",
-    "crypto-js": "^4.0.0"
+    "@iobroker/adapter-core": "^2.4.0",
+    "axios": "^0.19.2"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.2.0",
-    "@types/chai": "^4.2.11",
-    "@types/chai-as-promised": "^7.1.2",
+    "@types/chai": "^4.2.12",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/crypto-js": "^3.1.47",
     "@types/gulp": "^4.0.6",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^12.12.37",
+    "@types/node": "^14.0.27",
     "@types/proxyquire": "^1.3.28",
-    "@types/sinon": "^9.0.0",
+    "@types/sinon": "^9.0.4",
     "@types/sinon-chai": "^3.2.4",
-    "@typescript-eslint/eslint-plugin": "^2.29.0",
-    "@typescript-eslint/parser": "^2.29.0",
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
+    "@typescript-eslint/parser": "^3.9.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "crypto-js": "^4.0.0",
     "eslint": "^6.8.0",
     "gulp": "^4.0.2",
-    "mocha": "^7.1.2",
-    "nyc": "^15.0.1",
+    "mocha": "^8.1.1",
+    "nyc": "^15.1.0",
     "proxyquire": "^2.1.3",
     "rimraf": "^3.0.2",
-    "sinon": "^9.0.2",
-    "sinon-chai": "^3.4.0",
-    "source-map-support": "^0.5.16",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.8.3"
+    "sinon": "^9.0.3",
+    "sinon-chai": "^3.5.0",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   },
   "main": "build/main.js",
   "scripts": {
     "prebuild": "rimraf ./build",
+    "build:copyfiles": "cp ./node_modules/crypto-js/crypto-js.js ./admin/crypto-js.js",
     "build:ts": "tsc -p tsconfig.build.json",
-    "build": "cp ./node_modules/crypto-js/crypto-js.js ./admin/. && npm run build:ts",
+    "build": "npm run build:ts && npm run build:copyfiles",
     "watch:ts": "tsc -p tsconfig.build.json --watch",
     "watch": "npm run watch:ts",
-    "test:ts": "mocha --opts test/mocha.custom.opts",
+    "test:ts": "mocha --config test/mocha.custom.yml",
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit",
     "test:integration": "mocha test/integration --exit",
@@ -90,9 +95,5 @@
     ],
     "sourceMap": true,
     "instrument": true
-  },
-  "bugs": {
-    "url": "https://github.com/ylabonte/ioBroker.procon-ip/issues"
-  },
-  "readmeFilename": "README.md"
+  }
 }

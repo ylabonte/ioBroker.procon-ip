@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.UsrcfgCgiService = exports.SetStateValue = void 0;
 const abstract_service_1 = require("./abstract-service");
 const relay_data_interpreter_1 = require("./relay-data-interpreter");
 const axios_1 = require("axios");

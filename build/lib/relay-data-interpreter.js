@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RelayDataInterpreter = exports.RelayStateBitMask = void 0;
 const get_state_data_1 = require("./get-state-data");
 const relay_data_object_1 = require("./relay-data-object");
 /**
