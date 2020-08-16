@@ -93,12 +93,15 @@ export class ProconIp extends utils.Adapter {
 
             // Start the actual service
             this.getStateService.start((data: GetStateData) => {
+                this.log.silly(`Start processing new GetState.csv`);
+
                 // Set objects once
                 if (!this._bootstrapped) {
+                    this.log.debug(`Initially setting adapter objects`);
                     this.setSysInfo(data.sysInfo);
                     this.setObjects(data.objects);
                 }
-        
+
                 // Set sys info states
                 data.sysInfo.toArrayOfObjects().forEach((info) => {
                     // Only update when value has changed
@@ -112,19 +115,25 @@ export class ProconIp extends utils.Adapter {
 
                 // Set actual sensor and actor/relay object states
                 data.objects.forEach((obj) => {
+                    this.log.silly(`Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`);
+                    this.log.silly(`this._stateData.getDataObject(obj.id).value: ${this._stateData.getDataObject(obj.id).value}`);
+                    this.log.silly(`obj.value: ${obj.value}`);
+
                     // Only update when value has changed or update is forced (on state change)
                     const forceObjStateUpdate = this.forceUpdate.indexOf(obj.id);
                     if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
                         this._stateData.getDataObject(obj.id) && 
                         obj.value !== this._stateData.getDataObject(obj.id).value)
                     ) {
+                        this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
                         this.setDataState(obj);
                         if (this.forceUpdate[forceObjStateUpdate]) {
                             delete this.forceUpdate[forceObjStateUpdate];
                         }
                     }
                 });
-        
+
+                this.log.silly(`Updating data object for next comparison`);
                 this._stateData = data;
                 this._bootstrapped = true;
             });
@@ -256,7 +265,6 @@ export class ProconIp extends utils.Adapter {
      * Set/update system information
      */
     public setSysInfo(data: GetStateDataSysInfo): void {
-        this.log.info(JSON.stringify(data.toArrayOfObjects()));
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
             type: "channel",
             common: {

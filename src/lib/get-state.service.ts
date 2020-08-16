@@ -74,7 +74,8 @@ export class GetStateService extends AbstractService {
     public update(): void {
         this.getData().then((response) => {
             this._adapter.setState("info.connection", true, true);
-            this.data.parseCsv(response.data);
+            delete this.data;
+            this.data = new GetStateData(response.data);
             this._hasData = true;
             if (this._updateCallback !== undefined) {
                 this._updateCallback(this.data);

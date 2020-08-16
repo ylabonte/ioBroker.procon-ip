@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "news": {
+            "1.0.1": {
+                "en": "Hotfix release: Fix Object State updates",
+                "de": "Hotfix-Version: Aktualisierungen des Objektstatus korrigieren",
+                "ru": "Выпуск исправления: исправление обновлений состояния объекта",
+                "pt": "Versão de hotfix: corrigir atualizações de estado de objeto",
+                "nl": "Hotfix-release: updates van objectstatus repareren",
+                "fr": "Version du correctif: correction des mises à jour de l'état des objets",
+                "it": "Versione hotfix: correggi gli aggiornamenti dello stato dell'oggetto",
+                "es": "Lanzamiento de revisión: Reparar actualizaciones de estado de objeto",
+                "pl": "Wydanie poprawki: napraw aktualizacje stanu obiektu",
+                "zh-cn": "修补程序版本：修复对象状态更新"
+            },
             "1.0.0": {
                 "en": "Stable release for the official repos. For details see: https://github.com/ylabonte/ioBroker.procon-ip",
                 "de": "Stabile Veröffentlichung für die offiziellen Repos. Weitere Informationen finden Sie unter: https://github.com/ylabonte/ioBroker.procon-ip",

@@ -101,6 +101,13 @@ Useful links for the approach will be
 
 ## Changelog
 
+### 1.0.1
+Hotfix release:
+* Fix Object State updates  
+  For some reason the two js objects used to compare the before and after values
+  of the GetState.csv calls became the same object (before was referencing the
+  new values). That caused the adapter to never update the object states.
+
 ### 1.0.0
 Official release in ioBroker adapter repository:  
 The most exciting change with this release is, that it's available from the
