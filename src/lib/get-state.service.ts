@@ -29,6 +29,12 @@ export class GetStateService extends AbstractService {
 
     private _updateCallback: (data: GetStateData) => any;
 
+    private _maxConsecutiveFails = 2;
+
+    private _consecutiveFails: number;
+
+    private _recentError: any;
+
     public constructor(adapter: ProconIp) {
         super(adapter.config, adapter.log);
         this.data = new GetStateData();
@@ -36,6 +42,7 @@ export class GetStateService extends AbstractService {
         this._updateInterval = adapter.config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
         this._updateCallback = () => { return; };
+        this._consecutiveFails = 0;
     }
 
     public getUpdateInterval(): number {
@@ -82,9 +89,21 @@ export class GetStateService extends AbstractService {
             }
         },
         (e) => {
-            this._adapter.setState("info.connection", false, true);
-            this._hasData = false;
-            this.log.warn(e.response ? e.response : e);
+            this._consecutiveFails += 1;
+            if (this._consecutiveFails > this._maxConsecutiveFails && this._recentError == e) {
+                this._consecutiveFails = 0;
+                this._recentError = null;
+                this._adapter.setState("info.connection", false, true);
+                this._hasData = false;
+                this.log.warn(`${this._consecutiveFails} consecutive requests failed: ${e.response ? e.response : e}`);
+            } else {
+                if (this._recentError != e) {
+                    this.log.info(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
+                    this._recentError = e;
+                } else {
+                    this.log.debug(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
+                }
+            }
         });
     }
 

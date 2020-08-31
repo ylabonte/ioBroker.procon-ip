@@ -10,11 +10,13 @@ class GetStateService extends abstract_service_1.AbstractService {
         this._endpoint = "/GetState.csv";
         this._method = "get";
         this._hasData = false;
+        this._maxConsecutiveFails = 2;
         this.data = new get_state_data_1.GetStateData();
         this._adapter = adapter;
         this._updateInterval = adapter.config.updateInterval;
         this._requestHeaders.Accept = "text/csv,text/plain";
         this._updateCallback = () => { return; };
+        this._consecutiveFails = 0;
     }
     getUpdateInterval() {
         return this._updateInterval;
@@ -53,9 +55,23 @@ class GetStateService extends abstract_service_1.AbstractService {
                 this._updateCallback(this.data);
             }
         }, (e) => {
-            this._adapter.setState("info.connection", false, true);
-            this._hasData = false;
-            this.log.warn(e.response ? e.response : e);
+            this._consecutiveFails += 1;
+            if (this._consecutiveFails > this._maxConsecutiveFails && this._recentError == e) {
+                this._consecutiveFails = 0;
+                this._recentError = null;
+                this._adapter.setState("info.connection", false, true);
+                this._hasData = false;
+                this.log.warn(`${this._consecutiveFails} consecutive requests failed: ${e.response ? e.response : e}`);
+            }
+            else {
+                if (this._recentError != e) {
+                    this.log.info(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
+                    this._recentError = e;
+                }
+                else {
+                    this.log.debug(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
+                }
+            }
         });
     }
     getData() {
