@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "news": {
+            "1.0.2": {
+                "en": "Fine tuned the http requests to the pool controller",
+                "de": "Feinabstimmung der http-Anforderungen an den Pool-Controller",
+                "ru": "Точно настроены HTTP-запросы к контроллеру пула",
+                "pt": "Ajustou as solicitações de http para o controlador de pool",
+                "nl": "De http-verzoeken aan de poolcontroller verfijnd",
+                "fr": "Affiner les requêtes http au contrôleur de pool",
+                "it": "Ottimizzazione delle richieste http al controller del pool",
+                "es": "Ajustó las solicitudes http al controlador de la piscina",
+                "pl": "Dostrojono żądania http do kontrolera puli",
+                "zh-cn": "微调对池控制器的http请求"
+            },
             "1.0.1": {
                 "en": "Hotfix release: Fix Object State updates",
                 "de": "Hotfix-Version: Aktualisierungen des Objektstatus korrigieren",
