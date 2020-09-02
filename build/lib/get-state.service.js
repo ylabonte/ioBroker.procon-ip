@@ -6,17 +6,18 @@ const abstract_service_1 = require("./abstract-service");
 const get_state_data_1 = require("./get-state-data");
 class GetStateService extends abstract_service_1.AbstractService {
     constructor(adapter) {
-        super(adapter.config, adapter.log);
+        super(adapter.config, adapter.log, adapter.config.requestTimeout);
         this._endpoint = "/GetState.csv";
         this._method = "get";
         this._hasData = false;
-        this._maxConsecutiveFails = 2;
-        this.data = new get_state_data_1.GetStateData();
+        this._consecutiveFailsLimit = 10;
         this._adapter = adapter;
         this._updateInterval = adapter.config.updateInterval;
+        this._consecutiveFailsLimit = adapter.config.errorTolerance;
+        this._consecutiveFails = 0;
         this._requestHeaders.Accept = "text/csv,text/plain";
         this._updateCallback = () => { return; };
-        this._consecutiveFails = 0;
+        this.data = new get_state_data_1.GetStateData();
     }
     getUpdateInterval() {
         return this._updateInterval;
@@ -47,6 +48,8 @@ class GetStateService extends abstract_service_1.AbstractService {
     }
     update() {
         this.getData().then((response) => {
+            this._consecutiveFails = 0;
+            this._recentError = null;
             this._adapter.setState("info.connection", true, true);
             delete this.data;
             this.data = new get_state_data_1.GetStateData(response.data);
@@ -56,17 +59,18 @@ class GetStateService extends abstract_service_1.AbstractService {
             }
         }, (e) => {
             this._consecutiveFails += 1;
-            if (this._consecutiveFails > this._maxConsecutiveFails && this._recentError == e) {
-                this._consecutiveFails = 0;
+            if (this._consecutiveFails % this._consecutiveFailsLimit === 0 && this._recentError == e.response) {
+                this.log.warn(`${this._consecutiveFails} consecutive requests failed: ${e.response ? e.response : e}`);
                 this._recentError = null;
                 this._adapter.setState("info.connection", false, true);
                 this._hasData = false;
-                this.log.warn(`${this._consecutiveFails} consecutive requests failed: ${e.response ? e.response : e}`);
+                this._consecutiveFails = 0;
             }
             else {
-                if (this._recentError != e) {
+                if (this._recentError != e.response) {
                     this.log.info(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
-                    this._recentError = e;
+                    this._recentError = e.response;
+                    this._consecutiveFails = 1;
                 }
                 else {
                     this.log.debug(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);

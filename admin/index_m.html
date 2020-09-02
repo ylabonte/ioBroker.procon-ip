@@ -31,9 +31,19 @@
                     pattern: _('The url you have entered does not start with \'http://\' or \'https://\''),
                 },
                 updateInterval: {
-                    required: _('Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).'),
-                    min: _('Please keep the value above 100(ms).'),
-                    max: _('Please choose a value smaller than 86400000(ms = 24h).'),
+                    required: _('Please keep it reasonably plausible and stay between 500(ms) and 86400000(ms = 24h).'),
+                    min: _('Please keep the value greater or equal 500(ms).'),
+                    max: _('Please choose a value lesser or equal 86400000(ms = 24h).'),
+                },
+                requestTimeout: {
+                    required: _('Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).'),
+                    min: _('Please keep the value greater or euqal 500(ms).'),
+                    max: _('Please choose a value lesser or equal 60000(ms = 60s).'),
+                },
+                errorTolerance: {
+                    required: _('Define after how many consecutively failed requests as warning will be logged.'),
+                    min: _('Please keep the value greater or equal 2.'),
+                    max: _('Please choose a value greater or equal 1000.'),
                 },
             };
 
@@ -178,12 +188,28 @@
         </div>
 
         <div class="row">
-            <div class="col s6 input-field">
+            <div class="col s6 m4 input-field">
                 <input type="number" class="value" id="updateInterval" data-default="3000"
-                       min="100" max="86400000"
+                       min="500" max="86400000"
                        required>
                 <label for="updateInterval" class="translate">Update interval (ms)</label>
-                <span class="helper-text translate">Please keep it reasonably plausible and stay between 100(ms) and 86400000(ms = 24h).</span>
+                <span class="helper-text translate">Please keep it reasonably plausible and stay between 500(ms) and 86400000(ms = 24h).</span>
+            </div>
+
+            <div class="col s6 m4 input-field">
+                <input type="number" class="value" id="requestTimeout" data-default="10000"
+                       min="500" max="60000"
+                       required>
+                <label for="requestTimeout" class="translate">Request timeout (ms)</label>
+                <span class="helper-text translate">Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).</span>
+            </div>
+
+            <div class="col s6 m4 input-field">
+                <input type="number" class="value" id="errorTolerance" data-default="10"
+                       min="2" max="1000"
+                       required>
+                <label for="errorTolerance" class="translate">Max tolerable errors</label>
+                <span class="helper-text translate">Define after how many consecutively failed requests as warning will be logged.</span>
             </div>
         </div>
 

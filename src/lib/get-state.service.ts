@@ -29,20 +29,21 @@ export class GetStateService extends AbstractService {
 
     private _updateCallback: (data: GetStateData) => any;
 
-    private _maxConsecutiveFails = 2;
+    private _consecutiveFailsLimit = 10;
 
     private _consecutiveFails: number;
 
     private _recentError: any;
 
     public constructor(adapter: ProconIp) {
-        super(adapter.config, adapter.log);
-        this.data = new GetStateData();
+        super(adapter.config, adapter.log, adapter.config.requestTimeout);
         this._adapter = adapter;
         this._updateInterval = adapter.config.updateInterval;
+        this._consecutiveFailsLimit = adapter.config.errorTolerance;
+        this._consecutiveFails = 0;
         this._requestHeaders.Accept = "text/csv,text/plain";
         this._updateCallback = () => { return; };
-        this._consecutiveFails = 0;
+        this.data = new GetStateData();
     }
 
     public getUpdateInterval(): number {
@@ -80,6 +81,8 @@ export class GetStateService extends AbstractService {
 
     public update(): void {
         this.getData().then((response) => {
+            this._consecutiveFails = 0;
+            this._recentError = null;
             this._adapter.setState("info.connection", true, true);
             delete this.data;
             this.data = new GetStateData(response.data);
@@ -90,16 +93,17 @@ export class GetStateService extends AbstractService {
         },
         (e) => {
             this._consecutiveFails += 1;
-            if (this._consecutiveFails > this._maxConsecutiveFails && this._recentError == e) {
-                this._consecutiveFails = 0;
+            if (this._consecutiveFails % this._consecutiveFailsLimit === 0 && this._recentError == e.response) {
+                this.log.warn(`${this._consecutiveFails} consecutive requests failed: ${e.response ? e.response : e}`);
                 this._recentError = null;
                 this._adapter.setState("info.connection", false, true);
                 this._hasData = false;
-                this.log.warn(`${this._consecutiveFails} consecutive requests failed: ${e.response ? e.response : e}`);
+                this._consecutiveFails = 0;
             } else {
-                if (this._recentError != e) {
+                if (this._recentError != e.response) {
                     this.log.info(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
-                    this._recentError = e;
+                    this._recentError = e.response;
+                    this._consecutiveFails = 1;
                 } else {
                     this.log.debug(`${this._consecutiveFails} request(s) failed: ${e.response ? e.response : e}`);
                 }

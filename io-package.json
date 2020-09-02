@@ -232,9 +232,11 @@
     "native": {
         "controllerUrl": "",
         "basicAuth": true,
-        "username": "",
-        "password": "",
-        "updateInterval": 3000
+        "username": "admin",
+        "password": "admin",
+        "updateInterval": 3000,
+        "requestTimeout": 10000,
+        "errorTolerance": 10
     },
     "objects": [],
     "instanceObjects": [

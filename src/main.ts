@@ -24,8 +24,11 @@ declare global {
             username: string;
             password: string;
             updateInterval: number;
+            requestTimeout: number;
+            errorTolerance: number;
 
-            // Or use a catch-all approach
+            // Use a catch-all approach to enable array-like iteration with
+            // key as a variable...
             [key: string]: any;
         }
     }

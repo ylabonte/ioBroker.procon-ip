@@ -101,6 +101,13 @@ Useful links for the approach will be
 
 ## Changelog
 
+### 1.0.2
+Minor patch:
+* Fine tune the polling requests (add additional adapter settings for this).
+* Wait a configurable amount of consecutive errors, before raising the log level
+  to _Warning_.
+* **Both should fix issues regarding minor network disruptions.**
+
 ### 1.0.1
 Hotfix release:
 * Fix Object State updates  

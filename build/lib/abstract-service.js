@@ -3,13 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractService = void 0;
 const http_1 = require("http");
 class AbstractService {
-    constructor(config, logger) {
+    constructor(config, logger, timeout) {
         this._requestHeaders = {};
         this._baseUrl = config.controllerUrl;
         this._username = config.username;
         this._password = config.password;
         this._basicAuth = config.basicAuth;
-        this._timeout = 4500;
+        this._timeout = timeout ? timeout : 4500;
         this._agent = new http_1.Agent({
             /**
              * Socket timeout in milliseconds. This will set the timeout after the socket is connected.
@@ -18,15 +18,15 @@ class AbstractService {
             /**
              * Maximum number of sockets to allow per host. Default for Node 0.10 is 5, default for Node 0.12 is Infinity
              */
-            maxSockets: 16,
+            maxSockets: 5,
             /**
              * Maximum number of sockets to leave open in a free state. Only relevant if keepAlive is set to true. Default = 256.
              */
-            maxFreeSockets: 8,
+            maxFreeSockets: 3,
             /**
              * Keep sockets around in a pool to be used by other requests in the future. Default = false
              */
-            keepAlive: true,
+            keepAlive: false,
             /**
              * When using HTTP KeepAlive, how often to send TCP KeepAlive packets over sockets being kept alive. Default = 1000.
              * Only relevant if keepAlive is set to true.
