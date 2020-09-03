@@ -10,29 +10,6 @@ class AbstractService {
         this._password = config.password;
         this._basicAuth = config.basicAuth;
         this._timeout = timeout ? timeout : 4500;
-        this._agent = new http_1.Agent({
-            /**
-             * Socket timeout in milliseconds. This will set the timeout after the socket is connected.
-             */
-            timeout: this._timeout,
-            /**
-             * Maximum number of sockets to allow per host. Default for Node 0.10 is 5, default for Node 0.12 is Infinity
-             */
-            maxSockets: 5,
-            /**
-             * Maximum number of sockets to leave open in a free state. Only relevant if keepAlive is set to true. Default = 256.
-             */
-            maxFreeSockets: 3,
-            /**
-             * Keep sockets around in a pool to be used by other requests in the future. Default = false
-             */
-            keepAlive: false,
-            /**
-             * When using HTTP KeepAlive, how often to send TCP KeepAlive packets over sockets being kept alive. Default = 1000.
-             * Only relevant if keepAlive is set to true.
-             */
-            keepAliveMsecs: this._timeout
-        });
         this.log = logger;
     }
     get baseUrl() {
@@ -67,12 +44,34 @@ class AbstractService {
     // }
     get axiosRequestConfig() {
         const config = {
-            httpAgent: this._agent,
             // baseURL: this._baseUrl,
             timeout: this._timeout,
             url: this.url,
             method: this._method,
-            headers: this._requestHeaders
+            headers: this._requestHeaders,
+            httpAgent: new http_1.Agent({
+                /**
+                 * Socket timeout in milliseconds. This will set the timeout after the socket is connected.
+                 */
+                timeout: this._timeout,
+                /**
+                 * Maximum number of sockets to allow per host. Default for Node 0.10 is 5, default for Node 0.12 is Infinity
+                 */
+                maxSockets: 5,
+                /**
+                 * Maximum number of sockets to leave open in a free state. Only relevant if keepAlive is set to true. Default = 256.
+                 */
+                maxFreeSockets: 3,
+                /**
+                 * Keep sockets around in a pool to be used by other requests in the future. Default = false
+                 */
+                keepAlive: false,
+                /**
+                 * When using HTTP KeepAlive, how often to send TCP KeepAlive packets over sockets being kept alive. Default = 1000.
+                 * Only relevant if keepAlive is set to true.
+                 */
+                keepAliveMsecs: this._timeout
+            }),
         };
         if (this._basicAuth) {
             config.auth = {
