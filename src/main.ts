@@ -198,7 +198,7 @@ export class ProconIp extends utils.Adapter {
         }
     }
 
-    public async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<void> {
+    public async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<number> {
         const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, ".onOff"));
         if (!onOffState) {
             throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
@@ -214,17 +214,18 @@ export class ProconIp extends utils.Adapter {
         try {
             if (!!state.val) {
                 this.log.info(`Switching ${obj.native.label}: auto`);
-                await this.usrcfgCgiService.setAuto(getStateDataObject);
+                return this.usrcfgCgiService.setAuto(getStateDataObject);
             } else if (!!onOffState.val) {
                 this.log.info(`Switching ${obj.native.label}: on`);
-                await this.usrcfgCgiService.setOn(getStateDataObject);
+                return this.usrcfgCgiService.setOn(getStateDataObject);
             } else {
                 this.log.info(`Switching ${obj.native.label}: off`);
-                await this.usrcfgCgiService.setOff(getStateDataObject);
+                return this.usrcfgCgiService.setOff(getStateDataObject);
             }
         } catch (e) {
-            this.log.error(`Error on switching operation: ${e}`);
+            throw new Error(`Error on switching operation: ${e}`);
         }
+
     }
 
     public async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {

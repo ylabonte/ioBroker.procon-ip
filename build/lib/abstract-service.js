@@ -3,13 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractService = void 0;
 const http_1 = require("http");
 class AbstractService {
-    constructor(config, logger, timeout) {
+    constructor(config, logger) {
         this._requestHeaders = {};
         this._baseUrl = config.controllerUrl;
         this._username = config.username;
         this._password = config.password;
         this._basicAuth = config.basicAuth;
-        this._timeout = timeout ? timeout : 4500;
+        this._timeout = config.requestTimeout;
         this.log = logger;
     }
     get baseUrl() {

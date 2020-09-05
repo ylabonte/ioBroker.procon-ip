@@ -36,7 +36,7 @@ export class GetStateService extends AbstractService {
     private _recentError: any;
 
     public constructor(adapter: ProconIp) {
-        super(adapter.config, adapter.log, adapter.config.requestTimeout);
+        super(adapter.config, adapter.log);
         this._adapter = adapter;
         this._updateInterval = adapter.config.updateInterval;
         this._consecutiveFailsLimit = adapter.config.errorTolerance;

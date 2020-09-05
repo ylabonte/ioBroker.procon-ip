@@ -6,7 +6,7 @@ const abstract_service_1 = require("./abstract-service");
 const get_state_data_1 = require("./get-state-data");
 class GetStateService extends abstract_service_1.AbstractService {
     constructor(adapter) {
-        super(adapter.config, adapter.log, adapter.config.requestTimeout);
+        super(adapter.config, adapter.log);
         this._endpoint = "/GetState.csv";
         this._method = "get";
         this._hasData = false;

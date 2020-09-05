@@ -42,6 +42,19 @@ export class UsrcfgCgiService extends AbstractService {
     }
 
     private async setState(relay: GetStateDataObject, state: SetStateValue|number): Promise<number> {
+        for (let errors = 0; errors < 3; errors++) {
+            try {
+                const returnValue = await this._setState(relay, state);
+                return new Promise<number>(() => returnValue);
+            } catch (e) {
+                this.log.debug(`Error sending relay control command: ${e}`);
+            }
+        }
+
+        return new Promise<number>(() => -1);
+    }
+
+    private async _setState(relay: GetStateDataObject, state: SetStateValue|number): Promise<number> {
         let data: [number, number]|undefined = undefined;
         let desiredValue: number;
         switch (state) {

@@ -46,6 +46,20 @@ class UsrcfgCgiService extends abstract_service_1.AbstractService {
     }
     setState(relay, state) {
         return __awaiter(this, void 0, void 0, function* () {
+            for (let errors = 0; errors < 3; errors++) {
+                try {
+                    const returnValue = yield this._setState(relay, state);
+                    return new Promise(() => returnValue);
+                }
+                catch (e) {
+                    this.log.debug(`Error sending relay control command: ${e}`);
+                }
+            }
+            return new Promise(() => -1);
+        });
+    }
+    _setState(relay, state) {
+        return __awaiter(this, void 0, void 0, function* () {
             let data = undefined;
             let desiredValue;
             switch (state) {
@@ -80,7 +94,7 @@ class UsrcfgCgiService extends abstract_service_1.AbstractService {
                         reject(`(${response.status}: ${response.statusText}) Error sending relay control command: ${response.data}`);
                     }
                 }).catch((e) => {
-                    reject("response" in e ? e.response : e);
+                    reject(`Error sending relay control command: ${e.response ? e.response : e}`);
                 });
             });
         });

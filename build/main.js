@@ -178,19 +178,19 @@ class ProconIp extends utils.Adapter {
             try {
                 if (!!state.val) {
                     this.log.info(`Switching ${obj.native.label}: auto`);
-                    yield this.usrcfgCgiService.setAuto(getStateDataObject);
+                    return this.usrcfgCgiService.setAuto(getStateDataObject);
                 }
                 else if (!!onOffState.val) {
                     this.log.info(`Switching ${obj.native.label}: on`);
-                    yield this.usrcfgCgiService.setOn(getStateDataObject);
+                    return this.usrcfgCgiService.setOn(getStateDataObject);
                 }
                 else {
                     this.log.info(`Switching ${obj.native.label}: off`);
-                    yield this.usrcfgCgiService.setOff(getStateDataObject);
+                    return this.usrcfgCgiService.setOff(getStateDataObject);
                 }
             }
             catch (e) {
-                this.log.error(`Error on switching operation: ${e}`);
+                throw new Error(`Error on switching operation: ${e}`);
             }
         });
     }

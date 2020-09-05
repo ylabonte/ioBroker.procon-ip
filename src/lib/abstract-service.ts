@@ -21,13 +21,13 @@ export abstract class AbstractService {
 
     protected log: ioBroker.Logger;
 
-    protected constructor(config: ioBroker.AdapterConfig, logger: ioBroker.Logger, timeout?: number) {
+    protected constructor(config: ioBroker.AdapterConfig, logger: ioBroker.Logger) {
         this._requestHeaders = {};
         this._baseUrl = config.controllerUrl;
         this._username = config.username;
         this._password = config.password;
         this._basicAuth = config.basicAuth;
-        this._timeout = timeout ? timeout : 4500;
+        this._timeout = config.requestTimeout;
         this.log = logger;
     }
 
