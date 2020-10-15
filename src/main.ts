@@ -5,12 +5,13 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from "@iobroker/adapter-core";
-import {GetStateService} from "./lib/get-state.service";
-import {UsrcfgCgiService} from "./lib/usrcfg-cgi.service";
-import {RelayDataInterpreter} from "./lib/relay-data-interpreter";
-import {GetStateCategory, GetStateData} from "./lib/get-state-data";
-import {GetStateDataSysInfo} from "./lib/get-state-data-sys-info";
-import {GetStateDataObject} from "./lib/get-state-data-object";
+import {ServiceConfig} from "procon-ip/lib/service-config"
+import {GetStateService, GetStateServiceConfig} from "procon-ip/lib/get-state.service"
+import {UsrcfgCgiService} from "procon-ip/lib/usrcfg-cgi.service";
+import {RelayDataInterpreter} from "procon-ip/lib/relay-data-interpreter";
+import {GetStateCategory, GetStateData} from "procon-ip/lib/get-state-data";
+import {GetStateDataSysInfo} from "procon-ip/lib/get-state-data-sys-info";
+import {GetStateDataObject} from "procon-ip/lib/get-state-data-object";
 import {CryptoHelper} from "./lib/crypto-helper";
 
 // Augment the adapter.config object with the actual types
@@ -63,9 +64,9 @@ export class ProconIp extends utils.Adapter {
      */
     private async onReady(): Promise<void> {
         this.getForeignObject("system.config", (err: any, obj: any) => {
-            const encryptedNative: string[] = [];
+            let encryptedNative: string[] = [];
             if (this.ioPack && this.ioPack.encryptedNative) {
-                encryptedNative.concat(this.ioPack.encryptedNative as string[]);
+                encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative as string[]);
             }
             for (const setting in this.config) {
                 if (encryptedNative.indexOf(setting) >= 0 &&
@@ -86,10 +87,20 @@ export class ProconIp extends utils.Adapter {
             // this.config:
             this.log.debug("config basicAuth: " + this.config.basicAuth);
             this.log.debug("config updateInterval: " + this.config.updateInterval);
-    
+
+            const serviceConfig = Object.defineProperties(Object.create(this.config), {
+                baseUrl: {
+                    value: this.config.controllerUrl,
+                    writable: true,
+                },
+                timeout: {
+                    value: this.config.requestTimeout,
+                    writable: true,
+                },
+            });
             this.relayDataInterpreter = new RelayDataInterpreter(this.log);
-            this.getStateService = new GetStateService(this);
-            this.usrcfgCgiService = new UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
+            this.getStateService = new GetStateService(serviceConfig as GetStateServiceConfig, this.log);
+            this.usrcfgCgiService = new UsrcfgCgiService(serviceConfig as ServiceConfig, this.log, this.getStateService, this.relayDataInterpreter);
     
             this.log.debug(`GetStateService url: ${this.getStateService.url}`);
             this.log.debug(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);

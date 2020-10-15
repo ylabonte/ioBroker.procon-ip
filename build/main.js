@@ -16,10 +16,10 @@ exports.ProconIp = void 0;
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
-const get_state_service_1 = require("./lib/get-state.service");
-const usrcfg_cgi_service_1 = require("./lib/usrcfg-cgi.service");
-const relay_data_interpreter_1 = require("./lib/relay-data-interpreter");
-const get_state_data_1 = require("./lib/get-state-data");
+const get_state_service_1 = require("procon-ip/lib/get-state.service");
+const usrcfg_cgi_service_1 = require("procon-ip/lib/usrcfg-cgi.service");
+const relay_data_interpreter_1 = require("procon-ip/lib/relay-data-interpreter");
+const get_state_data_1 = require("procon-ip/lib/get-state-data");
 const crypto_helper_1 = require("./lib/crypto-helper");
 class ProconIp extends utils.Adapter {
     constructor(options = {}) {
@@ -40,9 +40,9 @@ class ProconIp extends utils.Adapter {
     onReady() {
         return __awaiter(this, void 0, void 0, function* () {
             this.getForeignObject("system.config", (err, obj) => {
-                const encryptedNative = [];
+                let encryptedNative = [];
                 if (this.ioPack && this.ioPack.encryptedNative) {
-                    encryptedNative.concat(this.ioPack.encryptedNative);
+                    encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative);
                 }
                 for (const setting in this.config) {
                     if (encryptedNative.indexOf(setting) >= 0 &&
@@ -63,9 +63,19 @@ class ProconIp extends utils.Adapter {
                 // this.config:
                 this.log.debug("config basicAuth: " + this.config.basicAuth);
                 this.log.debug("config updateInterval: " + this.config.updateInterval);
+                const serviceConfig = Object.defineProperties(Object.create(this.config), {
+                    baseUrl: {
+                        value: this.config.controllerUrl,
+                        writable: true,
+                    },
+                    timeout: {
+                        value: this.config.requestTimeout,
+                        writable: true,
+                    },
+                });
                 this.relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter(this.log);
-                this.getStateService = new get_state_service_1.GetStateService(this);
-                this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(this.config, this.log, this.getStateService, this.relayDataInterpreter);
+                this.getStateService = new get_state_service_1.GetStateService(serviceConfig, this.log);
+                this.usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(serviceConfig, this.log, this.getStateService, this.relayDataInterpreter);
                 this.log.debug(`GetStateService url: ${this.getStateService.url}`);
                 this.log.debug(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
                 // Start the actual service
