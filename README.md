@@ -101,8 +101,13 @@ Useful links for the approach will be
 
 ## Changelog
 
+### 1.1.0
+Minor release:
+* Move API library sources to a separate repository.
+* Update `common.name` attributes when the corresponding label changes.
+
 ### 1.0.2
-Minor update:
+Minor update (was accidentally released as patch, regarding the version number):
 * Fine tune the polling and control requests 
   (add additional adapter settings for this).
 * Wait a configurable amount of consecutive errors, before raising the log 

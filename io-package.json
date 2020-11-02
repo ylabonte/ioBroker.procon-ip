@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.0.2",
+        "version": "1.1.0",
         "news": {
+            "1.1.0": {
+                "en": "Minor release, moving the API library source code into a separate repository (npm package) and adding capability to update `common.name` attributes when object labels change.",
+                "de": "Kleines Update: Verschieben des Quellcodes der API-Bibliothek in ein separates Repository (npm-Paket) und Hinzufügen der Funktion zum Aktualisieren der Attribute \"common.name\", wenn sich die Objektbezeichnungen ändern.",
+                "ru": "Незначительный выпуск, в котором исходный код библиотеки API перемещен в отдельный репозиторий (пакет npm) и добавлена возможность обновлять атрибуты common.name при изменении меток объектов.",
+                "pt": "Versão secundária, movendo o código-fonte da biblioteca API para um repositório separado (pacote npm) e adicionando capacidade para atualizar os atributos `common.name` quando os rótulos dos objetos mudam.",
+                "nl": "Kleine uitgave, waarbij de broncode van de API-bibliotheek naar een aparte repository (npm-pakket) wordt verplaatst en de mogelijkheid wordt toegevoegd om de kenmerken van 'common.name' bij te werken wanneer objectlabels veranderen.",
+                "fr": "Version mineure, déplacement du code source de la bibliothèque API dans un référentiel séparé (package npm) et ajout de la possibilité de mettre à jour les attributs `common.name` lorsque les étiquettes d'objet changent.",
+                "it": "Versione minore, spostamento del codice sorgente della libreria API in un repository separato (pacchetto npm) e aggiunta della capacità di aggiornare gli attributi `common.name` quando le etichette degli oggetti cambiano.",
+                "es": "Lanzamiento menor, moviendo el código fuente de la biblioteca API a un repositorio separado (paquete npm) y agregando capacidad para actualizar los atributos `common.name` cuando cambian las etiquetas de los objetos.",
+                "pl": "Wydanie drugorzędne, przenoszące kod źródłowy biblioteki API do oddzielnego repozytorium (pakiet npm) i dodające możliwość aktualizowania atrybutów common.name, gdy zmieniają się etykiety obiektów.",
+                "zh-cn": "次要版本，将API库的源代码移动到单独的存储库（npm软件包）中，并添加了在对象标签更改时更新“ common.name”属性的功能。"
+            },
             "1.0.2": {
                 "en": "Fine tuned the http requests to the pool controller",
                 "de": "Feinabstimmung der http-Anforderungen an den Pool-Controller",

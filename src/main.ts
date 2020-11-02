@@ -137,8 +137,12 @@ export class ProconIp extends utils.Adapter {
                     const forceObjStateUpdate = this.forceUpdate.indexOf(obj.id);
                     if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
                         this._stateData.getDataObject(obj.id) && 
-                        obj.value !== this._stateData.getDataObject(obj.id).value)
-                    ) {
+                        obj.value !== this._stateData.getDataObject(obj.id).value
+                    )) {
+                        if (obj.label !== this._stateData.getDataObject(obj.id).label) {
+                            this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
+                            this.updateObjectCommonName(obj);
+                        }
                         this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
                         this.setDataState(obj);
                         if (this.forceUpdate[forceObjStateUpdate]) {
@@ -461,6 +465,22 @@ export class ProconIp extends utils.Adapter {
         });
         this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, this.relayDataInterpreter.isOn(obj), true).catch((e) => {
             this.log.error(`Failed setting onOff switch state for '${obj.label}': ${e}`);
+        });
+    }
+
+    public updateObjectCommonName(obj: GetStateDataObject): void {
+        const objId = `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`;
+        this.getObjectAsync(objId).then((ioObj) => {
+            if (ioObj) {
+                ioObj.common.name = obj.label;
+                this.setObjectAsync(objId, ioObj);
+            }
+        });
+        this.getStatesOfAsync(objId).then((objStates) => {
+            objStates.forEach((state) => {
+                state.common.name = obj.label;
+                this.setObjectAsync(state._id, state);
+            });
         });
     }
 }
