@@ -103,8 +103,9 @@ Useful links for the approach will be
 
 ### 1.1.0
 Minor release:
-* Move API library sources to a separate repository.
+* Move API library sources into a [separate package](https://www.npmjs.com/package/procon-ip).
 * Update `common.name` attributes when the corresponding label changes.
+* Update dependencies
 
 ### 1.0.2
 Minor update (was accidentally released as patch, regarding the version number):
