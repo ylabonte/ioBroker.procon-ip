@@ -5,8 +5,8 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from "@iobroker/adapter-core";
-import {ServiceConfig} from "procon-ip/lib/service-config"
-import {GetStateService, GetStateServiceConfig} from "procon-ip/lib/get-state.service"
+import {IServiceConfig} from "procon-ip/lib/abstract-service";
+import {GetStateService, IGetStateServiceConfig} from "procon-ip/lib/get-state.service"
 import {UsrcfgCgiService} from "procon-ip/lib/usrcfg-cgi.service";
 import {RelayDataInterpreter} from "procon-ip/lib/relay-data-interpreter";
 import {GetStateCategory, GetStateData} from "procon-ip/lib/get-state-data";
@@ -82,7 +82,7 @@ export class ProconIp extends utils.Adapter {
                     }
                 }
             }
-    
+
             // The adapters config (in the instance object everything under the attribute "native") is accessible via
             // this.config:
             this.log.debug("config basicAuth: " + this.config.basicAuth);
@@ -99,9 +99,9 @@ export class ProconIp extends utils.Adapter {
                 },
             });
             this.relayDataInterpreter = new RelayDataInterpreter(this.log);
-            this.getStateService = new GetStateService(serviceConfig as GetStateServiceConfig, this.log);
-            this.usrcfgCgiService = new UsrcfgCgiService(serviceConfig as ServiceConfig, this.log, this.getStateService, this.relayDataInterpreter);
-    
+            this.getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
+            this.usrcfgCgiService = new UsrcfgCgiService(serviceConfig as IServiceConfig, this.log, this.getStateService, this.relayDataInterpreter);
+
             this.log.debug(`GetStateService url: ${this.getStateService.url}`);
             this.log.debug(`UsrcfgCgiService url: ${this.usrcfgCgiService.url}`);
 
@@ -136,7 +136,7 @@ export class ProconIp extends utils.Adapter {
                     // Only update when value has changed or update is forced (on state change)
                     const forceObjStateUpdate = this.forceUpdate.indexOf(obj.id);
                     if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
-                        this._stateData.getDataObject(obj.id) && 
+                        this._stateData.getDataObject(obj.id) &&
                         obj.value !== this._stateData.getDataObject(obj.id).value
                     )) {
                         if (obj.label !== this._stateData.getDataObject(obj.id).label) {
@@ -155,7 +155,7 @@ export class ProconIp extends utils.Adapter {
                 this._stateData = data;
                 this._bootstrapped = true;
             });
-    
+
             this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
             this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
         });
