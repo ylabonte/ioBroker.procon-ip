@@ -6,7 +6,6 @@
 [![Installations](http://iobroker.live/badges/procon-ip-installed.svg)](http://iobroker.live/badges/procon-ip-installed.svg)
 [![Dependency Status](https://img.shields.io/david/ylabonte/iobroker.procon-ip.svg)](https://david-dm.org/ylabonte/iobroker.procon-ip)
 [![Known Vulnerabilities](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip/badge.svg)](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip)
-[![Travis-CI](http://img.shields.io/travis/ylabonte/ioBroker.procon-ip/master.svg)](https://travis-ci.org/ylabonte/ioBroker.procon-ip)
 
 [![NPM](https://nodei.co/npm/iobroker.procon-ip.png?downloads=true)](https://nodei.co/npm/iobroker.procon-ip/)
 
