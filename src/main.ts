@@ -112,10 +112,8 @@ export class ProconIp extends utils.Adapter {
             this.log.debug(`GetStateService url: ${this._getStateService.url}`);
             this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
 
-            // Start the actual service
-            this._getStateService.start((data: GetStateData) => {
-                this.log.silly(`Start processing new GetState.csv`);
-
+            this._getStateService.update().then(data => {
+                this._stateData = data;
 
                 // Set objects once
                 if (!this._bootstrapped) {
@@ -123,50 +121,58 @@ export class ProconIp extends utils.Adapter {
                     this.setSysInfo(data.sysInfo);
                     this.setObjects(data.objects);
                 }
-
-                // Set sys info states
-                data.sysInfo.toArrayOfObjects().forEach((info) => {
-                    // Only update when value has changed
-                    if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
-                        this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                        this.setStateAsync(`${this.name}.${this.instance}.info.system.${info.key}`, info.value.toString(), true).catch((e) => {
-                            this.log.error(`Failed setting state for '${info.key}': ${e}`);
-                        });
-                    }
-                });
-
-                // Set actual sensor and actor/relay object states
-                data.objects.forEach((obj) => {
-                    this.log.silly(`Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`);
-                    this.log.silly(`this._stateData.getDataObject(obj.id).value: ${this._stateData.getDataObject(obj.id).value}`);
-                    this.log.silly(`obj.value: ${obj.value}`);
-
-                    // Only update when value has changed or update is forced (on state change)
-                    const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
-                    if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
-                        this._stateData.getDataObject(obj.id) &&
-                        this._stateData.getDataObject(obj.id).value != obj.value
-                    )) {
-                        if (this._stateData.getDataObject(obj.id).label != obj.label) {
-                            this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
-                            this.updateObjectCommonName(obj);
-                        }
-                        this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
-                        this.setDataState(obj);
-                        if (this._forceUpdate[forceObjStateUpdate]) {
-                            delete this._forceUpdate[forceObjStateUpdate];
-                        }
-                    }
-                });
-
-                this.log.silly(`Updating data object for next comparison`);
-                this._stateData = data;
-                this._bootstrapped = true;
-                this.setState("info.connection", true, true);
-            },
-            () => {
-                this.setState("connection.info", false, true);
             });
+
+            setTimeout(() => {
+                // Start the actual service
+                this._getStateService.start((data: GetStateData) => {
+                    this.log.silly(`Start processing new GetState.csv`);
+
+                    // Set sys info states
+                    data.sysInfo.toArrayOfObjects().forEach((info) => {
+                        // Only update when value has changed
+                        if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
+                            this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
+                            this.setStateAsync(`${this.name}.${this.instance}.info.system.${info.key}`, info.value.toString(), true).catch((e) => {
+                                this.log.error(`Failed setting state for '${info.key}': ${e}`);
+                            });
+                        }
+                    });
+
+                    // Set actual sensor and actor/relay object states
+                    data.objects.forEach((obj) => {
+                        this.log.silly(`Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`);
+                        this.log.silly(`this._stateData.getDataObject(obj.id).value: ${this._stateData.getDataObject(obj.id).value}`);
+                        this.log.silly(`obj.value: ${obj.value}`);
+
+                        // Only update when value has changed or update is forced (on state change)
+                        const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
+                        if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
+                            this._stateData.getDataObject(obj.id) &&
+                            this._stateData.getDataObject(obj.id).value != obj.value
+                        )) {
+                            if (this._stateData.getDataObject(obj.id).label != obj.label) {
+                                this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
+                                this.updateObjectCommonName(obj);
+                            }
+                            this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
+                            this.setDataState(obj);
+                            if (this._forceUpdate[forceObjStateUpdate]) {
+                                delete this._forceUpdate[forceObjStateUpdate];
+                            }
+                        }
+                    });
+
+                    this.log.silly(`Updating data object for next comparison`);
+                    this._stateData = data;
+                    this._bootstrapped = true;
+                    this.setState("info.connection", true, true);
+                },
+                () => {
+                    this.setState("connection.info", false, true);
+                });
+            },
+            3000);
 
             this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
             this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
@@ -404,7 +410,7 @@ export class ProconIp extends utils.Adapter {
             }
 
             try {
-                await this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
+                this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
                     type: "state",
                     common: common,
                     native: obj,
@@ -481,7 +487,6 @@ export class ProconIp extends utils.Adapter {
     }
 
     public setDataState(obj: GetStateDataObject): void {
-
         for (const field of Object.keys(obj).filter(field => this._objectStateFields.indexOf(field) > -1)) {
             this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, obj[field], true).catch((e) => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
