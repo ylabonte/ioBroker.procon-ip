@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "news": {
-            "1.1.0": {
+            "1.1.1": {
                 "en": "Minor release, moving the API library source code into a separate repository (npm package) and adding capability to update `common.name` attributes when object labels change.",
                 "de": "Kleines Update: Verschieben des Quellcodes der API-Bibliothek in ein separates Repository (npm-Paket) und Hinzufügen der Funktion zum Aktualisieren der Attribute \"common.name\", wenn sich die Objektbezeichnungen ändern.",
                 "ru": "Незначительный выпуск, в котором исходный код библиотеки API перемещен в отдельный репозиторий (пакет npm) и добавлена возможность обновлять атрибуты common.name при изменении меток объектов.",
