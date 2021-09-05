@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 
 /**
  * Tests whether the given variable is a real object and not an Array
@@ -30,10 +30,12 @@ export async function translateText(text: string, targetLang: string): Promise<s
     if (targetLang === "en") return text;
     try {
         const url = `http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}&ie=UTF-8&oe=UTF-8`;
-        const response = await axios({url, timeout: 5000});
-        if (isArray(response.data)) {
+        const response: AxiosResponse = await axios({url, timeout: 5000});
+        if (isArray(response.data) && response.data[0] &&
+            isArray(response.data[0]) && response.data[0][0] &&
+            isArray(response.data[0][0]) && response.data[0][0][0]) {
             // we got a valid response
-            return response.data[0][0][0];
+            return response.data[0][0][0] as string;
         }
         throw new Error("Invalid response for translate request");
     } catch (e) {
