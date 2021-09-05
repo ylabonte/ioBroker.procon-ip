@@ -220,6 +220,7 @@
         "mode": "daemon",
         "type": "iot-systems",
         "connectionType": "local",
+        "dataSource": "poll",
         "compact": true,
         "materialize": true,
         "materializeTab": true,
