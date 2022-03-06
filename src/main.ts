@@ -96,7 +96,7 @@ export class ProconIp extends utils.Adapter {
             // this.config:
             if (this.config["controllerUrl"].length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
                 this.log.warn(`Invalid controller URL ('${this.config["controllerUrl"]}') supplied.`);
-                return 0;
+                return;
             }
 
             const serviceConfig = Object.defineProperties(Object.create(this.config), {
@@ -118,7 +118,6 @@ export class ProconIp extends utils.Adapter {
 
             this._getStateService.update().then(data => {
                 this._stateData = data;
-                connectionApproved = true;
 
                 // Set objects once
                 if (!this._bootstrapped) {
@@ -178,8 +177,7 @@ export class ProconIp extends utils.Adapter {
                     this.setState("info.connection", false, true);
                     if (!connectionApproved) {
                         this.log.error(`Could not connect to the controller: ${e?.message ? e.message : e}`);
-                        if (this.stop)
-                            this.stop();
+                        this._getStateService?.stop();
                     }
                 });
             },
@@ -196,8 +194,7 @@ export class ProconIp extends utils.Adapter {
     private onUnload(callback: () => void): void {
         try {
             // Stop the service loop (this also handles the info.connection state)
-            if (this._getStateService?.stop)
-                this._getStateService.stop();
+            this._getStateService?.stop();
             this.setState("info.connection", false, true);
         } catch (e) {
             this.log.error(`Failed to stop GetState service: ${e}`);
