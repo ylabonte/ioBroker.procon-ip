@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.5.1",
-    "procon-ip": "^1.2.1"
+    "procon-ip": "^1.3.2"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.4.4",
