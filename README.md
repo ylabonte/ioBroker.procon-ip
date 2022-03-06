@@ -104,6 +104,7 @@ Useful links for the approach will be
 Bugfix release:
 * Update `procon-ip` API library package to v1.3.2  
   (should fix a bug that let the relay switching fail).
+* Fix minor issues that occur with invalid controller URLs.
 * Update other dependencies.
 
 ### Release v1.1.1

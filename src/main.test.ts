@@ -6,7 +6,7 @@
  */
 
 import {expect} from "chai";
-// import { functionToTest } from "./moduleToTest";
+// import { ProconIp } from "./main";
 
 describe("module to test => function to test", () => {
     // initializing logic
@@ -20,7 +20,15 @@ describe("module to test => function to test", () => {
         result.should.equal(expected);
     });
     // ... more tests => it
+});
 
+describe("Controller URL precheck", () => {
+    it("URL('') should throw TypeError [ERR_INVALID_URL]", () => {
+        expect(() => new URL("")).to.throw("Invalid URL");
+    });
+    // it("ProconIp.isValidURL() returns false for empty string", () => {
+    //     expect(ProconIp.isValidURL.bind("")).to.equal(false);
+    // });
 });
 
 // ... more test suites => describe
