@@ -46,6 +46,7 @@ class ProconIp extends utils.Adapter {
      */
     onReady() {
         return __awaiter(this, void 0, void 0, function* () {
+            let connectionApproved = false;
             this.setState("info.connection", false, true);
             this.getForeignObject("system.config", (err, obj) => {
                 let encryptedNative = [];
@@ -92,6 +93,7 @@ class ProconIp extends utils.Adapter {
                 this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
                 this._getStateService.update().then(data => {
                     this._stateData = data;
+                    connectionApproved = true;
                     // Set objects once
                     if (!this._bootstrapped) {
                         this.log.debug(`Initially setting adapter objects`);
@@ -103,6 +105,7 @@ class ProconIp extends utils.Adapter {
                     // Start the actual service
                     this._getStateService.start((data) => {
                         this.log.silly(`Start processing new GetState.csv`);
+                        connectionApproved = true;
                         // Set sys info states
                         data.sysInfo.toArrayOfObjects().forEach((info) => {
                             // Only update when value has changed
@@ -137,8 +140,13 @@ class ProconIp extends utils.Adapter {
                         this._stateData = data;
                         this._bootstrapped = true;
                         this.setState("info.connection", true, true);
-                    }, () => {
+                    }, (e) => {
                         this.setState("info.connection", false, true);
+                        if (!connectionApproved) {
+                            this.log.error(`Could not connect to the controller: ${(e === null || e === void 0 ? void 0 : e.message) ? e.message : e}`);
+                            if (this.stop)
+                                this.stop();
+                        }
                     });
                 }, 3000);
                 this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
@@ -150,9 +158,10 @@ class ProconIp extends utils.Adapter {
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      */
     onUnload(callback) {
+        var _a;
         try {
             // Stop the service loop (this also handles the info.connection state)
-            if (this._getStateService)
+            if ((_a = this._getStateService) === null || _a === void 0 ? void 0 : _a.stop)
                 this._getStateService.stop();
             this.setState("info.connection", false, true);
         }

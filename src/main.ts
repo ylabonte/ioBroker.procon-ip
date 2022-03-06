@@ -70,6 +70,7 @@ export class ProconIp extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        let connectionApproved = false;
         this.setState("info.connection", false, true);
         this.getForeignObject("system.config", (err: any, obj: any) => {
             let encryptedNative: string[] = [];
@@ -119,6 +120,7 @@ export class ProconIp extends utils.Adapter {
 
             this._getStateService.update().then(data => {
                 this._stateData = data;
+                connectionApproved = true;
 
                 // Set objects once
                 if (!this._bootstrapped) {
@@ -132,6 +134,7 @@ export class ProconIp extends utils.Adapter {
                 // Start the actual service
                 this._getStateService.start((data: GetStateData) => {
                     this.log.silly(`Start processing new GetState.csv`);
+                    connectionApproved = true;
 
                     // Set sys info states
                     data.sysInfo.toArrayOfObjects().forEach((info) => {
@@ -173,8 +176,13 @@ export class ProconIp extends utils.Adapter {
                     this._bootstrapped = true;
                     this.setState("info.connection", true, true);
                 },
-                () => {
+                (e) => {
                     this.setState("info.connection", false, true);
+                    if (!connectionApproved) {
+                        this.log.error(`Could not connect to the controller: ${e?.message ? e.message : e}`);
+                        if (this.stop)
+                            this.stop();
+                    }
                 });
             },
             3000);
@@ -190,7 +198,7 @@ export class ProconIp extends utils.Adapter {
     private onUnload(callback: () => void): void {
         try {
             // Stop the service loop (this also handles the info.connection state)
-            if (this._getStateService)
+            if (this._getStateService?.stop)
                 this._getStateService.stop();
             this.setState("info.connection", false, true);
         } catch (e) {
