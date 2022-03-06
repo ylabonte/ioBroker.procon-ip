@@ -76,7 +76,7 @@ export class ProconIp extends utils.Adapter {
                 encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative as string[]);
             }
             for (const setting in this.config) {
-                if (this.config[setting].trim().length > 0 && encryptedNative.indexOf(setting) >= 0 &&
+                if (this.config[setting].length > 0 && encryptedNative.indexOf(setting) >= 0 &&
                     (!this.supportsFeature || !this.supportsFeature("ADAPTER_AUTO_DECRYPT_NATIVE"))) {
                     //noinspection JSUnresolvedVariable
                     if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
@@ -92,7 +92,7 @@ export class ProconIp extends utils.Adapter {
 
             // The adapters config (in the instance object everything under the attribute "native") is accessible via
             // this.config:
-            if (this.config["controllerUrl"].trim().length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
+            if (this.config["controllerUrl"].length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
                 this.log.warn(`Invalid controller url supplied: ${this.config["controllerUrl"]}`);
                 if (this.stop)
                     this.stop();
@@ -189,7 +189,8 @@ export class ProconIp extends utils.Adapter {
     private onUnload(callback: () => void): void {
         try {
             // Stop the service loop (this also handles the info.connection state)
-            this._getStateService.stop();
+            if (this._getStateService)
+                this._getStateService.stop();
             this.setState("info.connection", false, true);
         } catch (e) {
             this.log.error(`Failed to stop GetState service: ${e}`);
