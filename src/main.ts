@@ -95,9 +95,8 @@ export class ProconIp extends utils.Adapter {
             // this.config:
             if (this.config["controllerUrl"].length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
                 this.log.warn(`Invalid controller URL ('${this.config["controllerUrl"]}') supplied.`);
-                // Causes the integration test to fail.
-                // if (this.stop)
-                //     this.stop();
+                if (this.stop)
+                    this.stop();
                 return 0;
             }
 

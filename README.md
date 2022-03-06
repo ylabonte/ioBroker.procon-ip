@@ -100,12 +100,15 @@ Useful links for the approach will be
 
 ## Changelog
 
-### Release v1.1.3
-Bugfix release:
+### Release v1.2.0
+Minor release:
 * Update `procon-ip` API library package to v1.3.2  
   (should fix a bug that let the relay switching fail).
 * Fix minor issues that occur with invalid controller URLs.
-* Update other dependencies.
+* Update further dependencies.
+
+### ~~Release v1.1.3~~
+Skipped.
 
 ### ~~Release v1.1.2~~
 Release skipped, because it failed in integration tests.
