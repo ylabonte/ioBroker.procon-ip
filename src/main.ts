@@ -70,6 +70,7 @@ export class ProconIp extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        this.setState("info.connection", false, true);
         this.getForeignObject("system.config", (err: any, obj: any) => {
             let encryptedNative: string[] = [];
             if (this.ioPack && this.ioPack.encryptedNative) {
@@ -97,7 +98,7 @@ export class ProconIp extends utils.Adapter {
                 // Causes the integration test to fail.
                 // if (this.stop)
                 //     this.stop();
-                return;
+                return 0;
             }
 
             const serviceConfig = Object.defineProperties(Object.create(this.config), {
