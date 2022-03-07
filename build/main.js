@@ -72,8 +72,6 @@ class ProconIp extends utils.Adapter {
                 // this.config:
                 if (this.config["controllerUrl"].length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
                     this.log.warn(`Invalid controller URL ('${this.config["controllerUrl"]}') supplied.`);
-                    if (this.stop)
-                        this.stop();
                     return 0;
                 }
                 const serviceConfig = Object.defineProperties(Object.create(this.config), {
@@ -93,7 +91,6 @@ class ProconIp extends utils.Adapter {
                 this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
                 this._getStateService.update().then(data => {
                     this._stateData = data;
-                    connectionApproved = true;
                     // Set objects once
                     if (!this._bootstrapped) {
                         this.log.debug(`Initially setting adapter objects`);
@@ -141,11 +138,11 @@ class ProconIp extends utils.Adapter {
                         this._bootstrapped = true;
                         this.setState("info.connection", true, true);
                     }, (e) => {
+                        var _a;
                         this.setState("info.connection", false, true);
                         if (!connectionApproved) {
                             this.log.error(`Could not connect to the controller: ${(e === null || e === void 0 ? void 0 : e.message) ? e.message : e}`);
-                            if (this.stop)
-                                this.stop();
+                            (_a = this._getStateService) === null || _a === void 0 ? void 0 : _a.stop();
                         }
                     });
                 }, 3000);
@@ -161,8 +158,7 @@ class ProconIp extends utils.Adapter {
         var _a;
         try {
             // Stop the service loop (this also handles the info.connection state)
-            if ((_a = this._getStateService) === null || _a === void 0 ? void 0 : _a.stop)
-                this._getStateService.stop();
+            (_a = this._getStateService) === null || _a === void 0 ? void 0 : _a.stop();
             this.setState("info.connection", false, true);
         }
         catch (e) {
