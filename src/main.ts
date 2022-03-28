@@ -5,13 +5,16 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from "@iobroker/adapter-core";
-import {IServiceConfig} from "procon-ip/lib/abstract-service";
-import {GetStateService, IGetStateServiceConfig} from "procon-ip/lib/get-state.service"
-import {UsrcfgCgiService} from "procon-ip/lib/usrcfg-cgi.service";
-import {RelayDataInterpreter} from "procon-ip/lib/relay-data-interpreter";
-import {GetStateCategory, GetStateData} from "procon-ip/lib/get-state-data";
-import {GetStateDataSysInfo} from "procon-ip/lib/get-state-data-sys-info";
-import {GetStateDataObject} from "procon-ip/lib/get-state-data-object";
+import {
+    IServiceConfig,
+    GetStateService,
+    IGetStateServiceConfig,
+    UsrcfgCgiService,
+    RelayDataInterpreter,
+    GetStateCategory, GetStateData,
+    GetStateDataSysInfo,
+    GetStateDataObject
+} from "procon-ip";
 import {CryptoHelper} from "./lib/crypto-helper";
 
 // Augment the adapter.config object with the actual types

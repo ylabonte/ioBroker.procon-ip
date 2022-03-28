@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.2.0",
+        "version": "1.2.1",
         "news": {
+            "1.2.1": {
+                "en": "Bugfix release (fix connection problems)",
+                "de": "Bugfix-Release (Verbindungsprobleme beheben)",
+                "ru": "Релиз Bugfix (исправить проблемы с подключением)",
+                "pt": "Versão Bugfix (corrigir problemas de conexão)",
+                "nl": "Bugfix-release (verbindingsproblemen oplossen)",
+                "fr": "Version de correction de bugs (résolution des problèmes de connexion)",
+                "it": "Rilascio bugfix (risolvere problemi di connessione)",
+                "es": "Lanzamiento de corrección de errores (solucionar problemas de conexión)",
+                "pl": "Wydanie poprawki błędów (naprawienie problemów z połączeniem)",
+                "zh-cn": "错误修复发布（修复连接问题）"
+            },
             "1.2.0": {
                 "en": "Update `procon-ip` API library package to v1.3.2 (which should fix a bug that let the relay switching fail) and further dependencies.",
                 "de": "Aktualisieren Sie das `procon-ip`-API-Bibliothekspaket auf v1.3.2 (das einen Fehler beheben sollte, der das Umschalten des Relais fehlschlagen ließ) und weitere Abhängigkeiten.",
