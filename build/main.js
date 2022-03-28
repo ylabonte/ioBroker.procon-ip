@@ -16,10 +16,7 @@ exports.ProconIp = void 0;
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
-const get_state_service_1 = require("procon-ip/lib/get-state.service");
-const usrcfg_cgi_service_1 = require("procon-ip/lib/usrcfg-cgi.service");
-const relay_data_interpreter_1 = require("procon-ip/lib/relay-data-interpreter");
-const get_state_data_1 = require("procon-ip/lib/get-state-data");
+const procon_ip_1 = require("procon-ip");
 const crypto_helper_1 = require("./lib/crypto-helper");
 class ProconIp extends utils.Adapter {
     constructor(options = {}) {
@@ -39,7 +36,7 @@ class ProconIp extends utils.Adapter {
         // this.on("objectChange", this.onObjectChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
         this._forceUpdate = new Array();
-        this._stateData = new get_state_data_1.GetStateData();
+        this._stateData = new procon_ip_1.GetStateData();
     }
     /**
      * Is called when databases are connected and adapter received configuration.
@@ -84,9 +81,9 @@ class ProconIp extends utils.Adapter {
                         writable: true,
                     },
                 });
-                this._relayDataInterpreter = new relay_data_interpreter_1.RelayDataInterpreter(this.log);
-                this._getStateService = new get_state_service_1.GetStateService(serviceConfig, this.log);
-                this._usrcfgCgiService = new usrcfg_cgi_service_1.UsrcfgCgiService(serviceConfig, this.log, this._getStateService, this._relayDataInterpreter);
+                this._relayDataInterpreter = new procon_ip_1.RelayDataInterpreter(this.log);
+                this._getStateService = new procon_ip_1.GetStateService(serviceConfig, this.log);
+                this._usrcfgCgiService = new procon_ip_1.UsrcfgCgiService(serviceConfig, this.log, this._getStateService, this._relayDataInterpreter);
                 this.log.debug(`GetStateService url: ${this._getStateService.url}`);
                 this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
                 this._getStateService.update().then(data => {
@@ -354,7 +351,7 @@ class ProconIp extends utils.Adapter {
                 };
                 switch (field) {
                     case "value":
-                        if (obj.category == get_state_data_1.GetStateCategory.TEMPERATURES) {
+                        if (obj.category == procon_ip_1.GetStateCategory.TEMPERATURES) {
                             common.role = "value.temperature";
                             common.unit = `°${obj.unit}`;
                             if (obj.active) {
@@ -389,7 +386,7 @@ class ProconIp extends utils.Adapter {
                     this.log.error(`Failed setting object '${obj.label}': ${e}`);
                 }
             }
-            if (obj.category === get_state_data_1.GetStateCategory.RELAYS || (obj.category === get_state_data_1.GetStateCategory.EXTERNAL_RELAYS &&
+            if (obj.category === procon_ip_1.GetStateCategory.RELAYS || (obj.category === procon_ip_1.GetStateCategory.EXTERNAL_RELAYS &&
                 this._stateData.sysInfo.isExtRelaysEnabled())) {
                 this.setRelayDataObject(obj);
             }
@@ -456,7 +453,7 @@ class ProconIp extends utils.Adapter {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
             });
         }
-        if (obj.category === get_state_data_1.GetStateCategory.RELAYS || (obj.category === get_state_data_1.GetStateCategory.EXTERNAL_RELAYS &&
+        if (obj.category === procon_ip_1.GetStateCategory.RELAYS || (obj.category === procon_ip_1.GetStateCategory.EXTERNAL_RELAYS &&
             this._stateData.sysInfo.isExtRelaysEnabled())) {
             this.setRelayDataState(obj);
         }
