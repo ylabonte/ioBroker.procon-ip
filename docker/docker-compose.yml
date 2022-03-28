@@ -3,15 +3,10 @@ version: '3'
 services:
   iobroker:
     restart: always
-    image: buanet/iobroker:latest
+    image: iobroker/iobroker:latest
     container_name: iobroker
     hostname: iobroker
     ports:
       - "8081:8081"
     volumes:
-      - iobrokerdata:/opt/iobroker
       - ..:/opt/iobroker/node_modules/iobroker.procon-ip
-#      - ../../procon-ip:/opt/iobroker/node_modules/iobroker.procon-ip/node_modules/procon-ip
-
-volumes:
-  iobrokerdata:
