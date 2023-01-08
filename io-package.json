@@ -4,17 +4,17 @@
         "version": "1.2.2",
         "news": {
             "1.2.2": {
-                "en": "Dependency updates",
-                "de": "Änderungen der Abhängigkeit",
+                "en": "Dependencies update",
+                "de": "Aktualisierung der Abhängigkeiten",
                 "ru": "Обновление зависимости",
-                "pt": "Atualizações de dependência",
-                "nl": "Afhankelijke updates",
-                "fr": "Mises à jour des dépenses",
-                "it": "Aggiornamenti di dipendenza",
-                "es": "Actualizaciones de dependencia",
+                "pt": "Atualização de dependências",
+                "nl": "Afhankelijk van updates",
+                "fr": "Mise à jour des dépendances",
+                "it": "Aggiornamento delle dipendenze",
+                "es": "Actualización de las dependencias",
                 "pl": "Aktualizacja",
                 "uk": "Оновлення залежності",
-                "zh-cn": "B. 附属更新"
+                "zh-cn": "B. 现状更新"
             },
             "1.2.1": {
                 "en": "Bugfix release (fix connection problems)",
