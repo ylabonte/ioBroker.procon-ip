@@ -64,7 +64,7 @@ of the ProCon.IP. So there might be future firmware upgrades, that brake
 compatibility with this adapter or at least it functionality of switching the
 relays. 
 
-#### Compatiblity
+#### Compatibility
 For now the adapter has been tested and developed in combination with the
 ProCon.IP firmware **revision 1.7.0.c**.
 
