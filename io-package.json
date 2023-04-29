@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.2.2",
+        "version": "1.2.3",
         "news": {
+            "1.2.3": {
+                "en": "Dependencies update",
+                "de": "Aktualisierung der Abhängigkeiten",
+                "ru": "Обновление зависимости",
+                "pt": "Atualização de dependências",
+                "nl": "Afhankelijk van updates",
+                "fr": "Mise à jour des dépendances",
+                "it": "Aggiornamento delle dipendenze",
+                "es": "Actualización de las dependencias",
+                "pl": "Aktualizacja",
+                "uk": "Оновлення залежності",
+                "zh-cn": "B. 现状更新"
+            },
             "1.2.2": {
                 "en": "Dependencies update",
                 "de": "Aktualisierung der Abhängigkeiten",

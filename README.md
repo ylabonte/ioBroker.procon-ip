@@ -35,7 +35,7 @@ home swimming pools. With its software switched relays, it can control
 multiple pumps (for the pool filter and different dosage aspects) either
 simply planned per time schedule or depending on a reading/value from one of
 its many input channels for measurements (eg. i/o flow sensors, Dallas 1-Wire
-termometers, redox and pH electrodes). At least there is also the option to
+thermometers, redox and pH electrodes). At least there is also the option to
 switch these relays on demand, which makes them also applicable for switching
 lights (or anything else you want) on/off.
 Not all of its functionality is reachable via API. In fact there is one
@@ -99,6 +99,9 @@ Useful links for the approach will be
 
 
 ## Changelog
+
+### Release v1.2.3
+Dependency updates.
 
 ### Release v1.2.2
 Dependency updates.
