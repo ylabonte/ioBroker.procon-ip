@@ -147,6 +147,8 @@ export class ProconIp extends utils.Adapter {
                         }
                     });
 
+                    this.updateAdvancedSysInfoStates(data.sysInfo);
+
                     // Set actual sensor and actor/relay object states
                     data.objects.forEach((obj) => {
                         this.log.silly(`Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`);
@@ -311,6 +313,24 @@ export class ProconIp extends utils.Adapter {
     //     }
     // }
 
+    public updateAdvancedSysInfoStates(sysInfo: GetStateDataSysInfo): void {
+        if (!this._bootstrapped || sysInfo.dosageControl !== this._stateData.sysInfo.dosageControl) {
+            this.log.debug("Updating advanced sys info states");
+            this.setStateAsync(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, sysInfo.isPhPlusDosageEnabled(), true).catch((e) => {
+                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.system.phPlusDosageEnabled': ${e}`);
+            });
+            this.setStateAsync(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, sysInfo.isPhMinusDosageEnabled(), true).catch((e) => {
+                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.system.phMinusDosageEnabled': ${e}`);
+            });
+            this.setStateAsync(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, sysInfo.isChlorineDosageEnabled(), true).catch((e) => {
+                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.system.chlorineDosageEnabled': ${e}`);
+            });
+            this.setStateAsync(`${this.name}.${this.instance}.info.system.electrolysis`, sysInfo.isElectrolysis(), true).catch((e) => {
+                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.electrolysis': ${e}`);
+            });
+        }
+    }
+
     /**
      * Set/update system information
      */
@@ -350,6 +370,54 @@ export class ProconIp extends utils.Adapter {
             // }).catch((e) => {
             //     this.log.error(`Failed setting sysInfo object '${sysInfo.key}': ${e}`);
             // });
+        });
+
+        this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, {
+            type: "state",
+            common: {
+                name: "pH+ enabled",
+                type: "boolean",
+                role: "state",
+                read: true,
+                write: false
+            },
+            native: {},
+        });
+
+        this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, {
+            type: "state",
+            common: {
+                name: "pH- enabled",
+                type: "boolean",
+                role: "state",
+                read: true,
+                write: false
+            },
+            native: {},
+        });
+
+        this.setObjectNotExists(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, {
+            type: "state",
+            common: {
+                name: "CL enabled",
+                type: "boolean",
+                role: "state",
+                read: true,
+                write: false
+            },
+            native: {},
+        });
+
+        this.setObjectNotExists(`${this.name}.${this.instance}.info.system.electrolysis`, {
+            type: "state",
+            common: {
+                name: "Electrolysis",
+                type: "boolean",
+                role: "state",
+                read: true,
+                write: false
+            },
+            native: {},
         });
     }
 
@@ -459,8 +527,10 @@ export class ProconIp extends utils.Adapter {
             type: "boolean",
             role: isLight ? "switch.light" : "switch",
             read: true,
-            write: !this._getStateService.data.isDosageControl(obj.id),
-            smartName: obj.active && !this._getStateService.data.isDosageControl(obj.id) ? {
+            //write: !this._getStateService.data.isDosageControl(obj.id),
+            write: true,
+            //smartName: obj.active && !this._getStateService.data.isDosageControl(obj.id) ? {
+            smartName: obj.active ? {
                 de: obj.label,
                 en: obj.label,
                 smartType: isLight ? "LIGHT" : "SWITCH"

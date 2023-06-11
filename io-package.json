@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.2.3",
+        "version": "1.3.0",
         "news": {
+            "1.3.0": {
+                "en": "Remove restrictions on dosage control relays by enabling manual switching, add additional boolean states for dosage control information (formerly only available as combined bit-state/integer value as delivered by the GetState.csv and dependency updates.",
+                "de": "Entfernen von Einschränkungen der Dosierrelais (manuelles Schalten ermöglicht), hinzufügen zusätzlicher bool'scher Zustände für die Dosiersteuerung-Info (früher nur als kombinierter Bit-State/Integer-Wert, wie von der GetState.csv geliefert und Abhängigkeitsaktualisierungen.",
+                "ru": "Удалите ограничения на реле управления дозировками, позволяя ручному переключению, добавьте дополнительные boolean состояния для информации о контроле дозировки (ранее доступны только в качестве комбинированного разряда / целого числа, как доставлено GetState.csv и обновления зависимости.",
+                "pt": "Remova as restrições nos relés de controle de dosagem, permitindo a comutação manual, adicione estados booleanos adicionais para informações de controle de dosagem (anteriormente apenas disponíveis como valor bit-state/integer combinado como entregue pelo GetState.csv e atualizações de dependência.",
+                "nl": "Verwijder de beperkingen van de doseringscontrole door handmatig te verwisselen, extra boolean staten toevoegen voor doseringscontrole informatie die alleen beschikbaar is als gecombineerd kleine integerwaarde als afleverings.",
+                "fr": "Retirer les restrictions sur les relais de contrôle posologique en permettant le commutation manuelle, ajouter des états booléens supplémentaires pour l'information de contrôle posologique (anciennement seulement disponible comme valeur bit-état combinée / entier comme délivré par le GetState.csv et les mises à jour de dépendance.",
+                "it": "Rimuovere le restrizioni sui relè di controllo del dosaggio consentendo la commutazione manuale, aggiungere ulteriori stati booleani per le informazioni di controllo del dosaggio (precedentemente disponibili solo come valore combinato bit-state/integer come fornito dagli aggiornamenti GetState.csv e dipendenza.",
+                "es": "Eliminar las restricciones de los relés de control de dosis permitiendo la conmutación manual, añadir estados booleanos adicionales para la información de control de dosis (antes sólo disponibles como el valor combinado de bit-state/integer como lo entregan los GetState.csv y actualizaciones de dependencia.",
+                "pl": "Remove ograniczenia dotyczące przekaźników dosage poprzez umożliwienie przełączania ręcznego, dodanie dodatkowych stanów dosage (dawniej dostępne tylko jako wartość połączona bit-state/integer, jak dostarczana przez aktualizacje GetState.csv i zależność).",
+                "uk": "Зняти обмеження на реле дозування, дозволяючи ручним перемиканням, додати додаткові болеанові стани для контролю дозування інформації (звичайно доступні тільки як комбінований біт-держава / інтегер значення, як доставлений GetState.csv і оновлення залежності.",
+                "zh-cn": "取消对实况控制的控制的限制,使手工转换,增加实绩控制信息的善意国家(以前只作为Get国提供的共同标值。."
+            },
             "1.2.3": {
                 "en": "Dependencies update",
                 "de": "Aktualisierung der Abhängigkeiten",

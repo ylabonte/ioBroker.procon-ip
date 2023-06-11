@@ -88,6 +88,17 @@ Useful links for the approach will be
 
 ## Changelog
 
+### Release v1.3.0
+* Remove restrictions on dosage control relays: enable manual switching.
+* Add additional boolean states for dosage control information (formerly 
+  only available as combined bit-state/integer value
+  `info.system.dosageControl` as delivered by the GetState.csv):
+  * `info.system.chlorineDosageEnabled`
+  * `info.system.phPlusDosageEnabled`
+  * `info.system.phMinusDosageEnabled`
+  * `info.system.electrolysis`
+* Dependency updates.
+
 ### Release v1.2.3
 Dependency updates.
 
