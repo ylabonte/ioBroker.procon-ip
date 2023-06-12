@@ -6,6 +6,7 @@
 // you need to create an adapter
 import * as utils from "@iobroker/adapter-core";
 import {
+    CommandService,
     IServiceConfig,
     GetStateService,
     IGetStateServiceConfig,
@@ -43,6 +44,7 @@ export class ProconIp extends utils.Adapter {
     private _relayDataInterpreter!: RelayDataInterpreter;
     private _getStateService!: GetStateService;
     private _usrcfgCgiService!: UsrcfgCgiService;
+    private _commandService!: CommandService;
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
@@ -115,6 +117,7 @@ export class ProconIp extends utils.Adapter {
             this._relayDataInterpreter = new RelayDataInterpreter(this.log);
             this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
             this._usrcfgCgiService = new UsrcfgCgiService(serviceConfig as IServiceConfig, this.log, this._getStateService, this._relayDataInterpreter);
+            this._commandService = new CommandService(serviceConfig as IServiceConfig, this.log);
 
             this.log.debug(`GetStateService url: ${this._getStateService.url}`);
             this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
@@ -243,6 +246,10 @@ export class ProconIp extends utils.Adapter {
             this.relayToggleOnOff(id, state).catch((e) => {
                 this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
+        } else if (id.endsWith(".dosageTimer")) {
+            this.setDosageTimer(id, state).catch((e) => {
+                this.log.error(`Error on manual dosage (${id}): ${e}`);
+            });
         }
     }
 
@@ -292,6 +299,31 @@ export class ProconIp extends utils.Adapter {
                 this.log.info(`Switching ${obj.native.label}: off`);
                 await this._usrcfgCgiService.setOff(getStateDataObject);
             }
+        } catch (e: any) {
+            this.log.error(e);
+        }
+    }
+
+    public async setDosageTimer(objectId: string, state: ioBroker.State): Promise<void> {
+        const obj = await this.getObjectAsync(objectId);
+        if (!obj) {
+            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
+        }
+
+        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
+        const relayId = getStateDataObject.categoryId +
+            (getStateDataObject.category === GetStateCategory.EXTERNAL_RELAYS ? 8 : 0);
+        this._forceUpdate.push(getStateDataObject.id);
+        try {
+            const stateValNumber = state.val as number;
+            if (relayId === this._stateData.getChlorineDosageControlId()) {
+                await this._commandService.setChlorineDosage(stateValNumber);
+            } else if (relayId === this._stateData.getPhMinusDosageControlId()) {
+                await this._commandService.setPhMinusDosage(stateValNumber);
+            } else if (relayId === this._stateData.getPhPlusDosageControlId()) {
+                await this._commandService.setPhPlusDosage(stateValNumber);
+            }
+            this.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
         } catch (e: any) {
             this.log.error(e);
         }
@@ -510,6 +542,8 @@ export class ProconIp extends utils.Adapter {
 
     public setRelayDataObject(obj: GetStateDataObject): void {
         const isLight: boolean = new RegExp("light|bulb|licht|leucht", "i").test(obj.label);
+        const relayId: number = (obj.category === GetStateCategory.EXTERNAL_RELAYS ? 8 : 0) + obj.categoryId;
+        const isDosageRelay: boolean = this._getStateService.data.isDosageControl(relayId);
         const commonAuto: any = {
             name: obj.label,
             type: "boolean",
@@ -527,10 +561,8 @@ export class ProconIp extends utils.Adapter {
             type: "boolean",
             role: isLight ? "switch.light" : "switch",
             read: true,
-            //write: !this._getStateService.data.isDosageControl(obj.id),
-            write: true,
-            //smartName: obj.active && !this._getStateService.data.isDosageControl(obj.id) ? {
-            smartName: obj.active ? {
+            write: !isDosageRelay,
+            smartName: obj.active && !isDosageRelay ? {
                 de: obj.label,
                 en: obj.label,
                 smartType: isLight ? "LIGHT" : "SWITCH"
@@ -547,6 +579,22 @@ export class ProconIp extends utils.Adapter {
             common: commonOnOff,
             native: obj,
         });
+
+        if (isDosageRelay) {
+            const commonDosageTimerState: any = {
+                name: obj.label,
+                type: "number",
+                role: "value.interval",
+                read: false,
+                write: true,
+            }
+
+            this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`, {
+                type: "state",
+                common: commonDosageTimerState,
+                native: obj,
+            });
+        }
 
         // this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
         //     type: "state",

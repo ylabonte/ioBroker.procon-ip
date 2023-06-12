@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.3.0",
+        "version": "1.3.1",
         "news": {
+            "1.3.1": {
+                "en": "Fix manual dosage control abilities.",
+                "de": "Behebung der manuellen Dosierungsmöglichkeiten.",
+                "ru": "Исправьте ручные способности контроля дозировки.",
+                "pt": "Corrigir habilidades manuais de controle de dosagem.",
+                "nl": "Reparatie handmatige controlevaardigheden.",
+                "fr": "Fixer des capacités manuelles de contrôle des doses.",
+                "it": "Fissare le abilità di controllo del dosaggio manuale.",
+                "es": "Fijar habilidades de control de dosis manuales.",
+                "pl": "Współczynnik ręczny.",
+                "uk": "Фіксувати ручні здібності контролю дозування.",
+                "zh-cn": "固定手工操作控制能力。."
+            },
             "1.3.0": {
                 "en": "Remove restrictions on dosage control relays by enabling manual switching, add additional boolean states for dosage control information (formerly only available as combined bit-state/integer value as delivered by the GetState.csv and dependency updates.",
                 "de": "Entfernen von Einschränkungen der Dosierrelais (manuelles Schalten ermöglicht), hinzufügen zusätzlicher bool'scher Zustände für die Dosiersteuerung-Info (früher nur als kombinierter Bit-State/Integer-Wert, wie von der GetState.csv geliefert und Abhängigkeitsaktualisierungen.",
