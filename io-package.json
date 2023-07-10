@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.3.1",
+        "version": "1.3.2",
         "news": {
+            "1.3.2": {
+                "en": "Dependency updates and adapter icon change.",
+                "de": "Aktualisierung von Abhängigkeiten und Anpassung des Adapter-Icons.",
+                "ru": "Обновление зависимости и изменение иконки адаптера.",
+                "pt": "Atualizações de dependência e mudança de ícone do adaptador.",
+                "nl": "Afhankelijkheid updates en aanpassen van icoon.",
+                "fr": "Mises à jour de dépendance et changement d'icône d'adaptateur.",
+                "it": "Aggiornamenti di dipendenza e cambio icona adattatore.",
+                "es": "Actualizaciones de dependencia y cambio de icono de adaptador.",
+                "pl": "W zależności od aktualizacji i zmian adapterowych.",
+                "uk": "Зміна значків залежностей і адаптера.",
+                "zh-cn": "依赖性更新和适应性变化。."
+            },
             "1.3.1": {
                 "en": "Fix manual dosage control abilities.",
                 "de": "Behebung der manuellen Dosierungsmöglichkeiten.",
@@ -234,18 +247,6 @@
                 "es": "Lanzamiento de corrección de errores",
                 "pl": "Wersja Bugfix",
                 "zh-cn": "错误修正版本"
-            },
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Начальная версия",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "zh-cn": "首次出版"
             }
         },
         "title": "ProCon.IP Pool Control",
@@ -288,9 +289,9 @@
         "license": "MIT",
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
-        "icon": "iobroker-procon-ip.png",
+        "icon": "procon-ip.png",
         "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/iobroker-procon-ip.png",
+        "extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/procon-ip.png",
         "readme": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/README.md",
         "loglevel": "info",
         "mode": "daemon",
@@ -299,8 +300,10 @@
         "dataSource": "poll",
         "compact": true,
         "materialize": true,
-        "materializeTab": true,
-        "adminTab": false,
+        "materializeTab": false,
+        "adminUI": {
+            "config": "materialize"
+        },
         "supportCustoms": false,
         "dependencies": [
             {
@@ -321,8 +324,8 @@
     "native": {
         "controllerUrl": "",
         "basicAuth": true,
-        "username": "admin",
-        "password": "admin",
+        "username": "",
+        "password": "",
         "updateInterval": 3000,
         "requestTimeout": 10000,
         "errorTolerance": 10

@@ -1,16 +1,15 @@
-![Logo](admin/iobroker-procon-ip.png)
+![Adapter Icon](admin/procon-ip.png)
 # ioBroker.procon-ip
 
+![Number of Installations](http://iobroker.live/badges/procon-ip-installed.svg)
+![Downloads](https://img.shields.io/npm/dm/iobroker.procon-ip.svg)
 [![NPM version](http://img.shields.io/npm/v/iobroker.procon-ip.svg)](https://www.npmjs.com/package/iobroker.procon-ip)
-[![Installations](http://iobroker.live/badges/procon-ip-installed.svg)](http://iobroker.live/badges/procon-ip-installed.svg)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.procon-ip.svg)](https://www.npmjs.com/package/iobroker.procon-ip)  
-[![Known Vulnerabilities](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip/badge.svg)](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip)
-[![Buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=flat)](https://www.buymeacoffee.com/ylabonte)  
-[![Test and Release](https://github.com/ylabonte/ioBroker.procon-ip/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/ylabonte/ioBroker.procon-ip/actions/workflows/test-and-release.yml)
 
+[![Test and Release](https://github.com/ylabonte/ioBroker.procon-ip/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/ylabonte/ioBroker.procon-ip/actions/workflows/test-and-release.yml)
+[![Known Vulnerabilities](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip/badge.svg)](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip)
+[![Buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=flat)](https://www.buymeacoffee.com/ylabonte)
 
 [![NPM](https://nodei.co/npm/iobroker.procon-ip.png?downloads=true)](https://nodei.co/npm/iobroker.procon-ip/)
-
 
 ## ProCon.IP pool control adapter for ioBroker
 ioBroker adapter for basic support of the ProCon.IP swimming pool control
@@ -27,7 +26,6 @@ favorit voice assistant(s):
 
 See the [wiki](https://github.com/ylabonte/ioBroker.procon-ip/wiki) for more
 information.
-
 
 ### What is the ProCon.IP pool control?
 ![Picture from pooldigital.de](https://www.pooldigital.de/shop/media/image/66/47/a5/ProConIP1_720x600.png)
@@ -57,7 +55,6 @@ haven't found an english documentation/information so far):
 marketing or support of the pool control unit. I just developed a solution
 to integrate such with ioBroker to make my parent's home a bit smarter.**
 
-
 ### Details on the adapter
 The adapter uses the `/GetState.csv` API of the ProCon.IP to poll its values
 and another - not documented - API, that operates with bitwise commands to
@@ -70,11 +67,9 @@ relays.
 For now the adapter has been tested and developed in combination with the
 ProCon.IP firmware **revision 1.7.0.c**.
 
-
 ## Roadmap
 There is nothing special on the plan. You can create an issue to suggest new
 features/functionality...
-
 
 ## Development and participation
 Feel free to contact me, if you wish to participate in development or
@@ -85,8 +80,10 @@ Useful links for the approach will be
   I had started from and
 * the [guide for adapter developers](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md).
 
-
 ## Changelog
+### Release v1.3.2
+* Dependency updates.
+* Adapter Icon change.
 
 ### Release v1.3.1
 * Really enable manual dosage control:
@@ -121,20 +118,11 @@ Minor release:
 * Fix minor issues that occur with invalid controller URLs.
 * Update further dependencies.
 
-### ~~Release v1.1.3~~
-Skipped.
-
-### ~~Release v1.1.2~~
-Release skipped, because it failed in integration tests.
-
 ### Release v1.1.1
 Minor release:
 * Move API library sources into a [separate package](https://www.npmjs.com/package/procon-ip).
 * Update `common.name` attributes when the corresponding label changes.
 * Update dependencies
-
-### ~~Release v1.1.0~~
-Release skipped.
 
 ### Release v1.0.2
 Minor update (was accidentally released as patch, regarding the version number):
@@ -223,7 +211,6 @@ Initial release with following features:
 * Writable states for all relays to toggle auto/manual
 * Writable states for relays not configured for dosage control to toggle on/off
 
-
 ## License
 MIT License
 
@@ -245,4 +232,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Copyright (c) 2021 Yannic Labonte <yannic.labonte@gmail.com>
+Copyright (c) 2019-2023 Yannic Labonte <yannic.labonte@gmail.com>

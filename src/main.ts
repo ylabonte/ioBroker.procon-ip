@@ -19,7 +19,6 @@ import {
 import {CryptoHelper} from "./lib/crypto-helper";
 
 // Augment the adapter.config object with the actual types
-// TODO: delete this in the next version
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace ioBroker {
