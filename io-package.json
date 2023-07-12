@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.3.2",
+        "version": "1.3.3",
         "news": {
+            "1.3.3": {
+                "en": "Dependencies update",
+                "de": "Aktualisierung der Abhängigkeiten",
+                "ru": "Обновление зависимости",
+                "pt": "Atualização de dependências",
+                "nl": "Afhankelijk van updates",
+                "fr": "Mise à jour des dépendances",
+                "it": "Aggiornamento delle dipendenze",
+                "es": "Actualización de las dependencias",
+                "pl": "Aktualizacja",
+                "uk": "Оновлення залежності",
+                "zh-cn": "B. 现状更新"
+            },
             "1.3.2": {
                 "en": "Dependency updates and adapter icon change.",
                 "de": "Aktualisierung von Abhängigkeiten und Anpassung des Adapter-Icons.",
@@ -225,18 +238,6 @@
                 "zh-cn": "安全更新"
             },
             "0.0.3": {
-                "en": "Bugfix release",
-                "de": "Bugfix Release",
-                "ru": "Релиз исправления",
-                "pt": "Bugfix release",
-                "nl": "Bugfix-release",
-                "fr": "Version du correctif",
-                "it": "Rilascio bugfix",
-                "es": "Lanzamiento de corrección de errores",
-                "pl": "Wersja Bugfix",
-                "zh-cn": "错误修正版本"
-            },
-            "0.0.2": {
                 "en": "Bugfix release",
                 "de": "Bugfix Release",
                 "ru": "Релиз исправления",
