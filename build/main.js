@@ -83,6 +83,7 @@ class ProconIp extends utils.Adapter {
                 });
                 this._relayDataInterpreter = new procon_ip_1.RelayDataInterpreter(this.log);
                 this._getStateService = new procon_ip_1.GetStateService(serviceConfig, this.log);
+                this._setStateService = new procon_ip_1.SetStateService(serviceConfig, this.log);
                 this._usrcfgCgiService = new procon_ip_1.UsrcfgCgiService(serviceConfig, this.log, this._getStateService, this._relayDataInterpreter);
                 this._commandService = new procon_ip_1.CommandService(serviceConfig, this.log);
                 this.log.debug(`GetStateService url: ${this._getStateService.url}`);
@@ -207,6 +208,11 @@ class ProconIp extends utils.Adapter {
                 this.log.error(`Error on manual dosage (${id}): ${e}`);
             });
         }
+        else if (id.endsWith(".timer")) {
+            this.setRelayTimer(id, state).catch((e) => {
+                this.log.error(`Error on relay timer (${id}): ${e}`);
+            });
+        }
     }
     relayToggleAuto(objectId, state) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -284,6 +290,26 @@ class ProconIp extends utils.Adapter {
                     yield this._commandService.setPhPlusDosage(stateValNumber);
                 }
                 this.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
+            }
+            catch (e) {
+                this.log.error(e);
+            }
+        });
+    }
+    setRelayTimer(objectId, state) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const obj = yield this.getObjectAsync(objectId);
+            if (!obj) {
+                throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
+            }
+            const getStateDataObject = this._stateData.getDataObject(obj.native.id);
+            const relayId = getStateDataObject.categoryId +
+                (getStateDataObject.category === procon_ip_1.GetStateCategory.EXTERNAL_RELAYS ? 9 : 1);
+            this._forceUpdate.push(getStateDataObject.id);
+            try {
+                const stateValNumber = state.val;
+                yield this._setStateService.setTimer(relayId, stateValNumber);
+                this.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
             }
             catch (e) {
                 this.log.error(e);
@@ -537,6 +563,20 @@ class ProconIp extends utils.Adapter {
             this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`, {
                 type: "state",
                 common: commonDosageTimerState,
+                native: obj,
+            });
+        }
+        else {
+            const commonGenericRelayTimerState = {
+                name: obj.label,
+                type: "number",
+                role: "value.interval",
+                read: false,
+                write: true,
+            };
+            this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.timer`, {
+                type: "state",
+                common: commonGenericRelayTimerState,
                 native: obj,
             });
         }

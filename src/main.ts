@@ -14,7 +14,8 @@ import {
     RelayDataInterpreter,
     GetStateCategory, GetStateData,
     GetStateDataSysInfo,
-    GetStateDataObject
+    GetStateDataObject,
+    SetStateService
 } from "procon-ip";
 import {CryptoHelper} from "./lib/crypto-helper";
 
@@ -42,6 +43,7 @@ export class ProconIp extends utils.Adapter {
 
     private _relayDataInterpreter!: RelayDataInterpreter;
     private _getStateService!: GetStateService;
+    private _setStateService!: SetStateService;
     private _usrcfgCgiService!: UsrcfgCgiService;
     private _commandService!: CommandService;
     private _forceUpdate: number[];
@@ -115,6 +117,7 @@ export class ProconIp extends utils.Adapter {
             });
             this._relayDataInterpreter = new RelayDataInterpreter(this.log);
             this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
+            this._setStateService = new SetStateService(serviceConfig as IServiceConfig, this.log);
             this._usrcfgCgiService = new UsrcfgCgiService(serviceConfig as IServiceConfig, this.log, this._getStateService, this._relayDataInterpreter);
             this._commandService = new CommandService(serviceConfig as IServiceConfig, this.log);
 
@@ -249,6 +252,10 @@ export class ProconIp extends utils.Adapter {
             this.setDosageTimer(id, state).catch((e) => {
                 this.log.error(`Error on manual dosage (${id}): ${e}`);
             });
+        } else if (id.endsWith(".timer")) {
+            this.setRelayTimer(id, state).catch((e) => {
+                this.log.error(`Error on relay timer (${id}): ${e}`);
+            });
         }
     }
 
@@ -323,6 +330,25 @@ export class ProconIp extends utils.Adapter {
                 await this._commandService.setPhPlusDosage(stateValNumber);
             }
             this.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
+        } catch (e: any) {
+            this.log.error(e);
+        }
+    }
+
+    public async setRelayTimer(objectId: string, state: ioBroker.State): Promise<void> {
+        const obj = await this.getObjectAsync(objectId);
+        if (!obj) {
+            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
+        }
+
+        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
+        const relayId = getStateDataObject.categoryId +
+            (getStateDataObject.category === GetStateCategory.EXTERNAL_RELAYS ? 9 : 1);
+        this._forceUpdate.push(getStateDataObject.id);
+        try {
+            const stateValNumber = state.val as number;
+            await this._setStateService.setTimer(relayId, stateValNumber);
+            this.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
         } catch (e: any) {
             this.log.error(e);
         }
@@ -586,11 +612,25 @@ export class ProconIp extends utils.Adapter {
                 role: "value.interval",
                 read: false,
                 write: true,
-            }
+            };
 
             this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`, {
                 type: "state",
                 common: commonDosageTimerState,
+                native: obj,
+            });
+        } else {
+            const commonGenericRelayTimerState: any = {
+                name: obj.label,
+                type: "number",
+                role: "value.interval",
+                read: false,
+                write: true,
+            };
+
+            this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.timer`, {
+                type: "state",
+                common: commonGenericRelayTimerState,
                 native: obj,
             });
         }
