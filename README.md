@@ -1,9 +1,10 @@
-![Adapter Icon](admin/procon-ip.png)
+![Adapter Icon](https://github.com/ylabonte/ioBroker.procon-ip/blob/master/admin/procon-ip.png?raw=true)
 # ioBroker.procon-ip
 
-![Number of Installations](http://iobroker.live/badges/procon-ip-installed.svg)
 ![Downloads](https://img.shields.io/npm/dm/iobroker.procon-ip.svg)
+![Number of Installations](http://iobroker.live/badges/procon-ip-installed.svg)
 [![NPM version](http://img.shields.io/npm/v/iobroker.procon-ip.svg)](https://www.npmjs.com/package/iobroker.procon-ip)
+![Current stable version](http://iobroker.live/badges/procon-ip-stable.svg)
 
 [![Test and Release](https://github.com/ylabonte/ioBroker.procon-ip/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/ylabonte/ioBroker.procon-ip/actions/workflows/test-and-release.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip/badge.svg)](https://snyk.io/test/github/ylabonte/ioBroker.procon-ip)
@@ -65,7 +66,7 @@ relays.
 
 #### Compatibility
 For now the adapter has been tested and developed in combination with the
-ProCon.IP firmware **revision 1.7.0.c**.
+ProCon.IP firmware **revision 1.7.6.a**.
 
 ## Roadmap
 There is nothing special on the plan. You can create an issue to suggest new
@@ -80,7 +81,19 @@ Useful links for the approach will be
   I had started from and
 * the [guide for adapter developers](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md).
 
+## Donation
+Feel free. But if you're feeling really patronizing, you could... 😃  
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 144px !important;" >](https://www.buymeacoffee.com/ylabonte)
+
 ## Changelog
+### Release v1.5.0
+* Breaking backward compatibility: For older installations, this update may
+  require an adapter reconfiguration.
+* Require `js-controller >=3.0.0`: Remove support for obsolete credential 
+  encryption mechanisms (in favor to ioBroker's native encryption mechanism).
+* Require `iobroker.admin >=5.0.0`: Replace old-fashioned materialize admin 
+  interface with a newer JSON defined one. 
+
 ### Release v1.4.0
 * Add generic relay timers
   (relays must be set to 'auto' for the timer to function).
@@ -113,7 +126,7 @@ Useful links for the approach will be
 * Update dependencies.
 
 ### Release v1.2.1
-* Fix connection problem (see [related issue](https://github.com/ylabonte/ioBroker.procon-ip/issues/29))
+* Fix connection problem (see [related issue](https://github.com/ylabonte/ioBroker.procon-ip/issues/29)).
 
 ### Release v1.2.0
 * Update `procon-ip` API library package to v1.3.2  
@@ -124,7 +137,7 @@ Useful links for the approach will be
 ### Release v1.1.1
 * Move API library sources into a [separate package](https://www.npmjs.com/package/procon-ip).
 * Update `common.name` attributes when the corresponding label changes.
-* Update dependencies
+* Update dependencies.
 
 ### Release v1.0.2
 * Fine tune the polling and control requests 
@@ -135,7 +148,7 @@ Useful links for the approach will be
   request. 
 
 ### Release v1.0.1
-* Fix Object State updates  
+* Fix Object State updates.
   For some reason the two js objects used to compare the before and after values
   of the GetState.csv calls became the same object (before was referencing the
   new values). That caused the adapter to never update the object states.
@@ -146,61 +159,63 @@ Useful links for the approach will be
   ioBroker adapter repository. Hence you can just install it, without copy/
   pasting the github repo url of this adapter!
 * Fix all open [milestone issues](https://github.com/ylabonte/ioBroker.procon-ip/milestone/1)
-  especially regarding the ones resulted from the [adapter review](https://github.com/ioBroker/ioBroker.repositories/pull/756#issuecomment-646988248))
+  especially regarding the ones resulted from the [adapter review](https://github.com/ioBroker/ioBroker.repositories/pull/756#issuecomment-646988248)).
 * Add/Extend documentation
   (see [wiki](https://github.com/ylabonte/ioBroker.procon-ip/wiki)).  
   Now it's up to you to extend the wiki or request me using issues to extend
   the wiki or README.md regarding a specific content.
 
 ### Release v0.4.1
-* Fix write actions to the appropriate states of external relays  
+* Fix write actions to the appropriate states of external relays.  
   _This will add auto-recognition on whether the external relays are activated
   or not and therefore decide on how to handle write actions to the
   corresponding relay state._
 
 ### Release v0.4.0
-* Add encryption for configuration settings stored in ioBroker's internal db
-* Improve http request/connection error handling
-* Reduce logging output
-* Remove the unused admin tab
+* Add encryption for configuration settings stored in ioBroker's internal db.
+* Improve http request/connection error handling.
+* Reduce logging output.
+* Remove the unused admin tab.
 
 ### Release v0.3.1
-* Update dependencies including some reported as vulnerable
-* Add connection status indication for iobroker's instance tab
-* Add form validation for the configuration settings
+* Update dependencies including some reported as vulnerable.
+* Add connection status indication for iobroker's instance tab.
+* Add form validation for the configuration settings.
 
 ### Release v0.2.0
-* Update npm dependencies
-* Group admin settings input fields in rows
+* Update npm dependencies.
+* Group admin settings input fields in rows.
 
 ### Release v0.1.1
-* Update vulnerable eslint-utils
+* Update vulnerable eslint-utils.
 
 ### Release v0.1.0
-* Fix object attributes regarding the cloud adapter
+* Fix object attributes regarding the cloud adapter.
 * Pre-defined `smartName` attributes for active relays and temperature
-  sensors
+  sensors.
 * Recognize relays with 'light', 'licht' or 'leucht' in its name as
-  `smartType` _LIGHT_ 
+  `smartType` _LIGHT_.
 
 ### Release v0.0.4
-* Update `lodash` (pinning version `4.17.14`)
-* Update other indirect and direct dependencies
+* Update `lodash` (pinning version `4.17.14`).
+* Update other indirect and direct dependencies.
 
 ### Release v0.0.3
-* Fix missing `value` states
-* Reduce logging output
+* Fix missing `value` states.
+* Reduce logging output.
 
 ### Release v0.0.2
-* Fix sys info state values
+* Fix sys info state values.
 
 ### Release v0.0.1
-* All information from `GetState.csv` as readonly states
-* Writable states for all relays to toggle auto/manual
-* Writable states for relays not configured for dosage control to toggle on/off
+* All information from `GetState.csv` as readonly states.
+* Writable states for all relays to toggle auto/manual.
+* Writable states for relays not configured for dosage control to toggle on/off.
 
 ## License
 MIT License
+
+Copyright (c) 2024 Yannic Labonte <yannic.labonte@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -219,5 +234,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Copyright (c) 2019-2023 Yannic Labonte <yannic.labonte@gmail.com>

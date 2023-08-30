@@ -4,7 +4,7 @@
 
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
-import * as utils from "@iobroker/adapter-core";
+import * as utils from '@iobroker/adapter-core';
 import {
     CommandService,
     IServiceConfig,
@@ -12,12 +12,13 @@ import {
     IGetStateServiceConfig,
     UsrcfgCgiService,
     RelayDataInterpreter,
-    GetStateCategory, GetStateData,
+    GetStateCategory,
+    GetStateData,
     GetStateDataSysInfo,
     GetStateDataObject,
-    SetStateService
-} from "procon-ip";
-import {CryptoHelper} from "./lib/crypto-helper";
+    SetStateService,
+} from 'procon-ip';
+import {Adapter} from "@iobroker/adapter-core";
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -40,7 +41,6 @@ declare global {
 }
 
 export class ProconIp extends utils.Adapter {
-
     private _relayDataInterpreter!: RelayDataInterpreter;
     private _getStateService!: GetStateService;
     private _setStateService!: SetStateService;
@@ -49,25 +49,16 @@ export class ProconIp extends utils.Adapter {
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
-    private _objectStateFields = [
-        "value",
-        "category",
-        "label",
-        "unit",
-        "displayValue",
-        "active",
-    ];
+    private _objectStateFields = ['value', 'category', 'label', 'unit', 'displayValue', 'active'];
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
-            name: "procon-ip",
+            name: 'procon-ip',
         });
-        this.on("ready", this.onReady.bind(this));
-        this.on("unload", this.onUnload.bind(this));
-        this.on("stateChange", this.onStateChange.bind(this));
-        // this.on("objectChange", this.onObjectChange.bind(this));
-        // this.on("message", this.onMessage.bind(this));
+        this.on('ready', this.onReady.bind(this));
+        this.on('unload', this.onUnload.bind(this));
+        this.on('stateChange', this.onStateChange.bind(this));
         this._forceUpdate = new Array<number>();
         this._stateData = new GetStateData();
     }
@@ -77,31 +68,30 @@ export class ProconIp extends utils.Adapter {
      */
     private async onReady(): Promise<void> {
         let connectionApproved = false;
-        this.setState("info.connection", false, true);
-        this.getForeignObject("system.config", (err: any, obj: any) => {
+        this.setState('info.connection', false, true);
+        this.getForeignObject('system.config', (err: any, obj: any) => {
             let encryptedNative: string[] = [];
             if (this.ioPack && this.ioPack.encryptedNative) {
                 encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative as string[]);
             }
             for (const setting in this.config) {
-                if (this.config[setting].length > 0 && encryptedNative.indexOf(setting) >= 0 &&
-                    (!this.supportsFeature || !this.supportsFeature("ADAPTER_AUTO_DECRYPT_NATIVE"))) {
-                    //noinspection JSUnresolvedVariable
-                    if (typeof obj !== "undefined" && obj.native && obj.native.secret) {
-                        //noinspection JSUnresolvedVariable
-                        this.config[setting] = CryptoHelper.decrypt(this.config[setting], obj.native.secret);
+                if (
+                    this.config[setting].length > 0 &&
+                    encryptedNative.indexOf(setting) >= 0 &&
+                    (!this.supportsFeature || !this.supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
+                ) {
+                    if (typeof obj !== 'undefined' && obj.native && obj.native.secret !== undefined) {
+                        this.config[setting] = this.decrypt(obj.native.secret, this.config[setting]);
                     } else {
-                        //noinspection JSUnresolvedVariable
-                        this.log.warn("Cannot get native secret for encryption. Falling back to hard coded default key!");
-                        this.config[setting] = CryptoHelper.decrypt(this.config[setting], "1234567890abcdef1234567890abcdef1234567890abcdef");
+                        this.config[setting] = this.decrypt(this.config[setting]);
                     }
                 }
             }
 
             // The adapters config (in the instance object everything under the attribute "native") is accessible via
             // this.config:
-            if (this.config["controllerUrl"].length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
-                this.log.warn(`Invalid controller URL ('${this.config["controllerUrl"]}') supplied.`);
+            if (this.config['controllerUrl'].length < 1 || !ProconIp.isValidURL(this.config['controllerUrl'])) {
+                this.log.warn(`Invalid controller URL ('${this.config['controllerUrl']}') supplied.`);
                 return 0;
             }
 
@@ -118,13 +108,18 @@ export class ProconIp extends utils.Adapter {
             this._relayDataInterpreter = new RelayDataInterpreter(this.log);
             this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
             this._setStateService = new SetStateService(serviceConfig as IServiceConfig, this.log);
-            this._usrcfgCgiService = new UsrcfgCgiService(serviceConfig as IServiceConfig, this.log, this._getStateService, this._relayDataInterpreter);
+            this._usrcfgCgiService = new UsrcfgCgiService(
+                serviceConfig as IServiceConfig,
+                this.log,
+                this._getStateService,
+                this._relayDataInterpreter,
+            );
             this._commandService = new CommandService(serviceConfig as IServiceConfig, this.log);
 
             this.log.debug(`GetStateService url: ${this._getStateService.url}`);
             this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
 
-            this._getStateService.update().then(data => {
+            this._getStateService.update().then((data) => {
                 this._stateData = data;
 
                 // Set objects once
@@ -137,61 +132,74 @@ export class ProconIp extends utils.Adapter {
 
             setTimeout(() => {
                 // Start the actual service
-                this._getStateService.start((data: GetStateData) => {
-                    this.log.silly(`Start processing new GetState.csv`);
-                    connectionApproved = true;
+                this._getStateService.start(
+                    (data: GetStateData) => {
+                        this.log.silly(`Start processing new GetState.csv`);
+                        connectionApproved = true;
 
-                    // Set sys info states
-                    data.sysInfo.toArrayOfObjects().forEach((info) => {
-                        // Only update when value has changed
-                        if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
-                            this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                            this.setStateAsync(`${this.name}.${this.instance}.info.system.${info.key}`, info.value.toString(), true).catch((e) => {
-                                this.log.error(`Failed setting state for '${info.key}': ${e}`);
-                            });
-                        }
-                    });
-
-                    this.updateAdvancedSysInfoStates(data.sysInfo);
-
-                    // Set actual sensor and actor/relay object states
-                    data.objects.forEach((obj) => {
-                        this.log.silly(`Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`);
-                        this.log.silly(`this._stateData.getDataObject(obj.id).value: ${this._stateData.getDataObject(obj.id).value}`);
-                        this.log.silly(`obj.value: ${obj.value}`);
-
-                        // Only update when value has changed or update is forced (on state change)
-                        const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
-                        if (!this._bootstrapped || forceObjStateUpdate >= 0 || (
-                            this._stateData.getDataObject(obj.id) &&
-                            this._stateData.getDataObject(obj.id).value != obj.value
-                        )) {
-                            if (this._stateData.getDataObject(obj.id).label != obj.label) {
-                                this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
-                                this.updateObjectCommonName(obj);
+                        // Set sys info states
+                        data.sysInfo.toArrayOfObjects().forEach((info) => {
+                            // Only update when value has changed
+                            if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
+                                this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
+                                this.setStateAsync(
+                                    `${this.name}.${this.instance}.info.system.${info.key}`,
+                                    info.value.toString(),
+                                    true,
+                                ).catch((e) => {
+                                    this.log.error(`Failed setting state for '${info.key}': ${e}`);
+                                });
                             }
-                            this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
-                            this.setDataState(obj);
-                            if (this._forceUpdate[forceObjStateUpdate]) {
-                                delete this._forceUpdate[forceObjStateUpdate];
-                            }
-                        }
-                    });
+                        });
 
-                    this.log.silly(`Updating data object for next comparison`);
-                    this._stateData = data;
-                    this._bootstrapped = true;
-                    this.setState("info.connection", true, true);
-                },
-                (e) => {
-                    this.setState("info.connection", false, true);
-                    if (!connectionApproved) {
-                        this.log.error(`Could not connect to the controller: ${e?.message ? e.message : e}`);
-                        this._getStateService?.stop();
-                    }
-                });
-            },
-            3000);
+                        this.updateAdvancedSysInfoStates(data.sysInfo);
+
+                        // Set actual sensor and actor/relay object states
+                        data.objects.forEach((obj) => {
+                            this.log.silly(
+                                `Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`,
+                            );
+                            this.log.silly(
+                                `this._stateData.getDataObject(obj.id).value: ${
+                                    this._stateData.getDataObject(obj.id).value
+                                }`,
+                            );
+                            this.log.silly(`obj.value: ${obj.value}`);
+
+                            // Only update when value has changed or update is forced (on state change)
+                            const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
+                            if (
+                                !this._bootstrapped ||
+                                forceObjStateUpdate >= 0 ||
+                                (this._stateData.getDataObject(obj.id) &&
+                                    this._stateData.getDataObject(obj.id).value != obj.value)
+                            ) {
+                                if (this._stateData.getDataObject(obj.id).label != obj.label) {
+                                    this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
+                                    this.updateObjectCommonName(obj);
+                                }
+                                this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
+                                this.setDataState(obj);
+                                if (this._forceUpdate[forceObjStateUpdate]) {
+                                    delete this._forceUpdate[forceObjStateUpdate];
+                                }
+                            }
+                        });
+
+                        this.log.silly(`Updating data object for next comparison`);
+                        this._stateData = data;
+                        this._bootstrapped = true;
+                        this.setState('info.connection', true, true);
+                    },
+                    (e) => {
+                        this.setState('info.connection', false, true);
+                        if (!connectionApproved) {
+                            this.log.error(`Could not connect to the controller: ${e?.message ? e.message : e}`);
+                            this._getStateService?.stop();
+                        }
+                    },
+                );
+            }, 3000);
 
             this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
             this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
@@ -205,26 +213,13 @@ export class ProconIp extends utils.Adapter {
         try {
             // Stop the service loop (this also handles the info.connection state)
             this._getStateService?.stop();
-            this.setState("info.connection", false, true);
+            this.setState('info.connection', false, true);
         } catch (e) {
             this.log.error(`Failed to stop GetState service: ${e}`);
         } finally {
             callback();
         }
     }
-
-    /**
-     * Is called if a subscribed object changes
-     */
-    // private onObjectChange(id: string, obj: ioBroker.Object | null | undefined): void {
-    //     if (obj) {
-    //         // The object was changed
-    //         this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-    //     } else {
-    //         // The object was deleted
-    //         this.log.info(`object ${id} deleted`);
-    //     }
-    // }
 
     /**
      * Is called if a subscribed state changes
@@ -240,19 +235,19 @@ export class ProconIp extends utils.Adapter {
             return;
         }
 
-        if (id.endsWith(".auto")) {
+        if (id.endsWith('.auto')) {
             this.relayToggleAuto(id, state).catch((e) => {
                 this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
-        } else if (id.endsWith(".onOff")) {
+        } else if (id.endsWith('.onOff')) {
             this.relayToggleOnOff(id, state).catch((e) => {
                 this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
-        } else if (id.endsWith(".dosageTimer")) {
+        } else if (id.endsWith('.dosageTimer')) {
             this.setDosageTimer(id, state).catch((e) => {
                 this.log.error(`Error on manual dosage (${id}): ${e}`);
             });
-        } else if (id.endsWith(".timer")) {
+        } else if (id.endsWith('.timer')) {
             this.setRelayTimer(id, state).catch((e) => {
                 this.log.error(`Error on relay timer (${id}): ${e}`);
             });
@@ -260,7 +255,7 @@ export class ProconIp extends utils.Adapter {
     }
 
     public async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<number> {
-        const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, ".onOff"));
+        const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, '.onOff'));
         if (!onOffState) {
             throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
         }
@@ -286,7 +281,6 @@ export class ProconIp extends utils.Adapter {
         } catch (e) {
             throw new Error(`Error on switching operation: ${e}`);
         }
-
     }
 
     public async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {
@@ -317,8 +311,8 @@ export class ProconIp extends utils.Adapter {
         }
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
-        const relayId = getStateDataObject.categoryId +
-            (getStateDataObject.category === GetStateCategory.EXTERNAL_RELAYS ? 8 : 0);
+        const relayId =
+            getStateDataObject.categoryId + (getStateDataObject.category === GetStateCategory.EXTERNAL_RELAYS ? 8 : 0);
         this._forceUpdate.push(getStateDataObject.id);
         try {
             const stateValNumber = state.val as number;
@@ -342,8 +336,8 @@ export class ProconIp extends utils.Adapter {
         }
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(obj.native.id);
-        const relayId = getStateDataObject.categoryId +
-            (getStateDataObject.category === GetStateCategory.EXTERNAL_RELAYS ? 9 : 1);
+        const relayId =
+            getStateDataObject.categoryId + (getStateDataObject.category === GetStateCategory.EXTERNAL_RELAYS ? 9 : 1);
         this._forceUpdate.push(getStateDataObject.id);
         try {
             const stateValNumber = state.val as number;
@@ -354,35 +348,41 @@ export class ProconIp extends utils.Adapter {
         }
     }
 
-    // /**
-    //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-    //  * Using this method requires "common.message" property to be set to true in io-package.json
-    //  */
-    // private onMessage(obj: ioBroker.Message): void {
-    //     if (typeof obj === "object" && obj.message) {
-    //         if (obj.command === "send") {
-    //             // e.g. send email or pushover or whatever
-    //             this.log.info("send command");
-
-    //             // Send response in callback if required
-    //             if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
-    //         }
-    //     }
-    // }
-
     public updateAdvancedSysInfoStates(sysInfo: GetStateDataSysInfo): void {
         if (!this._bootstrapped || sysInfo.dosageControl !== this._stateData.sysInfo.dosageControl) {
-            this.log.debug("Updating advanced sys info states");
-            this.setStateAsync(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, sysInfo.isPhPlusDosageEnabled(), true).catch((e) => {
-                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.system.phPlusDosageEnabled': ${e}`);
+            this.log.debug('Updating advanced sys info states');
+            this.setStateAsync(
+                `${this.name}.${this.instance}.info.system.phPlusDosageEnabled`,
+                sysInfo.isPhPlusDosageEnabled(),
+                true,
+            ).catch((e) => {
+                this.log.error(
+                    `Failed setting state for '${this.name}.${this.instance}.info.system.phPlusDosageEnabled': ${e}`,
+                );
             });
-            this.setStateAsync(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, sysInfo.isPhMinusDosageEnabled(), true).catch((e) => {
-                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.system.phMinusDosageEnabled': ${e}`);
+            this.setStateAsync(
+                `${this.name}.${this.instance}.info.system.phMinusDosageEnabled`,
+                sysInfo.isPhMinusDosageEnabled(),
+                true,
+            ).catch((e) => {
+                this.log.error(
+                    `Failed setting state for '${this.name}.${this.instance}.info.system.phMinusDosageEnabled': ${e}`,
+                );
             });
-            this.setStateAsync(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, sysInfo.isChlorineDosageEnabled(), true).catch((e) => {
-                this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.system.chlorineDosageEnabled': ${e}`);
+            this.setStateAsync(
+                `${this.name}.${this.instance}.info.system.chlorineDosageEnabled`,
+                sysInfo.isChlorineDosageEnabled(),
+                true,
+            ).catch((e) => {
+                this.log.error(
+                    `Failed setting state for '${this.name}.${this.instance}.info.system.chlorineDosageEnabled': ${e}`,
+                );
             });
-            this.setStateAsync(`${this.name}.${this.instance}.info.system.electrolysis`, sysInfo.isElectrolysis(), true).catch((e) => {
+            this.setStateAsync(
+                `${this.name}.${this.instance}.info.system.electrolysis`,
+                sysInfo.isElectrolysis(),
+                true,
+            ).catch((e) => {
                 this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.electrolysis': ${e}`);
             });
         }
@@ -393,86 +393,70 @@ export class ProconIp extends utils.Adapter {
      */
     public setSysInfo(data: GetStateDataSysInfo): void {
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
-            type: "channel",
+            type: 'channel',
             common: {
-                name: "SysInfo"
+                name: 'SysInfo',
             },
-            native: {}
+            native: {},
         });
         data.toArrayOfObjects().forEach((sysInfo) => {
             this.setObjectNotExists(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
-                type: "state",
+                type: 'state',
                 common: {
                     name: sysInfo.key,
-                    type: "string",
-                    role: "state",
+                    type: 'string',
+                    role: 'state',
                     read: true,
-                    write: false
+                    write: false,
                 },
                 native: {},
             });
-
-            // this.setObjectNotExistsAsync(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
-            //     type: "state",
-            //     common: {
-            //         name: sysInfo.key,
-            //         type: "string",
-            //         role: "state",
-            //         read: true,
-            //         write: false
-            //     },
-            //     native: {},
-            // }).then(() => {
-            //     this.log.info(`Sys info object '${sysInfo.key}' has been set`);
-            // }).catch((e) => {
-            //     this.log.error(`Failed setting sysInfo object '${sysInfo.key}': ${e}`);
-            // });
         });
 
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, {
-            type: "state",
+            type: 'state',
             common: {
-                name: "pH+ enabled",
-                type: "boolean",
-                role: "state",
+                name: 'pH+ enabled',
+                type: 'boolean',
+                role: 'state',
                 read: true,
-                write: false
+                write: false,
             },
             native: {},
         });
 
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, {
-            type: "state",
+            type: 'state',
             common: {
-                name: "pH- enabled",
-                type: "boolean",
-                role: "state",
+                name: 'pH- enabled',
+                type: 'boolean',
+                role: 'state',
                 read: true,
-                write: false
+                write: false,
             },
             native: {},
         });
 
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, {
-            type: "state",
+            type: 'state',
             common: {
-                name: "CL enabled",
-                type: "boolean",
-                role: "state",
+                name: 'CL enabled',
+                type: 'boolean',
+                role: 'state',
                 read: true,
-                write: false
+                write: false,
             },
             native: {},
         });
 
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system.electrolysis`, {
-            type: "state",
+            type: 'state',
             common: {
-                name: "Electrolysis",
-                type: "boolean",
-                role: "state",
+                name: 'Electrolysis',
+                type: 'boolean',
+                role: 'state',
                 read: true,
-                write: false
+                write: false,
             },
             native: {},
         });
@@ -483,16 +467,16 @@ export class ProconIp extends utils.Adapter {
      * @param data
      */
     public setObjects(objects: GetStateDataObject[]): void {
-        let lastObjCategory = "";
+        let lastObjCategory = '';
         objects.forEach((obj) => {
             if (lastObjCategory !== obj.category) {
                 // Define each api object category as device
                 this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}`, {
-                    type: "channel",
+                    type: 'channel',
                     common: {
                         name: obj.category,
                     },
-                    native: {}
+                    native: {},
                 });
                 lastObjCategory = obj.category;
             }
@@ -504,7 +488,7 @@ export class ProconIp extends utils.Adapter {
 
     public async setDataObject(obj: GetStateDataObject): Promise<void> {
         this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
-            type: "channel",
+            type: 'channel',
             common: {
                 name: obj.label,
             },
@@ -514,33 +498,33 @@ export class ProconIp extends utils.Adapter {
             const common: any = {
                 name: obj.label,
                 type: typeof obj[field],
-                role: "value",
+                role: 'value',
                 read: true,
-                write: false
+                write: false,
             };
 
             switch (field) {
-                case "value":
+                case 'value':
                     if (obj.category == GetStateCategory.TEMPERATURES) {
-                        common.role = "value.temperature";
+                        common.role = 'value.temperature';
                         common.unit = `°${obj.unit}`;
                         if (obj.active) {
                             common.smartName = {
                                 de: obj.label,
                                 en: obj.label,
-                                smartType: "THERMOSTAT"
+                                smartType: 'THERMOSTAT',
                             };
                         }
                     }
                     break;
-                case "category":
-                case "label":
-                case "unit":
-                case "displayValue":
-                    common.role = "text";
+                case 'category':
+                case 'label':
+                case 'unit':
+                case 'displayValue':
+                    common.role = 'text';
                     break;
-                case "active":
-                    common.role = "indicator";
+                case 'active':
+                    common.role = 'indicator';
                     break;
                 default:
                     continue;
@@ -548,7 +532,7 @@ export class ProconIp extends utils.Adapter {
 
             try {
                 this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
-                    type: "state",
+                    type: 'state',
                     common: common,
                     native: obj,
                 });
@@ -557,50 +541,56 @@ export class ProconIp extends utils.Adapter {
             }
         }
 
-        if (obj.category as GetStateCategory === GetStateCategory.RELAYS || (
-            obj.category as GetStateCategory === GetStateCategory.EXTERNAL_RELAYS &&
-            this._stateData.sysInfo.isExtRelaysEnabled()
-        )) {
+        if (
+            (obj.category as GetStateCategory) === GetStateCategory.RELAYS ||
+            ((obj.category as GetStateCategory) === GetStateCategory.EXTERNAL_RELAYS &&
+                this._stateData.sysInfo.isExtRelaysEnabled())
+        ) {
             this.setRelayDataObject(obj);
         }
     }
 
     public setRelayDataObject(obj: GetStateDataObject): void {
-        const isLight: boolean = new RegExp("light|bulb|licht|leucht", "i").test(obj.label);
+        const isLight: boolean = new RegExp('light|bulb|licht|leucht', 'i').test(obj.label);
         const relayId: number = (obj.category === GetStateCategory.EXTERNAL_RELAYS ? 8 : 0) + obj.categoryId;
         const isDosageRelay: boolean = this._getStateService.data.isDosageControl(relayId);
         const commonAuto: any = {
             name: obj.label,
-            type: "boolean",
-            role: "switch.mode.auto",
+            type: 'boolean',
+            role: 'switch.mode.auto',
             read: true,
             write: true,
-            smartName: obj.active ? {
-                de: `${obj.label} auto`,
-                en: `${obj.label} auto`,
-                smartType: isLight ? "LIGHT" : "SWITCH"
-            } : {}
+            smartName: obj.active
+                ? {
+                      de: `${obj.label} auto`,
+                      en: `${obj.label} auto`,
+                      smartType: isLight ? 'LIGHT' : 'SWITCH',
+                  }
+                : {},
         };
         const commonOnOff: any = {
             name: obj.label,
-            type: "boolean",
-            role: isLight ? "switch.light" : "switch",
+            type: 'boolean',
+            role: isLight ? 'switch.light' : 'switch',
             read: true,
             write: !isDosageRelay,
-            smartName: obj.active && !isDosageRelay ? {
-                de: obj.label,
-                en: obj.label,
-                smartType: isLight ? "LIGHT" : "SWITCH"
-            } : {}
+            smartName:
+                obj.active && !isDosageRelay
+                    ? {
+                          de: obj.label,
+                          en: obj.label,
+                          smartType: isLight ? 'LIGHT' : 'SWITCH',
+                      }
+                    : {},
         };
 
         this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
-            type: "state",
+            type: 'state',
             common: commonAuto,
             native: obj,
         });
         this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
-            type: "state",
+            type: 'state',
             common: commonOnOff,
             native: obj,
         });
@@ -608,73 +598,67 @@ export class ProconIp extends utils.Adapter {
         if (isDosageRelay) {
             const commonDosageTimerState: any = {
                 name: obj.label,
-                type: "number",
-                role: "value.interval",
+                type: 'number',
+                role: 'value.interval',
                 read: false,
                 write: true,
             };
 
             this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`, {
-                type: "state",
+                type: 'state',
                 common: commonDosageTimerState,
                 native: obj,
             });
         } else {
             const commonGenericRelayTimerState: any = {
                 name: obj.label,
-                type: "number",
-                role: "value.interval",
+                type: 'number',
+                role: 'value.interval',
                 read: false,
                 write: true,
             };
 
             this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.timer`, {
-                type: "state",
+                type: 'state',
                 common: commonGenericRelayTimerState,
                 native: obj,
             });
         }
-
-        // this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
-        //     type: "state",
-        //     common: commonAuto,
-        //     native: obj,
-        // }).then(() => {
-        //     this.log.info(`set auto/manual switch for '${obj.label}'`);
-        // }).catch((e) => {
-        //     this.log.error(`Failed setting auto/manual switch for '${obj.label}': ${e}`);
-        // });
-        // this.setObjectNotExistsAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
-        //     type: "state",
-        //     common: commonOnOff,
-        //     native: obj,
-        // }).then(() => {
-        //     this.log.info(`set onOff switch for '${obj.label}'`);
-        // }).catch((e) => {
-        //     this.log.error(`Failed setting onOff switch for '${obj.label}': ${e}`);
-        // });
     }
 
     public setDataState(obj: GetStateDataObject): void {
-        for (const field of Object.keys(obj).filter(field => this._objectStateFields.indexOf(field) > -1)) {
-            this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, obj[field], true).catch((e) => {
+        for (const field of Object.keys(obj).filter((field) => this._objectStateFields.indexOf(field) > -1)) {
+            this.setStateAsync(
+                `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
+                obj[field],
+                true,
+            ).catch((e) => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
             });
         }
 
-        if (obj.category as GetStateCategory === GetStateCategory.RELAYS || (
-            obj.category as GetStateCategory === GetStateCategory.EXTERNAL_RELAYS &&
-            this._stateData.sysInfo.isExtRelaysEnabled()
-        )) {
+        if (
+            (obj.category as GetStateCategory) === GetStateCategory.RELAYS ||
+            ((obj.category as GetStateCategory) === GetStateCategory.EXTERNAL_RELAYS &&
+                this._stateData.sysInfo.isExtRelaysEnabled())
+        ) {
             this.setRelayDataState(obj);
         }
     }
 
     public setRelayDataState(obj: GetStateDataObject): void {
-        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, this._relayDataInterpreter.isAuto(obj), true).catch((e) => {
+        this.setStateAsync(
+            `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`,
+            this._relayDataInterpreter.isAuto(obj),
+            true,
+        ).catch((e) => {
             this.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
         });
-        this.setStateAsync(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, this._relayDataInterpreter.isOn(obj), true).catch((e) => {
+        this.setStateAsync(
+            `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`,
+            this._relayDataInterpreter.isOn(obj),
+            true,
+        ).catch((e) => {
             this.log.error(`Failed setting onOff switch state for '${obj.label}': ${e}`);
         });
     }

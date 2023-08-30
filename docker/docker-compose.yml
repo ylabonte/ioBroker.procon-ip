@@ -8,5 +8,9 @@ services:
     hostname: iobroker
     ports:
       - "8081:8081"
+#      - "9229:9229"
     volumes:
+      - ../iobroker-data:/opt/iobroker/iobroker-data
       - ..:/opt/iobroker/node_modules/iobroker.procon-ip
+      - ../../procon-ip:/opt/iobroker/node_modules/procon-ip
+#    command: iobroker stop procon-ip && node --inspect-brk=0.0.0.0:9229 node_modules/iobroker.procon-ip/main.js --debug

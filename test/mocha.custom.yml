@@ -1,9 +1,0 @@
-# Mocha config
-require:
-  - test/mocha.setup.js
-  - ts-node/register
-  - source-map-support/register
-extensions:
-  - ts
-spec:
-  - 'src/**/*.test.ts'

@@ -1,12 +1,16 @@
 {
+    "'3' means 'tolerate up to 3 consecutive request errors'.": "„3” oznacza „tolerować do 3 kolejnych błędów żądań”.",
+    "'3000' means 'every 3 seconds'.": "„3000” oznacza „co 3 sekundy”.",
+    "'5000' means 'wait max 5 seconds for a response'.": "„5000” oznacza „poczekaj maksymalnie 5 sekund na odpowiedź”.",
     "Controller Base-URL": "Controller Base-URL",
     "Define after how many consecutively failed requests as warning will be logged.": "Określ, po ilu kolejnych nieudanych żądaniach będą rejestrowane ostrzeżenia.",
     "Max tolerable errors": "Maksymalna dopuszczalna liczba błędów",
+    "Must start with 'http://' or 'https://'": "Musi zaczynać się od „http://” lub „https://”",
     "Password": "Password",
     "Please choose a value greater or equal 1000.": "Wybierz wartość większą lub równą 1000.",
     "Please choose a value lesser or equal 60000(ms = 60s).": "Wybierz wartość mniejszą lub równą 60000 (ms = 60s).",
     "Please choose a value smaller than 86400000(ms = 24h).": "Wybierz wartość mniejszą niż 86400000 (ms = 24h).",
-    "Please enter a valid url including the 'http' or 'https'.": "Wprowadź prawidłowy adres URL, w tym „http” lub „https”.",
+    "Please enter a valid url including the 'http://' or 'https://'.": "Wprowadź prawidłowy adres URL, w tym „http://” lub „https://”.",
     "Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).": "Proszę zachować rozsądną wiarygodność i pozostawać pomiędzy 500 (ms) a 60000 (ms = 60s = 1min).",
     "Please keep it reasonably plausible and stay between 500(ms) and 86400000(ms = 24h).": "Proszę zachować rozsądną wiarygodność i pozostać między 500 (ms) a 86400000 (ms = 24h).",
     "Please keep the value above 100(ms).": "Proszę utrzymać wartość powyżej 100 (ms).",
@@ -16,5 +20,7 @@
     "The url you have entered does not start with 'http://' or 'https://'": "Wprowadzony adres URL nie zaczyna się od „http: //” ani „https: //”",
     "Update interval (ms)": "Update interval (ms)",
     "Use basic auth": "Use basic auth",
-    "Username": "Username"
+    "Username": "Username",
+    "admin": "admin",
+    "http://<controller-url>": "http://<controller-url>"
 }

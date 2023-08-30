@@ -1,12 +1,16 @@
 {
+    "'3' means 'tolerate up to 3 consecutive request errors'.": "„3“ bedeutet „bis zu 3 aufeinanderfolgende Fehler tolerieren“.",
+    "'3000' means 'every 3 seconds'.": "„3000“ bedeutet „alle 3 Sekunden“.",
+    "'5000' means 'wait max 5 seconds for a response'.": "„5000“ bedeutet „maximal 5 Sekunden auf eine Antwort warten“.",
     "Controller Base-URL": "URL der Poolsteuerung",
     "Define after how many consecutively failed requests as warning will be logged.": "Legen Sie fest, nach wie vielen nacheinander fehlgeschlagenen Anforderungen als Warnung protokolliert wird.",
     "Max tolerable errors": "Max tolerierbare Fehler",
+    "Must start with 'http://' or 'https://'": "Die URL muss mit \"http://\" oder \"https://\" anfangen",
     "Password": "Passwort",
     "Please choose a value greater or equal 1000.": "Bitte wählen Sie einen Wert größer oder gleich 1000.",
     "Please choose a value lesser or equal 60000(ms = 60s).": "Bitte wählen Sie einen Wert kleiner oder gleich 60000 (ms = 60s).",
     "Please choose a value smaller than 86400000(ms = 24h).": "Bitte wählen Sie einen Wert kleiner als 86400000 (ms = 24h).",
-    "Please enter a valid url including the 'http' or 'https'.": "Bitte geben Sie eine gültige URL ein, einschließlich \"http\" oder \"https\".",
+    "Please enter a valid url including the 'http://' or 'https://'.": "Bitte geben Sie eine gültige URL ein, einschließlich \"http://\" oder \"https://\".",
     "Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).": "Bitte halten Sie es einigermaßen plausibel und bleiben Sie zwischen 500 (ms) und 60000 (ms = 60s = 1min).",
     "Please keep it reasonably plausible and stay between 500(ms) and 86400000(ms = 24h).": "Bitte halten Sie es einigermaßen plausibel und bleiben Sie zwischen 500 (ms) und 86400000 (ms = 24h).",
     "Please keep the value above 100(ms).": "Bitte halten Sie den Wert über 100 (ms).",
@@ -16,5 +20,7 @@
     "The url you have entered does not start with 'http://' or 'https://'": "Die von Ihnen eingegebene URL beginnt nicht mit \"http: //\" oder \"https: //\".",
     "Update interval (ms)": "Update-Interval (ms)",
     "Use basic auth": "Authentifizierung benutzen (HTTP Basic Auth)",
-    "Username": "Benutzername"
+    "Username": "Benutzername",
+    "admin": "admin",
+    "http://<controller-url>": "http://<controller-url>"
 }

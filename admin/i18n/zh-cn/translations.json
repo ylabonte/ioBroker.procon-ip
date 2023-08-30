@@ -1,12 +1,16 @@
 {
+    "'3' means 'tolerate up to 3 consecutive request errors'.": "“3”表示“最多容忍 3 个连续请求错误”。",
+    "'3000' means 'every 3 seconds'.": "“3000”表示“每 3 秒”。",
+    "'5000' means 'wait max 5 seconds for a response'.": "“5000”表示“最多等待 5 秒以获得响应”。",
     "Controller Base-URL": "Controller Base-URL",
     "Define after how many consecutively failed requests as warning will be logged.": "定义将记录多少连续失败的警告请求后。",
     "Max tolerable errors": "最大容许误差",
+    "Must start with 'http://' or 'https://'": "必须以“http://”或“https://”开头",
     "Password": "Password",
     "Please choose a value greater or equal 1000.": "请选择一个大于或等于1000的值。",
     "Please choose a value lesser or equal 60000(ms = 60s).": "请选择一个小于或等于60000（ms = 60s）的值。",
     "Please choose a value smaller than 86400000(ms = 24h).": "请选择小于86400000（ms = 24h）的值。",
-    "Please enter a valid url including the 'http' or 'https'.": "请输入有效的网址，包括“ http”或“ https”。",
+    "Please enter a valid url including the 'http://' or 'https://'.": "请输入有效的网址，包括“http://”或“https://”。",
     "Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).": "请使其合理合理，并保持在500（ms）至60000（ms = 60s = 1min）之间。",
     "Please keep it reasonably plausible and stay between 500(ms) and 86400000(ms = 24h).": "请使其合理合理，并保持在500（ms）至86400000（ms = 24h）之间。",
     "Please keep the value above 100(ms).": "请将该值保持在100（ms）以上。",
@@ -16,5 +20,7 @@
     "The url you have entered does not start with 'http://' or 'https://'": "您输入的网址不是以“ http：//”或“ https：//”开头",
     "Update interval (ms)": "Update interval (ms)",
     "Use basic auth": "Use basic auth",
-    "Username": "Username"
+    "Username": "Username",
+    "admin": "admin",
+    "http://<controller-url>": "http://<controller-url>"
 }

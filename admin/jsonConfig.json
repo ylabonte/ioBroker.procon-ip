@@ -1,0 +1,94 @@
+{
+  "i18n": true,
+  "type": "panel",
+  "items": {
+    "controllerUrl": {
+      "type": "text",
+      "label": "Controller Base-URL",
+      "help": "Please enter a valid url including the 'http://' or 'https://'.",
+      "placeholder": "http://<controller-url>",
+      "validator": "/^https?:\\\/\\\/.+/i.test(data.controllerUrl)",
+      "validatorErrorText": "Must start with 'http://' or 'https://'",
+      "validatorNoSaveOnError": true,
+      "xs": 12,
+      "sm": 8,
+      "md": 8,
+      "lg": 3,
+      "newLine": true
+    },
+    "basicAuth": {
+      "type": "checkbox",
+      "label": "Use basic auth",
+      "xs": 4,
+      "sm": 4,
+      "md": 4,
+      "lg": 3
+    },
+    "username": {
+      "type": "text",
+      "label": "Username",
+      "placeholder": "admin",
+      "hidden": "!data.basicAuth",
+      "xs": 12,
+      "sm": 6,
+      "md": 6,
+      "lg": 3,
+      "newLine": true
+    },
+    "password": {
+      "type": "password",
+      "label": "Password",
+      "hidden": "!data.basicAuth",
+      "xs": 12,
+      "sm": 6,
+      "md": 6,
+      "lg": 3
+    },
+    "updateInterval": {
+      "type": "number",
+      "label": "Update interval (ms)",
+      "help": "'3000' means 'every 3 seconds'.",
+      "default": 3000,
+      "min": 500,
+      "max": 60000,
+      "step": 500,
+      "validatorErrorText": "Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 1min).",
+      "validatorNoSaveOnError": true,
+      "xs": 6,
+      "sm": 4,
+      "md": 4,
+      "lg": 2,
+      "newLine": true
+    },
+    "requestTimeout": {
+      "type": "number",
+      "label": "Request timeout (ms)",
+      "help": "'5000' means 'wait max 5 seconds for a response'.",
+      "default": 5000,
+      "min": 500,
+      "max": 60000,
+      "step": 500,
+      "validatorErrorText": "Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).",
+      "validatorNoSaveOnError": true,
+      "xs": 6,
+      "sm": 4,
+      "md": 4,
+      "lg": 2
+    },
+    "errorTolerance": {
+      "type": "number",
+      "label": "Max tolerable errors",
+      "help": "'3' means 'tolerate up to 3 consecutive request errors'.",
+      "validatorErrorText": "Define after how many consecutively failed requests as warning will be logged.",
+      "validatorNoSaveOnError": true,
+      "default": 3,
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "xs": 6,
+      "sm": 4,
+      "md": 4,
+      "lg": 2
+    }
+  }
+}

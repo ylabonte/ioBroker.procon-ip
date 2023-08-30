@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.4.0",
+        "version": "1.5.0",
         "news": {
             "1.4.0": {
                 "en": "Add generic relay timers and update dependencies",
@@ -104,7 +104,8 @@
                 "it": "Rilascio bugfix (risolvere problemi di connessione)",
                 "es": "Lanzamiento de corrección de errores (solucionar problemas de conexión)",
                 "pl": "Wydanie poprawki błędów (naprawienie problemów z połączeniem)",
-                "zh-cn": "错误修复发布（修复连接问题）"
+                "zh-cn": "错误修复发布（修复连接问题）",
+                "uk": "Випуск виправлення помилок (виправлення проблем з підключенням)"
             },
             "1.2.0": {
                 "en": "Update `procon-ip` API library package to v1.3.2 (which should fix a bug that let the relay switching fail) and further dependencies.",
@@ -116,7 +117,8 @@
                 "it": "Aggiorna il pacchetto della libreria API `procon-ip` alla v1.3.2 (che dovrebbe correggere un bug che lasciava fallire il cambio di relè) e ulteriori dipendenze.",
                 "es": "Actualice el paquete de la biblioteca API `procon-ip` a v1.3.2 (lo que debería corregir un error que permitía que fallara el cambio de relé) y otras dependencias.",
                 "pl": "Zaktualizuj pakiet biblioteki API `procon-ip` do wersji 1.3.2 (co powinno naprawić błąd, który pozwalał na niepowodzenie przełączania przekaźnika) i inne zależności.",
-                "zh-cn": "将 `procon-ip` API 库包更新到 v1.3.2（应该会修复一个导致中继切换失败的错误）和更多依赖项。"
+                "zh-cn": "将 `procon-ip` API 库包更新到 v1.3.2（应该会修复一个导致中继切换失败的错误）和更多依赖项。",
+                "uk": "Оновіть пакет бібліотеки API `procon-ip` до версії 1.3.2 (що має виправити помилку, через яку не вдавалося перемикати реле) та інші залежності."
             },
             "1.1.1": {
                 "en": "Minor release, moving the API library source code into a separate repository (npm package) and adding capability to update `common.name` attributes when object labels change.",
@@ -128,7 +130,8 @@
                 "it": "Versione minore, spostamento del codice sorgente della libreria API in un repository separato (pacchetto npm) e aggiunta della capacità di aggiornare gli attributi `common.name` quando le etichette degli oggetti cambiano.",
                 "es": "Lanzamiento menor, moviendo el código fuente de la biblioteca API a un repositorio separado (paquete npm) y agregando capacidad para actualizar los atributos `common.name` cuando cambian las etiquetas de los objetos.",
                 "pl": "Wydanie drugorzędne, przenoszące kod źródłowy biblioteki API do oddzielnego repozytorium (pakiet npm) i dodające możliwość aktualizowania atrybutów common.name, gdy zmieniają się etykiety obiektów.",
-                "zh-cn": "次要版本，将API库的源代码移动到单独的存储库（npm软件包）中，并添加了在对象标签更改时更新“ common.name”属性的功能。"
+                "zh-cn": "次要版本，将API库的源代码移动到单独的存储库（npm软件包）中，并添加了在对象标签更改时更新“ common.name”属性的功能。",
+                "uk": "Незначний випуск, переміщення вихідного коду бібліотеки API в окреме сховище (пакет npm) і додавання можливості оновлення атрибутів `common.name` при зміні міток об’єктів."
             },
             "1.0.2": {
                 "en": "Fine tuned the http requests to the pool controller",
@@ -140,7 +143,8 @@
                 "it": "Ottimizzazione delle richieste http al controller del pool",
                 "es": "Ajustó las solicitudes http al controlador de la piscina",
                 "pl": "Dostrojono żądania http do kontrolera puli",
-                "zh-cn": "微调对池控制器的http请求"
+                "zh-cn": "微调对池控制器的http请求",
+                "uk": "Точне налаштування http-запитів до контролера пулу"
             },
             "1.0.1": {
                 "en": "Hotfix release: Fix Object State updates",
@@ -152,7 +156,8 @@
                 "it": "Versione hotfix: correggi gli aggiornamenti dello stato dell'oggetto",
                 "es": "Lanzamiento de revisión: Reparar actualizaciones de estado de objeto",
                 "pl": "Wydanie poprawki: napraw aktualizacje stanu obiektu",
-                "zh-cn": "修补程序版本：修复对象状态更新"
+                "zh-cn": "修补程序版本：修复对象状态更新",
+                "uk": "Випуск виправлення: оновлення стану виправлення об’єкта"
             },
             "1.0.0": {
                 "en": "Stable release for the official repos. For details see: https://github.com/ylabonte/ioBroker.procon-ip",
@@ -164,10 +169,10 @@
                 "it": "Rilascio stabile per i repository ufficiali. Per i dettagli, consultare: https://github.com/ylabonte/ioBroker.procon-ip",
                 "es": "Lanzamiento estable para los repositorios oficiales. Para más detalles, consulte: https://github.com/ylabonte/ioBroker.procon-ip",
                 "pl": "Stabilna wersja oficjalnych repozytoriów. Aby uzyskać szczegółowe informacje, patrz: https://github.com/ylabonte/ioBroker.procon-ip",
-                "zh-cn": "官方仓库的稳定版本。有关详细信息，请参见：https://github.com/ylabonte/ioBroker.procon-ip"
+                "zh-cn": "官方仓库的稳定版本。有关详细信息，请参见：https://github.com/ylabonte/ioBroker.procon-ip",
+                "uk": "Стабільний випуск для офіційних репо. Детальніше див.: https://github.com/ylabonte/ioBroker.procon-ip"
             }
         },
-        "title": "ProCon.IP Pool Control",
         "titleLang": {
             "en": "ProCon.IP Pool Control",
             "de": "ProCon.IP Poolsteuerung",
@@ -178,7 +183,8 @@
             "it": "ProCon.IP controllo piscina",
             "es": "ProCon.IP control de la piscina",
             "pl": "ProCon.IP sterowanie basenem",
-            "zh-cn": "ProCon.IP 池控制"
+            "zh-cn": "ProCon.IP 池控制",
+            "uk": "Контроль пулу ProCon.IP"
         },
         "desc": {
             "en": "ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. It is intended for integration with your ioBroker home automation, eg. to build logic that involves other devices or simply to be paired with your favorit voice assistant(s).",
@@ -190,19 +196,18 @@
             "it": "adattatore ioBroker per il supporto di base dell'unità di controllo della piscina ProCon.IP. È destinato all'integrazione con l'automazione domestica ioBroker, ad es. per costruire una logica che coinvolga altri dispositivi o semplicemente per essere accoppiato con i tuoi assistenti vocali preferiti.",
             "es": "Adaptador ioBroker para soporte básico de la unidad de control de piscina ProCon.IP. Está destinado a la integración con su domótica ioBroker, por ejemplo. para construir una lógica que involucre otros dispositivos o simplemente para que se vincule con su (s) asistente (s) de voz favorito (s).",
             "pl": "Adapter ioBroker do podstawowej obsługi jednostki sterującej basenu ProCon.IP. Jest przeznaczony do integracji z automatyką domową ioBroker, np. zbudować logikę, która obejmuje inne urządzenia lub po prostu sparować ze swoimi ulubionymi asystentami głosowymi.",
-            "zh-cn": "ioBroker适配器，用于ProCon.IP游泳池控制单元的基本支持。它旨在与您的ioBroker家庭自动化集成，例如。建立涉及其他设备的逻辑，或者仅与您喜欢的语音助手配对。"
+            "zh-cn": "ioBroker适配器，用于ProCon.IP游泳池控制单元的基本支持。它旨在与您的ioBroker家庭自动化集成，例如。建立涉及其他设备的逻辑，或者仅与您喜欢的语音助手配对。",
+            "uk": "Адаптер ioBroker для базової підтримки блоку керування басейном ProCon.IP. Він призначений для інтеграції з системою домашньої автоматизації ioBroker, наприклад. створювати логіку, яка залучає інші пристрої, або просто бути в парі з вашим улюбленим голосовим помічником(ами)."
         },
         "authors": [
             "Yannic Labonte <yannic.labonte@gmail.com>"
         ],
         "keywords": [
-            "ioBroker",
             "ProCon.IP",
-            "pool control",
+            "procon",
             "pool-digital",
-            "pool controller",
-            "home automation",
-            "Smart Home"
+            "swimming",
+            "pool"
         ],
         "license": "MIT",
         "platform": "Javascript/Node.js",
@@ -214,18 +219,22 @@
         "loglevel": "info",
         "mode": "daemon",
         "type": "iot-systems",
+        "tier": 2,
         "connectionType": "local",
         "dataSource": "poll",
         "compact": true,
-        "materialize": true,
-        "materializeTab": false,
         "adminUI": {
-            "config": "materialize"
+            "config": "json"
         },
         "supportCustoms": false,
         "dependencies": [
             {
-                "js-controller": ">=2.2.0"
+                "js-controller": ">=3.3.22"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=5.1.13"
             }
         ]
     },

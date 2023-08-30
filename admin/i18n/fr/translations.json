@@ -1,12 +1,16 @@
 {
+    "'3' means 'tolerate up to 3 consecutive request errors'.": "« 3 » signifie « tolérer jusqu'à 3 erreurs de requête consécutives ».",
+    "'3000' means 'every 3 seconds'.": "« 3000 » signifie « toutes les 3 secondes ».",
+    "'5000' means 'wait max 5 seconds for a response'.": "« 5 000 » signifie « attendre 5 secondes maximum pour une réponse ».",
     "Controller Base-URL": "Controller Base-URL",
     "Define after how many consecutively failed requests as warning will be logged.": "Définissez après combien de demandes ayant échoué consécutivement, les avertissements seront enregistrés.",
     "Max tolerable errors": "Erreurs tolérables maximales",
+    "Must start with 'http://' or 'https://'": "Doit commencer par « http:// » ou « https:// »",
     "Password": "Password",
     "Please choose a value greater or equal 1000.": "Veuillez choisir une valeur supérieure ou égale à 1000.",
     "Please choose a value lesser or equal 60000(ms = 60s).": "Veuillez choisir une valeur inférieure ou égale à 60000 (ms = 60s).",
     "Please choose a value smaller than 86400000(ms = 24h).": "Veuillez choisir une valeur inférieure à 86400000 (ms = 24h).",
-    "Please enter a valid url including the 'http' or 'https'.": "Veuillez saisir une URL valide comprenant le \"http\" ou le \"https\".",
+    "Please enter a valid url including the 'http://' or 'https://'.": "Veuillez saisir une URL valide incluant « http:// » ou « https:// ».",
     "Please keep it reasonably plausible and stay between 500(ms) and 60000(ms = 60s = 1min).": "Veuillez le garder raisonnablement plausible et rester entre 500 (ms) et 60000 (ms = 60s = 1min).",
     "Please keep it reasonably plausible and stay between 500(ms) and 86400000(ms = 24h).": "Veuillez le garder raisonnablement plausible et rester entre 500 (ms) et 86400000 (ms = 24h).",
     "Please keep the value above 100(ms).": "Veuillez conserver la valeur au-dessus de 100 (ms).",
@@ -16,5 +20,7 @@
     "The url you have entered does not start with 'http://' or 'https://'": "L'URL que vous avez saisie ne commence pas par «http: //» ou «https: //»",
     "Update interval (ms)": "Update interval (ms)",
     "Use basic auth": "Use basic auth",
-    "Username": "Username"
+    "Username": "Username",
+    "admin": "admin",
+    "http://<controller-url>": "http://<controller-url>"
 }
