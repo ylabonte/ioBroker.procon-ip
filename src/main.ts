@@ -68,144 +68,120 @@ export class ProconIp extends utils.Adapter {
     private async onReady(): Promise<void> {
         let connectionApproved = false;
         this.setState('info.connection', false, true);
-        this.getForeignObject('system.config', (err: any, obj: any) => {
-            // let encryptedNative: string[] = [];
-            // this.log.info(`ioPack: ${JSON.stringify(this.ioPack)}`);
-            // this.log.info(`encryptedNative: ${JSON.stringify(this.ioPack.encryptedNative)}`);
-            // if (this.ioPack && this.ioPack.encryptedNative) {
-            //     encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative as string[]);
-            // }
-            // for (const setting in this.config) {
-            //     this.log.info(`config: ${JSON.stringify(this.config)}`);
-            //     if (
-            //         this.config[setting].length > 0 &&
-            //         encryptedNative.indexOf(setting) >= 0 &&
-            //         (!this.supportsFeature || !this.supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
-            //     ) {
-            //         if (typeof obj !== 'undefined' && obj.native && obj.native.secret !== undefined) {
-            //             this.config[setting] = this.decrypt(obj.native.secret, this.config[setting]);
-            //         } else {
-            //             this.config[setting] = this.decrypt(this.config[setting]);
-            //         }
-            //     }
-            // }
 
-            // The adapters config (in the instance object everything under the attribute "native") is accessible via
-            // this.config:
-            if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
-                this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
-                return 0;
-            }
+        if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
+            this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
+            return;
+        }
 
-            const serviceConfig = Object.defineProperties(Object.create(this.config), {
-                baseUrl: {
-                    value: this.config.controllerUrl,
-                    writable: true,
-                },
-                timeout: {
-                    value: this.config.requestTimeout,
-                    writable: true,
-                },
-            });
-            this._relayDataInterpreter = new RelayDataInterpreter(this.log);
-            this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
-            this._setStateService = new SetStateService(serviceConfig as IServiceConfig, this.log);
-            this._usrcfgCgiService = new UsrcfgCgiService(
-                serviceConfig as IServiceConfig,
-                this.log,
-                this._getStateService,
-                this._relayDataInterpreter,
-            );
-            this._commandService = new CommandService(serviceConfig as IServiceConfig, this.log);
-
-            this.log.debug(`GetStateService url: ${this._getStateService.url}`);
-            this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
-
-            this._getStateService.update().then((data) => {
-                this._stateData = data;
-
-                // Set objects once
-                if (!this._bootstrapped) {
-                    this.log.debug(`Initially setting adapter objects`);
-                    this.setSysInfo(data.sysInfo);
-                    this.setObjects(data.objects);
-                }
-            });
-
-            setTimeout(() => {
-                // Start the actual service
-                this._getStateService.start(
-                    (data: GetStateData) => {
-                        this.log.silly(`Start processing new GetState.csv`);
-                        connectionApproved = true;
-
-                        // Set sys info states
-                        data.sysInfo.toArrayOfObjects().forEach((info) => {
-                            // Only update when value has changed
-                            if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
-                                this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                                this.setStateAsync(
-                                    `${this.name}.${this.instance}.info.system.${info.key}`,
-                                    info.value.toString(),
-                                    true,
-                                ).catch((e) => {
-                                    this.log.error(`Failed setting state for '${info.key}': ${e}`);
-                                });
-                            }
-                        });
-
-                        this.updateAdvancedSysInfoStates(data.sysInfo);
-
-                        // Set actual sensor and actor/relay object states
-                        data.objects.forEach((obj) => {
-                            this.log.silly(
-                                `Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`,
-                            );
-                            this.log.silly(
-                                `this._stateData.getDataObject(obj.id).value: ${
-                                    this._stateData.getDataObject(obj.id).value
-                                }`,
-                            );
-                            this.log.silly(`obj.value: ${obj.value}`);
-
-                            // Only update when value has changed or update is forced (on state change)
-                            const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
-                            if (
-                                !this._bootstrapped ||
-                                forceObjStateUpdate >= 0 ||
-                                (this._stateData.getDataObject(obj.id) &&
-                                    this._stateData.getDataObject(obj.id).value != obj.value)
-                            ) {
-                                if (this._stateData.getDataObject(obj.id).label != obj.label) {
-                                    this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
-                                    this.updateObjectCommonName(obj);
-                                }
-                                this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
-                                this.setDataState(obj);
-                                if (this._forceUpdate[forceObjStateUpdate]) {
-                                    delete this._forceUpdate[forceObjStateUpdate];
-                                }
-                            }
-                        });
-
-                        this.log.silly(`Updating data object for next comparison`);
-                        this._stateData = data;
-                        this._bootstrapped = true;
-                        this.setState('info.connection', true, true);
-                    },
-                    (e) => {
-                        this.setState('info.connection', false, true);
-                        if (!connectionApproved) {
-                            this.log.error(`Could not connect to the controller: ${e?.message ? e.message : e}`);
-                            this._getStateService?.stop();
-                        }
-                    },
-                );
-            }, 3000);
-
-            this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
-            this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+        const serviceConfig = Object.defineProperties(Object.create(this.config), {
+            baseUrl: {
+                value: this.config.controllerUrl,
+                writable: true,
+            },
+            timeout: {
+                value: this.config.requestTimeout,
+                writable: true,
+            },
         });
+        this._relayDataInterpreter = new RelayDataInterpreter(this.log);
+        this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
+        this._setStateService = new SetStateService(serviceConfig as IServiceConfig, this.log);
+        this._usrcfgCgiService = new UsrcfgCgiService(
+            serviceConfig as IServiceConfig,
+            this.log,
+            this._getStateService,
+            this._relayDataInterpreter,
+        );
+        this._commandService = new CommandService(serviceConfig as IServiceConfig, this.log);
+
+        this.log.debug(`GetStateService url: ${this._getStateService.url}`);
+        this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
+
+        this._getStateService.update().then((data) => {
+            this._stateData = data;
+
+            // Set objects once
+            if (!this._bootstrapped) {
+                this.log.debug(`Initially setting adapter objects`);
+                this.setSysInfo(data.sysInfo);
+                this.setObjects(data.objects);
+            }
+        });
+
+        setTimeout(() => {
+            // Start the actual service
+            this._getStateService.start(
+                (data: GetStateData) => {
+                    this.log.silly(`Start processing new GetState.csv`);
+                    connectionApproved = true;
+
+                    // Set sys info states
+                    data.sysInfo.toArrayOfObjects().forEach((info) => {
+                        // Only update when value has changed
+                        if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
+                            this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
+                            this.setStateAsync(
+                                `${this.name}.${this.instance}.info.system.${info.key}`,
+                                info.value.toString(),
+                                true,
+                            ).catch((e) => {
+                                this.log.error(`Failed setting state for '${info.key}': ${e}`);
+                            });
+                        }
+                    });
+
+                    this.updateAdvancedSysInfoStates(data.sysInfo);
+
+                    // Set actual sensor and actor/relay object states
+                    data.objects.forEach((obj) => {
+                        this.log.silly(
+                            `Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`,
+                        );
+                        this.log.silly(
+                            `this._stateData.getDataObject(obj.id).value: ${
+                                this._stateData.getDataObject(obj.id).value
+                            }`,
+                        );
+                        this.log.silly(`obj.value: ${obj.value}`);
+
+                        // Only update when value has changed or update is forced (on state change)
+                        const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
+                        if (
+                            !this._bootstrapped ||
+                            forceObjStateUpdate >= 0 ||
+                            (this._stateData.getDataObject(obj.id) &&
+                                this._stateData.getDataObject(obj.id).value != obj.value)
+                        ) {
+                            if (this._stateData.getDataObject(obj.id).label != obj.label) {
+                                this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
+                                this.updateObjectCommonName(obj);
+                            }
+                            this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
+                            this.setDataState(obj);
+                            if (this._forceUpdate[forceObjStateUpdate]) {
+                                delete this._forceUpdate[forceObjStateUpdate];
+                            }
+                        }
+                    });
+
+                    this.log.silly(`Updating data object for next comparison`);
+                    this._stateData = data;
+                    this._bootstrapped = true;
+                    this.setState('info.connection', true, true);
+                },
+                (e) => {
+                    this.setState('info.connection', false, true);
+                    if (!connectionApproved) {
+                        this.log.error(`Could not connect to the controller: ${e?.message ? e.message : e}`);
+                        this._getStateService?.stop();
+                    }
+                },
+            );
+        }, 300);
+
+        this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
+        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
     }
 
     /**
