@@ -39,7 +39,7 @@ declare global {
     }
 }
 
-export class ProconIp extends utils.Adapter {
+class ProconIp extends utils.Adapter {
     private _relayDataInterpreter!: RelayDataInterpreter;
     private _getStateService!: GetStateService;
     private _setStateService!: SetStateService;
@@ -666,7 +666,7 @@ export class ProconIp extends utils.Adapter {
     }
 }
 
-if (module.parent) {
+if (require.main !== module) {
     // Export the constructor in compact mode
     module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new ProconIp(options);
 } else {
