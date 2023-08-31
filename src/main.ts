@@ -18,7 +18,6 @@ import {
     GetStateDataObject,
     SetStateService,
 } from 'procon-ip';
-import {Adapter} from "@iobroker/adapter-core";
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -70,28 +69,31 @@ export class ProconIp extends utils.Adapter {
         let connectionApproved = false;
         this.setState('info.connection', false, true);
         this.getForeignObject('system.config', (err: any, obj: any) => {
-            let encryptedNative: string[] = [];
-            if (this.ioPack && this.ioPack.encryptedNative) {
-                encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative as string[]);
-            }
-            for (const setting in this.config) {
-                if (
-                    this.config[setting].length > 0 &&
-                    encryptedNative.indexOf(setting) >= 0 &&
-                    (!this.supportsFeature || !this.supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
-                ) {
-                    if (typeof obj !== 'undefined' && obj.native && obj.native.secret !== undefined) {
-                        this.config[setting] = this.decrypt(obj.native.secret, this.config[setting]);
-                    } else {
-                        this.config[setting] = this.decrypt(this.config[setting]);
-                    }
-                }
-            }
+            // let encryptedNative: string[] = [];
+            // this.log.info(`ioPack: ${JSON.stringify(this.ioPack)}`);
+            // this.log.info(`encryptedNative: ${JSON.stringify(this.ioPack.encryptedNative)}`);
+            // if (this.ioPack && this.ioPack.encryptedNative) {
+            //     encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative as string[]);
+            // }
+            // for (const setting in this.config) {
+            //     this.log.info(`config: ${JSON.stringify(this.config)}`);
+            //     if (
+            //         this.config[setting].length > 0 &&
+            //         encryptedNative.indexOf(setting) >= 0 &&
+            //         (!this.supportsFeature || !this.supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
+            //     ) {
+            //         if (typeof obj !== 'undefined' && obj.native && obj.native.secret !== undefined) {
+            //             this.config[setting] = this.decrypt(obj.native.secret, this.config[setting]);
+            //         } else {
+            //             this.config[setting] = this.decrypt(this.config[setting]);
+            //         }
+            //     }
+            // }
 
             // The adapters config (in the instance object everything under the attribute "native") is accessible via
             // this.config:
-            if (this.config['controllerUrl'].length < 1 || !ProconIp.isValidURL(this.config['controllerUrl'])) {
-                this.log.warn(`Invalid controller URL ('${this.config['controllerUrl']}') supplied.`);
+            if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
+                this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
                 return 0;
             }
 
@@ -464,7 +466,6 @@ export class ProconIp extends utils.Adapter {
 
     /**
      * Set/update objects (not their states!)
-     * @param data
      */
     public setObjects(objects: GetStateDataObject[]): void {
         let lastObjCategory = '';

@@ -47,21 +47,8 @@ class ProconIp extends utils.Adapter {
     let connectionApproved = false;
     this.setState("info.connection", false, true);
     this.getForeignObject("system.config", (err, obj) => {
-      let encryptedNative = [];
-      if (this.ioPack && this.ioPack.encryptedNative) {
-        encryptedNative = encryptedNative.concat(this.ioPack.encryptedNative);
-      }
-      for (const setting in this.config) {
-        if (this.config[setting].length > 0 && encryptedNative.indexOf(setting) >= 0 && (!this.supportsFeature || !this.supportsFeature("ADAPTER_AUTO_DECRYPT_NATIVE"))) {
-          if (typeof obj !== "undefined" && obj.native && obj.native.secret !== void 0) {
-            this.config[setting] = this.decrypt(obj.native.secret, this.config[setting]);
-          } else {
-            this.config[setting] = this.decrypt(this.config[setting]);
-          }
-        }
-      }
-      if (this.config["controllerUrl"].length < 1 || !ProconIp.isValidURL(this.config["controllerUrl"])) {
-        this.log.warn(`Invalid controller URL ('${this.config["controllerUrl"]}') supplied.`);
+      if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
+        this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
         return 0;
       }
       const serviceConfig = Object.defineProperties(Object.create(this.config), {
