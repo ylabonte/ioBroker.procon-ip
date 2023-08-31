@@ -3,6 +3,19 @@
         "name": "procon-ip",
         "version": "1.5.0",
         "news": {
+            "1.5.0": {
+                "en": "Code base modernization, removing support for obsolete credential encryption.",
+                "de": "Modernisierung der Codebasis, Entfernung der Unterstützung für veraltete Anmeldeinformationsverschlüsselung.",
+                "ru": "Модернизация базы кода, удаление поддержки устаревшего шифрования учетных данных.",
+                "pt": "Modernização da base de código, removendo o suporte para criptografia de credenciais obsoletas.",
+                "nl": "Modernisering van de codebasis, waarbij de ondersteuning voor verouderde legitimatieversleuteling wordt verwijderd.",
+                "fr": "Modernisation de la base de code, suppression de la prise en charge du cryptage des informations d'identification obsolètes.",
+                "it": "Modernizzazione della base di codice, rimozione del supporto per la crittografia delle credenziali obsoleta.",
+                "es": "Modernización de la base de código, eliminando la compatibilidad con el cifrado de credenciales obsoletas.",
+                "pl": "Modernizacja bazy kodu, usunięcie obsługi przestarzałego szyfrowania poświadczeń.",
+                "uk": "Модернізація бази коду, усунення підтримки застарілого шифрування облікових даних.",
+                "zh-cn": "代码库现代化，删除对过时凭证加密的支持。"
+            },
             "1.4.0": {
                 "en": "Add generic relay timers and update dependencies",
                 "de": "Einführung allgemeiner Relais-Timer und Aktualisierung von Abhängigkeiten",
