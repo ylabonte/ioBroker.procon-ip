@@ -84,6 +84,9 @@ Feel free. But if you're feeling really patronizing, you could... 😃
 
 ## Changelog
 ### **WORK IN PROGRESS**
+* Add newline before descriptive text in adapter config.
+
+### 1.5.1 (2023-09-05)
 * Re-translate adapter config.
 * Cleanup adapter code.
 * Update dependencies.
