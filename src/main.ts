@@ -1,9 +1,3 @@
-/*
- * Created with @iobroker/create-adapter v1.15.1
- */
-
-// The adapter-core module gives you access to the core ioBroker functions
-// you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
 import {
     CommandService,
@@ -31,10 +25,6 @@ declare global {
             updateInterval: number;
             requestTimeout: number;
             errorTolerance: number;
-
-            // Use a catch-all approach to enable array-like iteration with
-            // key as a variable...
-            [key: string]: any;
         }
     }
 }
@@ -104,8 +94,8 @@ class ProconIp extends utils.Adapter {
             // Set objects once
             if (!this._bootstrapped) {
                 this.log.debug(`Initially setting adapter objects`);
-                this.setSysInfo(data.sysInfo);
-                this.setObjects(data.objects);
+                this.setSysInfoObjectsNotExists(data.sysInfo);
+                this.setStateDataObjectsNotExists(data.objects);
             }
         });
 
@@ -184,9 +174,7 @@ class ProconIp extends utils.Adapter {
         this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
     }
 
-    /**
-     * Is called when adapter shuts down - callback has to be called under any circumstances!
-     */
+    // Is called when adapter shuts down - callback has to be called under any circumstances!
     private onUnload(callback: () => void): void {
         try {
             // Stop the service loop (this also handles the info.connection state)
@@ -199,9 +187,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    /**
-     * Is called if a subscribed state changes
-     */
+    // Is called if a subscribed state changes
     private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
         if (!state) {
             // The state was deleted
@@ -232,7 +218,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<number> {
+    private async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<number> {
         const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, '.onOff'));
         if (!onOffState) {
             throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
@@ -261,7 +247,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {
+    private async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {
         const obj = await this.getObjectAsync(objectId);
         if (!obj) {
             throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
@@ -282,7 +268,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public async setDosageTimer(objectId: string, state: ioBroker.State): Promise<void> {
+    private async setDosageTimer(objectId: string, state: ioBroker.State): Promise<void> {
         const obj = await this.getObjectAsync(objectId);
         if (!obj) {
             throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
@@ -307,7 +293,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public async setRelayTimer(objectId: string, state: ioBroker.State): Promise<void> {
+    private async setRelayTimer(objectId: string, state: ioBroker.State): Promise<void> {
         const obj = await this.getObjectAsync(objectId);
         if (!obj) {
             throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
@@ -326,7 +312,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public updateAdvancedSysInfoStates(sysInfo: GetStateDataSysInfo): void {
+    private updateAdvancedSysInfoStates(sysInfo: GetStateDataSysInfo): void {
         if (!this._bootstrapped || sysInfo.dosageControl !== this._stateData.sysInfo.dosageControl) {
             this.log.debug('Updating advanced sys info states');
             this.setStateAsync(
@@ -366,10 +352,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    /**
-     * Set/update system information
-     */
-    public setSysInfo(data: GetStateDataSysInfo): void {
+    private setSysInfoObjectsNotExists(data: GetStateDataSysInfo): void {
         this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
             type: 'channel',
             common: {
@@ -440,14 +423,10 @@ class ProconIp extends utils.Adapter {
         });
     }
 
-    /**
-     * Set/update objects (not their states!)
-     */
-    public setObjects(objects: GetStateDataObject[]): void {
+    private setStateDataObjectsNotExists(objects: GetStateDataObject[]): void {
         let lastObjCategory = '';
         objects.forEach((obj) => {
             if (lastObjCategory !== obj.category) {
-                // Define each api object category as device
                 this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}`, {
                     type: 'channel',
                     common: {
@@ -457,13 +436,13 @@ class ProconIp extends utils.Adapter {
                 });
                 lastObjCategory = obj.category;
             }
-            this.setDataObject(obj).catch((e) => {
+            this.setDataObjectNotExists(obj).catch((e) => {
                 this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
             });
         });
     }
 
-    public async setDataObject(obj: GetStateDataObject): Promise<void> {
+    private async setDataObjectNotExists(obj: GetStateDataObject): Promise<void> {
         this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
             type: 'channel',
             common: {
@@ -527,7 +506,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public setRelayDataObject(obj: GetStateDataObject): void {
+    private setRelayDataObject(obj: GetStateDataObject): void {
         const isLight: boolean = new RegExp('light|bulb|licht|leucht', 'i').test(obj.label);
         const relayId: number = (obj.category === GetStateCategory.EXTERNAL_RELAYS ? 8 : 0) + obj.categoryId;
         const isDosageRelay: boolean = this._getStateService.data.isDosageControl(relayId);
@@ -603,7 +582,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public setDataState(obj: GetStateDataObject): void {
+    private setDataState(obj: GetStateDataObject): void {
         for (const field of Object.keys(obj).filter((field) => this._objectStateFields.indexOf(field) > -1)) {
             this.setStateAsync(
                 `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
@@ -623,7 +602,7 @@ class ProconIp extends utils.Adapter {
         }
     }
 
-    public setRelayDataState(obj: GetStateDataObject): void {
+    private setRelayDataState(obj: GetStateDataObject): void {
         this.setStateAsync(
             `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`,
             this._relayDataInterpreter.isAuto(obj),
@@ -640,7 +619,7 @@ class ProconIp extends utils.Adapter {
         });
     }
 
-    public updateObjectCommonName(obj: GetStateDataObject): void {
+    private updateObjectCommonName(obj: GetStateDataObject): void {
         const objId = `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`;
         this.getObjectAsync(objId).then((ioObj) => {
             if (ioObj) {
@@ -656,7 +635,7 @@ class ProconIp extends utils.Adapter {
         });
     }
 
-    public static isValidURL(url: string): boolean {
+    private static isValidURL(url: string): boolean {
         try {
             new URL(url);
             return true;

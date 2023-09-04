@@ -66,8 +66,8 @@ class ProconIp extends utils.Adapter {
       this._stateData = data;
       if (!this._bootstrapped) {
         this.log.debug(`Initially setting adapter objects`);
-        this.setSysInfo(data.sysInfo);
-        this.setObjects(data.objects);
+        this.setSysInfoObjectsNotExists(data.sysInfo);
+        this.setStateDataObjectsNotExists(data.objects);
       }
     });
     setTimeout(() => {
@@ -286,7 +286,7 @@ class ProconIp extends utils.Adapter {
       });
     }
   }
-  setSysInfo(data) {
+  setSysInfoObjectsNotExists(data) {
     this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
       type: "channel",
       common: {
@@ -352,7 +352,7 @@ class ProconIp extends utils.Adapter {
       native: {}
     });
   }
-  setObjects(objects) {
+  setStateDataObjectsNotExists(objects) {
     let lastObjCategory = "";
     objects.forEach((obj) => {
       if (lastObjCategory !== obj.category) {
@@ -365,12 +365,12 @@ class ProconIp extends utils.Adapter {
         });
         lastObjCategory = obj.category;
       }
-      this.setDataObject(obj).catch((e) => {
+      this.setDataObjectNotExists(obj).catch((e) => {
         this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
       });
     });
   }
-  async setDataObject(obj) {
+  async setDataObjectNotExists(obj) {
     this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
       type: "channel",
       common: {
