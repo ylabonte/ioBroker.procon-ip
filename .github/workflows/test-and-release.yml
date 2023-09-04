@@ -71,4 +71,4 @@ jobs:
             node-version: '18.x'
             build: true
             npm-token: ${{ secrets.NPM_TOKEN }}
-            github-token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
