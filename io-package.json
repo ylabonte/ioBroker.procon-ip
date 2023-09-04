@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.5.0",
+        "version": "1.5.1",
         "news": {
+            "1.5.1": {
+                "en": "Code and translation files cleanup.",
+                "de": "Bereinigung von Code- und Übersetzungsdateien.",
+                "ru": "Очистка кода и файлов перевода.",
+                "pt": "Limpeza de arquivos de código e tradução.",
+                "nl": "Opschonen van code- en vertaalbestanden.",
+                "fr": "Nettoyage des fichiers de code et de traduction.",
+                "it": "Pulizia del codice e dei file di traduzione.",
+                "es": "Limpieza de archivos de código y traducción.",
+                "pl": "Czyszczenie kodu i plików tłumaczeń.",
+                "uk": "Очищення файлів коду та перекладу.",
+                "zh-cn": "代码和翻译文件清理。"
+            },
             "1.5.0": {
                 "en": "Code base modernization, removing support for obsolete credential encryption.",
                 "de": "Modernisierung der Codebasis, Entfernung der Unterstützung für veraltete Anmeldeinformationsverschlüsselung.",
