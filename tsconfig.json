@@ -32,7 +32,18 @@
 		// "useUnknownInCatchVariables": false,
 
 		"sourceMap": true,
-		"inlineSourceMap": false
+		"inlineSourceMap": false,
+		"types": [
+			"node",
+			"@iobroker/types",
+			"@types/chai",
+			"@types/chai-as-promised",
+			"@types/mocha",
+			"@types/node",
+			"@types/proxyquire",
+			"@types/sinon",
+			"@types/sinon-chai"
+		]
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["build/**", "node_modules/**", "widgets/**"]

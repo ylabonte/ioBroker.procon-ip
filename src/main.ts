@@ -1,4 +1,4 @@
-import * as utils from '@iobroker/adapter-core';
+import { Adapter, AdapterOptions } from '@iobroker/adapter-core';
 import {
     CommandService,
     IServiceConfig,
@@ -29,7 +29,7 @@ declare global {
     }
 }
 
-class ProconIp extends utils.Adapter {
+class ProconIp extends Adapter {
     private _relayDataInterpreter!: RelayDataInterpreter;
     private _getStateService!: GetStateService;
     private _setStateService!: SetStateService;
@@ -40,7 +40,7 @@ class ProconIp extends utils.Adapter {
     private _bootstrapped = false;
     private _objectStateFields = ['value', 'category', 'label', 'unit', 'displayValue', 'active'];
 
-    public constructor(options: Partial<utils.AdapterOptions> = {}) {
+    public constructor(options: Partial<AdapterOptions> = {}) {
         super({
             ...options,
             name: 'procon-ip',
@@ -647,7 +647,7 @@ class ProconIp extends utils.Adapter {
 
 if (require.main !== module) {
     // Export the constructor in compact mode
-    module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new ProconIp(options);
+    module.exports = (options: Partial<AdapterOptions> | undefined) => new ProconIp(options);
 } else {
     // otherwise start the instance directly
     (() => new ProconIp())();
