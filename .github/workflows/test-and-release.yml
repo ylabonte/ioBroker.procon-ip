@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: ioBroker/testing-action-check@v1
+      - uses: ylabonte/iobroker-testing-action-check@master
         with:
           node-version: '18.x'
           install-command: 'yarn'
@@ -47,7 +47,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: ioBroker/testing-action-adapter@v1
+      - uses: ylabonte/iobroker-testing-action-adapter@master
         with:
           node-version: ${{ matrix.node-version }}
           install-command: 'yarn'
@@ -73,7 +73,7 @@ jobs:
         contents: write
 
       steps:
-        - uses: ioBroker/testing-action-deploy@v1
+        - uses: ylabonte/iobroker-testing-action-deploy@master
           with:
             node-version: '18.x'
             install-command: 'yarn'
