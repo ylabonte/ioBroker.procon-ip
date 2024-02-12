@@ -34,7 +34,7 @@ jobs:
           type-checking: true
           type-checking-command: 'yarn run check'
           lint: true
-          linter-command: 'yarn run lint'
+          lint-command: 'yarn run lint'
 
   # Runs adapter tests on all supported node versions and OSes
   adapter-tests:
@@ -55,6 +55,8 @@ jobs:
           os: ${{ matrix.os }}
           build: true
           build-command: 'yarn run build'
+          unit-test-command: 'yarn run test:unit'
+          integration-test-command: 'yarn run test:integration'
 
   # Deploys the final package to NPM
   deploy:
