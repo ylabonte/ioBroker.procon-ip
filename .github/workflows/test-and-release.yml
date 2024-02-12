@@ -29,8 +29,12 @@ jobs:
       - uses: ioBroker/testing-action-check@v1
         with:
           node-version: '18.x'
+          install-command: 'yarn'
+          package-cache: 'yarn'
           type-checking: true
+          type-checking-command: 'yarn run check'
           lint: true
+          linter-command: 'yarn run lint'
 
   # Runs adapter tests on all supported node versions and OSes
   adapter-tests:
@@ -46,8 +50,11 @@ jobs:
       - uses: ioBroker/testing-action-adapter@v1
         with:
           node-version: ${{ matrix.node-version }}
+          install-command: 'yarn'
+          package-cache: 'yarn'
           os: ${{ matrix.os }}
           build: true
+          build-command: 'yarn run build'
 
   # Deploys the final package to NPM
   deploy:
@@ -69,6 +76,9 @@ jobs:
         - uses: ioBroker/testing-action-deploy@v1
           with:
             node-version: '18.x'
+            install-command: 'yarn'
+            package-cache: 'yarn'
             build: true
+            build-command: 'yarn run build'
             npm-token: ${{ secrets.NPM_TOKEN }}
             github-token: ${{ secrets.GITHUB_TOKEN }}

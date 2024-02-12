@@ -26,6 +26,7 @@ maps/
 # npm package files
 iobroker.*.tgz
 package-lock.json
+yarn.lock
 
 # NYC coverage files
 coverage
