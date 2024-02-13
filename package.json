@@ -66,11 +66,11 @@
     "typescript": "^5.3.3"
   },
   "resolutions": {
-    "@iobroker/adapter-dev/axios": "^1.6.7"
+    "@iobroker/adapter-dev/axios": "latest"
   },
   "overrides": {
-    "dependencies": {
-      "axios": "^1.6.7"
+    "@iobroker/adapter-dev": {
+      "axios": "latest"
     }
   },
   "main": "build/main.js",
@@ -92,7 +92,7 @@
     "test:ts": "mocha --config test/mocharc.custom.json",
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
-    "test": "npm run test:ts && npm run test:package",
+    "test": "yarn test:ts && yarn test:package",
     "check": "tsc --noEmit",
     "lint": "eslint --ext .ts src/",
     "translate": "translate-adapter",

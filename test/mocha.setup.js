@@ -9,15 +9,17 @@ process.env.TS_NODE_FILES = 'TRUE';
 
 // Don't silently swallow unhandled rejections
 process.on('unhandledRejection', (e) => {
-	throw e;
+    throw e;
 });
 
 // enable the should interface with sinon
 // and load chai-as-promised and sinon-chai by default
 const sinonChai = require('sinon-chai');
 const chaiAsPromised = require('chai-as-promised');
-const { should, use } = require('chai');
+// const { should, use } =
+import('chai').then(chai => {
+    chai.should();
+    chai.use(sinonChai);
+    chai.use(chaiAsPromised);
+});
 
-should();
-use(sinonChai);
-use(chaiAsPromised);
