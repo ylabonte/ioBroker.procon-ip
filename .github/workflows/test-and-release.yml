@@ -83,4 +83,4 @@ jobs:
             build: true
             build-command: 'yarn run build'
             npm-token: ${{ secrets.NPM_TOKEN }}
-            github-token: ${{ secrets.GITHUB_TOKEN }}
+#            github-token: ${{ secrets.GITHUB_TOKEN }}
