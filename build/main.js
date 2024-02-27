@@ -15,6 +15,9 @@ class ProconIp extends import_adapter_core.Adapter {
     this._forceUpdate = new Array();
     this._stateData = new import_procon_ip.GetStateData();
   }
+  /**
+   * Is called when databases are connected and adapter received configuration.
+   */
   async onReady() {
     let connectionApproved = false;
     this.setState("info.connection", false, true);
@@ -109,6 +112,7 @@ class ProconIp extends import_adapter_core.Adapter {
     this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
     this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
   }
+  // Is called when adapter shuts down - callback has to be called under any circumstances!
   onUnload(callback) {
     var _a;
     try {
@@ -120,6 +124,7 @@ class ProconIp extends import_adapter_core.Adapter {
       callback();
     }
   }
+  // Is called if a subscribed state changes
   onStateChange(id, state) {
     if (!state) {
       this.log.info(`state ${id} deleted`);
