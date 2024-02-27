@@ -221,4 +221,4 @@ Feel free. But if you're feeling really patronizing, you could... 😃
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2019-2023 ylabonte <yannic.labonte@gmail.com>
+Copyright (c) 2019-2024 ylabonte <yannic.labonte@gmail.com>
