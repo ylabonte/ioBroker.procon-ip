@@ -9,6 +9,7 @@ class ProconIp extends import_adapter_core.Adapter {
     });
     this._bootstrapped = false;
     this._objectStateFields = ["value", "category", "label", "unit", "displayValue", "active"];
+    this._timeout = null;
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
@@ -55,7 +56,7 @@ class ProconIp extends import_adapter_core.Adapter {
         this.setStateDataObjectsNotExists(data.objects);
       }
     });
-    setTimeout(() => {
+    this._timeout = setTimeout(() => {
       this._getStateService.start(
         (data) => {
           this.log.silly(`Start processing new GetState.csv`);
@@ -121,6 +122,9 @@ class ProconIp extends import_adapter_core.Adapter {
     } catch (e) {
       this.log.error(`Failed to stop GetState service: ${e}`);
     } finally {
+      if (this._timeout) {
+        clearTimeout(this._timeout);
+      }
       callback();
     }
   }

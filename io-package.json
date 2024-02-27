@@ -1,20 +1,33 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.5.3",
+        "version": "1.5.4",
         "news": {
+            "1.5.4": {
+                "en": "Dependency update and minor optimization in implementation.",
+                "de": "Abhängigkeitsaktualisierung und kleinere Optimierung in der Implementierung.",
+                "ru": "Обновление зависимости и незначительная оптимизация в реализации.",
+                "pt": "Atualização de dependência e menor otimização na implementação.",
+                "nl": "Dependency update en kleine optimalisatie in implementatie.",
+                "fr": "Mise à jour de la dépendance et optimisation mineure dans la mise en œuvre.",
+                "it": "Aggiornamento della dipendenza e ottimizzazione minore in implementazione.",
+                "es": "Actualización de la dependencia y menor optimización en la aplicación.",
+                "pl": "Aktualizacja zależności i mała optymalizacja w realizacji.",
+                "uk": "Оновлення та оптимізація залежностей в реалізації.",
+                "zh-cn": "实施中的依赖性更新和小优化."
+            },
             "1.5.3": {
-                "en": "Minor UI changes in adapter config and dependency updates.",
-                "de": "Kleine Änderungen an der Konfigurationsoberfläche des Adapters und Abhängigkeitsaktualisierungen.",
-                "ru": "Незначительные изменения пользовательского интерфейса в конфигурации адаптера и обновления зависимостей.",
-                "pt": "Pequenas mudanças de interface de usuário nas atualizações de configuração e dependência do adaptador.",
-                "nl": "Kleine wijzigingen in adapterconfiguratie en afhankelijkheidsupdates.",
-                "fr": "Changements mineurs d'interface utilisateur dans la configuration de l'adaptateur et les mises à jour de dépendance.",
-                "it": "Minori modifiche dell'interfaccia utente negli aggiornamenti di configurazione e dipendenza dell'adattatore.",
-                "es": "Menor UI cambia en configuración de adaptador y actualizaciones de dependencia.",
-                "pl": "Mniejsze zmiany interfejsu użytkownika w aktualizacjach konfiguracji adaptera i zależności.",
-                "uk": "Мінор UI зміни в налаштуваннях адаптера та оновлення залежності.",
-                "zh-cn": "适配器配置和依赖性更新中小的UI变化."
+                "en": "Dependency updates",
+                "de": "Aktualisierung von eingesetzten Code-Bibliotheken",
+                "ru": "Обновления зависимостей",
+                "pt": "Atualizações de dependência",
+                "nl": "Afhankelijkheidsupdates",
+                "fr": "Mises à jour sur la dépendance",
+                "it": "Aggiornamenti di dipendenza",
+                "es": "Actualizaciones de dependencia",
+                "pl": "Aktualizacje zależności",
+                "uk": "Оновлення залежності",
+                "zh-cn": "依赖性更新"
             },
             "1.5.2": {
                 "en": "Minor UI changes in adapter config and dependency updates.",

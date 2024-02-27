@@ -39,6 +39,7 @@ class ProconIp extends Adapter {
     private _stateData: GetStateData;
     private _bootstrapped = false;
     private _objectStateFields = ['value', 'category', 'label', 'unit', 'displayValue', 'active'];
+    private _timeout: NodeJS.Timeout | null = null;
 
     public constructor(options: Partial<AdapterOptions> = {}) {
         super({
@@ -99,7 +100,7 @@ class ProconIp extends Adapter {
             }
         });
 
-        setTimeout(() => {
+        this._timeout = setTimeout(() => {
             // Start the actual service
             this._getStateService.start(
                 (data: GetStateData) => {
@@ -183,6 +184,9 @@ class ProconIp extends Adapter {
         } catch (e) {
             this.log.error(`Failed to stop GetState service: ${e}`);
         } finally {
+            if (this._timeout) {
+                clearTimeout(this._timeout);
+            }
             callback();
         }
     }
