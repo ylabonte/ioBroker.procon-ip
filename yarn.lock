@@ -50,10 +50,10 @@
     "@alcalzone/release-script-core" "3.7.0"
     fs-extra "^10.1.0"
 
-"@alcalzone/release-script-plugin-iobroker@^3.7.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@alcalzone/release-script-plugin-iobroker/-/release-script-plugin-iobroker-3.7.0.tgz#2a0ac7a88d59aee7ab8fee4b329847a6e9899c80"
-  integrity sha512-6nkLIDZ4qvZ21f3ozjPJ//x+hqkaiTfkDcYnyw6SWOIUbCa5v7Xj0cAZY7INguSfjv18UOTlU1J8xdzqHxtREg==
+"@alcalzone/release-script-plugin-iobroker@^3.7.2":
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/@alcalzone/release-script-plugin-iobroker/-/release-script-plugin-iobroker-3.7.2.tgz#4c17bf4b613586de475c6bb85392749917666a39"
+  integrity sha512-ezXFyxx2irq7my3BmlBUrzT+QHNsldR9MQYkXs7uyH6lXSkudmqq5EiDW9WckT0Cj9YqIUzoOJhhnZA9M+XTvQ==
   dependencies:
     "@alcalzone/release-script-core" "3.7.0"
     alcalzone-shared "^4.0.1"
