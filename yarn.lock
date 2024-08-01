@@ -439,10 +439,10 @@
     sinon "^15.0.1"
     sinon-chai "^3.7.0"
 
-"@iobroker/types@^5.0.19":
-  version "5.0.19"
-  resolved "https://registry.yarnpkg.com/@iobroker/types/-/types-5.0.19.tgz#4319405cdccc71b0a821cecf0aacb0623a42380b"
-  integrity sha512-FY+lpPbYVlX/WHzEGVIXZrM6XQXI+GtWb3E/ZR2ZKdSBK4/w7VezUQuqxq1lYW914LxjcynXxYtLxHva/nal6g==
+"@iobroker/types@^6.0.9":
+  version "6.0.9"
+  resolved "https://registry.yarnpkg.com/@iobroker/types/-/types-6.0.9.tgz#c0f659b52d7ef82cd88ea2c68b600c3639a469a5"
+  integrity sha512-8+u5c/cawj5cmnQaW95TJv1vBMs68GaepPko7urvylGfixPE/vJ0nwNq392v67B52PwHPi41kctmR9gNt9M+tw==
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
