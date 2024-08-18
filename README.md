@@ -79,7 +79,7 @@ If you want to support this adapter or say thank you, you can:
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 144px !important;" >](https://www.buymeacoffee.com/ylabonte)
 
 ## Changelog
-### 1.5.5 (2024-08-18)
+### 1.5.5 (2024-08-19)
 * Dependency updates.
 * Raise minimum required js-controller version to 5.0.19.
 * Raise minimum required node version to 18.
