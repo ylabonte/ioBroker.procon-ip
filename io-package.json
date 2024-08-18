@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.5.4",
+        "version": "1.5.5",
         "news": {
+            "1.5.5": {
+                "en": "Dependency updates.",
+                "de": "Abhängigkeitsaktualisierungen.",
+                "ru": "Обновление зависимостей.",
+                "pt": "Atualizações de dependência.",
+                "nl": "Afhankelijkheid updates.",
+                "fr": "Mises à jour sur la dépendance.",
+                "it": "Aggiornamenti di dipendenza.",
+                "es": "Actualizaciones de dependencia.",
+                "pl": "Aktualizacje zależności.",
+                "uk": "Залежність оновлення.",
+                "zh-cn": "依赖性更新."
+            },
             "1.5.4": {
                 "en": "Dependency update and minor optimization in implementation.",
                 "de": "Abhängigkeitsaktualisierung und kleinere Optimierung in der Implementierung.",
@@ -80,162 +93,6 @@
                 "pl": "Adddition timers and update Dependencyjność",
                 "uk": "Додавання генних таймерів реле та оновлення залежностей",
                 "zh-cn": "增加通用的延迟时间和最新频率"
-            },
-            "1.3.3": {
-                "en": "Dependencies update",
-                "de": "Aktualisierung der Abhängigkeiten",
-                "ru": "Обновление зависимости",
-                "pt": "Atualização de dependências",
-                "nl": "Afhankelijk van updates",
-                "fr": "Mise à jour des dépendances",
-                "it": "Aggiornamento delle dipendenze",
-                "es": "Actualización de las dependencias",
-                "pl": "Aktualizacja",
-                "uk": "Оновлення залежності",
-                "zh-cn": "B. 现状更新"
-            },
-            "1.3.2": {
-                "en": "Dependency updates and adapter icon change.",
-                "de": "Aktualisierung von Abhängigkeiten und Anpassung des Adapter-Icons.",
-                "ru": "Обновление зависимости и изменение иконки адаптера.",
-                "pt": "Atualizações de dependência e mudança de ícone do adaptador.",
-                "nl": "Afhankelijkheid updates en aanpassen van icoon.",
-                "fr": "Mises à jour de dépendance et changement d'icône d'adaptateur.",
-                "it": "Aggiornamenti di dipendenza e cambio icona adattatore.",
-                "es": "Actualizaciones de dependencia y cambio de icono de adaptador.",
-                "pl": "W zależności od aktualizacji i zmian adapterowych.",
-                "uk": "Зміна значків залежностей і адаптера.",
-                "zh-cn": "依赖性更新和适应性变化。."
-            },
-            "1.3.1": {
-                "en": "Fix manual dosage control abilities.",
-                "de": "Behebung der manuellen Dosierungsmöglichkeiten.",
-                "ru": "Исправьте ручные способности контроля дозировки.",
-                "pt": "Corrigir habilidades manuais de controle de dosagem.",
-                "nl": "Reparatie handmatige controlevaardigheden.",
-                "fr": "Fixer des capacités manuelles de contrôle des doses.",
-                "it": "Fissare le abilità di controllo del dosaggio manuale.",
-                "es": "Fijar habilidades de control de dosis manuales.",
-                "pl": "Współczynnik ręczny.",
-                "uk": "Фіксувати ручні здібності контролю дозування.",
-                "zh-cn": "固定手工操作控制能力。."
-            },
-            "1.3.0": {
-                "en": "Remove restrictions on dosage control relays by enabling manual switching, add additional boolean states for dosage control information (formerly only available as combined bit-state/integer value as delivered by the GetState.csv and dependency updates.",
-                "de": "Entfernen von Einschränkungen der Dosierrelais (manuelles Schalten ermöglicht), hinzufügen zusätzlicher bool'scher Zustände für die Dosiersteuerung-Info (früher nur als kombinierter Bit-State/Integer-Wert, wie von der GetState.csv geliefert und Abhängigkeitsaktualisierungen.",
-                "ru": "Удалите ограничения на реле управления дозировками, позволяя ручному переключению, добавьте дополнительные boolean состояния для информации о контроле дозировки (ранее доступны только в качестве комбинированного разряда / целого числа, как доставлено GetState.csv и обновления зависимости.",
-                "pt": "Remova as restrições nos relés de controle de dosagem, permitindo a comutação manual, adicione estados booleanos adicionais para informações de controle de dosagem (anteriormente apenas disponíveis como valor bit-state/integer combinado como entregue pelo GetState.csv e atualizações de dependência.",
-                "nl": "Verwijder de beperkingen van de doseringscontrole door handmatig te verwisselen, extra boolean staten toevoegen voor doseringscontrole informatie die alleen beschikbaar is als gecombineerd kleine integerwaarde als afleverings.",
-                "fr": "Retirer les restrictions sur les relais de contrôle posologique en permettant le commutation manuelle, ajouter des états booléens supplémentaires pour l'information de contrôle posologique (anciennement seulement disponible comme valeur bit-état combinée / entier comme délivré par le GetState.csv et les mises à jour de dépendance.",
-                "it": "Rimuovere le restrizioni sui relè di controllo del dosaggio consentendo la commutazione manuale, aggiungere ulteriori stati booleani per le informazioni di controllo del dosaggio (precedentemente disponibili solo come valore combinato bit-state/integer come fornito dagli aggiornamenti GetState.csv e dipendenza.",
-                "es": "Eliminar las restricciones de los relés de control de dosis permitiendo la conmutación manual, añadir estados booleanos adicionales para la información de control de dosis (antes sólo disponibles como el valor combinado de bit-state/integer como lo entregan los GetState.csv y actualizaciones de dependencia.",
-                "pl": "Remove ograniczenia dotyczące przekaźników dosage poprzez umożliwienie przełączania ręcznego, dodanie dodatkowych stanów dosage (dawniej dostępne tylko jako wartość połączona bit-state/integer, jak dostarczana przez aktualizacje GetState.csv i zależność).",
-                "uk": "Зняти обмеження на реле дозування, дозволяючи ручним перемиканням, додати додаткові болеанові стани для контролю дозування інформації (звичайно доступні тільки як комбінований біт-держава / інтегер значення, як доставлений GetState.csv і оновлення залежності.",
-                "zh-cn": "取消对实况控制的控制的限制,使手工转换,增加实绩控制信息的善意国家(以前只作为Get国提供的共同标值。."
-            },
-            "1.2.3": {
-                "en": "Dependencies update",
-                "de": "Aktualisierung der Abhängigkeiten",
-                "ru": "Обновление зависимости",
-                "pt": "Atualização de dependências",
-                "nl": "Afhankelijk van updates",
-                "fr": "Mise à jour des dépendances",
-                "it": "Aggiornamento delle dipendenze",
-                "es": "Actualización de las dependencias",
-                "pl": "Aktualizacja",
-                "uk": "Оновлення залежності",
-                "zh-cn": "B. 现状更新"
-            },
-            "1.2.2": {
-                "en": "Dependencies update",
-                "de": "Aktualisierung der Abhängigkeiten",
-                "ru": "Обновление зависимости",
-                "pt": "Atualização de dependências",
-                "nl": "Afhankelijk van updates",
-                "fr": "Mise à jour des dépendances",
-                "it": "Aggiornamento delle dipendenze",
-                "es": "Actualización de las dependencias",
-                "pl": "Aktualizacja",
-                "uk": "Оновлення залежності",
-                "zh-cn": "B. 现状更新"
-            },
-            "1.2.1": {
-                "en": "Bugfix release (fix connection problems)",
-                "de": "Bugfix-Release (Verbindungsprobleme beheben)",
-                "ru": "Релиз Bugfix (исправить проблемы с подключением)",
-                "pt": "Versão Bugfix (corrigir problemas de conexão)",
-                "nl": "Bugfix-release (verbindingsproblemen oplossen)",
-                "fr": "Version de correction de bugs (résolution des problèmes de connexion)",
-                "it": "Rilascio bugfix (risolvere problemi di connessione)",
-                "es": "Lanzamiento de corrección de errores (solucionar problemas de conexión)",
-                "pl": "Wydanie poprawki błędów (naprawienie problemów z połączeniem)",
-                "zh-cn": "错误修复发布（修复连接问题）",
-                "uk": "Випуск виправлення помилок (виправлення проблем з підключенням)"
-            },
-            "1.2.0": {
-                "en": "Update `procon-ip` API library package to v1.3.2 (which should fix a bug that let the relay switching fail) and further dependencies.",
-                "de": "Aktualisieren Sie das `procon-ip`-API-Bibliothekspaket auf v1.3.2 (das einen Fehler beheben sollte, der das Umschalten des Relais fehlschlagen ließ) und weitere Abhängigkeiten.",
-                "ru": "Обновите пакет библиотеки API `procon-ip` до версии 1.3.2 (что должно исправить ошибку, приводившую к сбою переключения реле) и дополнительные зависимости.",
-                "pt": "Atualize o pacote de biblioteca da API `procon-ip` para v1.3.2 (que deve corrigir um bug que deixa a comutação de retransmissão falhar) e outras dependências.",
-                "nl": "Update `procon-ip` API-bibliotheekpakket naar v1.3.2 (wat een bug zou moeten oplossen waardoor het schakelen tussen relais mislukt) en verdere afhankelijkheden.",
-                "fr": "Mettez à jour le package de bibliothèque d'API `procon-ip` vers la v1.3.2 (qui devrait corriger un bogue qui faisait échouer la commutation de relais) et d'autres dépendances.",
-                "it": "Aggiorna il pacchetto della libreria API `procon-ip` alla v1.3.2 (che dovrebbe correggere un bug che lasciava fallire il cambio di relè) e ulteriori dipendenze.",
-                "es": "Actualice el paquete de la biblioteca API `procon-ip` a v1.3.2 (lo que debería corregir un error que permitía que fallara el cambio de relé) y otras dependencias.",
-                "pl": "Zaktualizuj pakiet biblioteki API `procon-ip` do wersji 1.3.2 (co powinno naprawić błąd, który pozwalał na niepowodzenie przełączania przekaźnika) i inne zależności.",
-                "zh-cn": "将 `procon-ip` API 库包更新到 v1.3.2（应该会修复一个导致中继切换失败的错误）和更多依赖项。",
-                "uk": "Оновіть пакет бібліотеки API `procon-ip` до версії 1.3.2 (що має виправити помилку, через яку не вдавалося перемикати реле) та інші залежності."
-            },
-            "1.1.1": {
-                "en": "Minor release, moving the API library source code into a separate repository (npm package) and adding capability to update `common.name` attributes when object labels change.",
-                "de": "Kleines Update: Verschieben des Quellcodes der API-Bibliothek in ein separates Repository (npm-Paket) und Hinzufügen der Funktion zum Aktualisieren der Attribute \"common.name\", wenn sich die Objektbezeichnungen ändern.",
-                "ru": "Незначительный выпуск, в котором исходный код библиотеки API перемещен в отдельный репозиторий (пакет npm) и добавлена возможность обновлять атрибуты common.name при изменении меток объектов.",
-                "pt": "Versão secundária, movendo o código-fonte da biblioteca API para um repositório separado (pacote npm) e adicionando capacidade para atualizar os atributos `common.name` quando os rótulos dos objetos mudam.",
-                "nl": "Kleine uitgave, waarbij de broncode van de API-bibliotheek naar een aparte repository (npm-pakket) wordt verplaatst en de mogelijkheid wordt toegevoegd om de kenmerken van 'common.name' bij te werken wanneer objectlabels veranderen.",
-                "fr": "Version mineure, déplacement du code source de la bibliothèque API dans un référentiel séparé (package npm) et ajout de la possibilité de mettre à jour les attributs `common.name` lorsque les étiquettes d'objet changent.",
-                "it": "Versione minore, spostamento del codice sorgente della libreria API in un repository separato (pacchetto npm) e aggiunta della capacità di aggiornare gli attributi `common.name` quando le etichette degli oggetti cambiano.",
-                "es": "Lanzamiento menor, moviendo el código fuente de la biblioteca API a un repositorio separado (paquete npm) y agregando capacidad para actualizar los atributos `common.name` cuando cambian las etiquetas de los objetos.",
-                "pl": "Wydanie drugorzędne, przenoszące kod źródłowy biblioteki API do oddzielnego repozytorium (pakiet npm) i dodające możliwość aktualizowania atrybutów common.name, gdy zmieniają się etykiety obiektów.",
-                "zh-cn": "次要版本，将API库的源代码移动到单独的存储库（npm软件包）中，并添加了在对象标签更改时更新“ common.name”属性的功能。",
-                "uk": "Незначний випуск, переміщення вихідного коду бібліотеки API в окреме сховище (пакет npm) і додавання можливості оновлення атрибутів `common.name` при зміні міток об’єктів."
-            },
-            "1.0.2": {
-                "en": "Fine tuned the http requests to the pool controller",
-                "de": "Feinabstimmung der http-Anforderungen an den Pool-Controller",
-                "ru": "Точно настроены HTTP-запросы к контроллеру пула",
-                "pt": "Ajustou as solicitações de http para o controlador de pool",
-                "nl": "De http-verzoeken aan de poolcontroller verfijnd",
-                "fr": "Affiner les requêtes http au contrôleur de pool",
-                "it": "Ottimizzazione delle richieste http al controller del pool",
-                "es": "Ajustó las solicitudes http al controlador de la piscina",
-                "pl": "Dostrojono żądania http do kontrolera puli",
-                "zh-cn": "微调对池控制器的http请求",
-                "uk": "Точне налаштування http-запитів до контролера пулу"
-            },
-            "1.0.1": {
-                "en": "Hotfix release: Fix Object State updates",
-                "de": "Hotfix-Version: Aktualisierungen des Objektstatus korrigieren",
-                "ru": "Выпуск исправления: исправление обновлений состояния объекта",
-                "pt": "Versão de hotfix: corrigir atualizações de estado de objeto",
-                "nl": "Hotfix-release: updates van objectstatus repareren",
-                "fr": "Version du correctif: correction des mises à jour de l'état des objets",
-                "it": "Versione hotfix: correggi gli aggiornamenti dello stato dell'oggetto",
-                "es": "Lanzamiento de revisión: Reparar actualizaciones de estado de objeto",
-                "pl": "Wydanie poprawki: napraw aktualizacje stanu obiektu",
-                "zh-cn": "修补程序版本：修复对象状态更新",
-                "uk": "Випуск виправлення: оновлення стану виправлення об’єкта"
-            },
-            "1.0.0": {
-                "en": "Stable release for the official repos. For details see: https://github.com/ylabonte/ioBroker.procon-ip",
-                "de": "Stabile Veröffentlichung für die offiziellen Repos. Weitere Informationen finden Sie unter: https://github.com/ylabonte/ioBroker.procon-ip",
-                "ru": "Стабильный релиз для официальных репо. Для получения дополнительной информации см .: https://github.com/ylabonte/ioBroker.procon-ip",
-                "pt": "Lançamento estável para os repositórios oficiais. Para detalhes, consulte: https://github.com/ylabonte/ioBroker.procon-ip",
-                "nl": "Stabiele release voor de officiële repo's. Zie voor details: https://github.com/ylabonte/ioBroker.procon-ip",
-                "fr": "Version stable pour les repos officiels. Pour plus de détails, voir: https://github.com/ylabonte/ioBroker.procon-ip",
-                "it": "Rilascio stabile per i repository ufficiali. Per i dettagli, consultare: https://github.com/ylabonte/ioBroker.procon-ip",
-                "es": "Lanzamiento estable para los repositorios oficiales. Para más detalles, consulte: https://github.com/ylabonte/ioBroker.procon-ip",
-                "pl": "Stabilna wersja oficjalnych repozytoriów. Aby uzyskać szczegółowe informacje, patrz: https://github.com/ylabonte/ioBroker.procon-ip",
-                "zh-cn": "官方仓库的稳定版本。有关详细信息，请参见：https://github.com/ylabonte/ioBroker.procon-ip",
-                "uk": "Стабільний випуск для офіційних репо. Детальніше див.: https://github.com/ylabonte/ioBroker.procon-ip"
             }
         },
         "titleLang": {
@@ -275,7 +132,6 @@
             "pool"
         ],
         "platform": "Javascript/Node.js",
-        "main": "build/main.js",
         "icon": "procon-ip.png",
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/procon-ip.png",
@@ -293,7 +149,7 @@
         "supportCustoms": false,
         "dependencies": [
             {
-                "js-controller": ">=3.3.22"
+                "js-controller": ">=5.0.19"
             }
         ],
         "globalDependencies": [

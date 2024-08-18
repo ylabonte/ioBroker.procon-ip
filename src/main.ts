@@ -590,7 +590,7 @@ class ProconIp extends Adapter {
         for (const field of Object.keys(obj).filter((field) => this._objectStateFields.indexOf(field) > -1)) {
             this.setStateAsync(
                 `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
-                obj[field],
+                obj[field] as ioBroker.StateValue,
                 true,
             ).catch((e) => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
