@@ -2,4 +2,4 @@ build/** linguist-generated=true
 test/** linguist-vendored=true
 test/**/*.test.js linguist-vendored=false
 crypto-js.js linguist-vendored=true
-.eslintrc.js linguist-vendored=true
+eslint.config.mjs linguist-vendored=true

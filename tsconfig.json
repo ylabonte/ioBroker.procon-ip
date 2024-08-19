@@ -45,6 +45,6 @@
 			"@types/sinon-chai"
 		]
 	},
-	"include": ["src/**/*.ts"],
+	"include": ["src/*.ts", "eslint.config.mjs"],
 	"exclude": ["build/**", "node_modules/**", "widgets/**"]
 }
