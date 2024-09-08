@@ -14,12 +14,10 @@ process.on('unhandledRejection', (e) => {
 
 // enable the should interface with sinon
 // and load chai-as-promised and sinon-chai by default
-const sinonChai = require('sinon-chai');
-const chaiAsPromised = require('chai-as-promised');
-// const { should, use } =
-import('chai').then(chai => {
-    chai.should();
-    chai.use(sinonChai);
-    chai.use(chaiAsPromised);
-});
+import * as sinonChai from 'sinon-chai';
+import * as chaiAsPromised from "chai-as-promised";
+import * as chai from 'chai';
 
+chai.should();
+chai.use(sinonChai.default);
+chai.use(chaiAsPromised.default);
