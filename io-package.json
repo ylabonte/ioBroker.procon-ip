@@ -16,19 +16,6 @@
                 "uk": "Вимоги до рефакторингу коду (node>=20, js-controller>=5.0.19) та оновлення залежностей.",
                 "zh-cn": "代码重构提高要求(节点QQ20,js-controlerQQ5.0.19)和依赖性更新."
             },
-            "1.5.5": {
-                "en": "Dependency updates.",
-                "de": "Abhängigkeitsaktualisierungen.",
-                "ru": "Обновление зависимостей.",
-                "pt": "Atualizações de dependência.",
-                "nl": "Afhankelijkheid updates.",
-                "fr": "Mises à jour sur la dépendance.",
-                "it": "Aggiornamenti di dipendenza.",
-                "es": "Actualizaciones de dependencia.",
-                "pl": "Aktualizacje zależności.",
-                "uk": "Залежність оновлення.",
-                "zh-cn": "依赖性更新."
-            },
             "1.5.4": {
                 "en": "Dependency update and minor optimization in implementation.",
                 "de": "Abhängigkeitsaktualisierung und kleinere Optimierung in der Implementierung.",
@@ -41,19 +28,6 @@
                 "pl": "Aktualizacja zależności i mała optymalizacja w realizacji.",
                 "uk": "Оновлення та оптимізація залежностей в реалізації.",
                 "zh-cn": "实施中的依赖性更新和小优化."
-            },
-            "1.5.3": {
-                "en": "Dependency updates",
-                "de": "Aktualisierung von eingesetzten Code-Bibliotheken",
-                "ru": "Обновления зависимостей",
-                "pt": "Atualizações de dependência",
-                "nl": "Afhankelijkheidsupdates",
-                "fr": "Mises à jour sur la dépendance",
-                "it": "Aggiornamenti di dipendenza",
-                "es": "Actualizaciones de dependencia",
-                "pl": "Aktualizacje zależności",
-                "uk": "Оновлення залежності",
-                "zh-cn": "依赖性更新"
             },
             "1.5.2": {
                 "en": "Minor UI changes in adapter config and dependency updates.",
