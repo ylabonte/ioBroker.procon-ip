@@ -26,7 +26,7 @@
     "url": "https://github.com/ylabonte/ioBroker.procon-ip/issues"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "packageManager": "yarn@1.22.22",
   "dependencies": {
