@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.5.5",
+        "version": "1.6.0",
         "news": {
+            "1.6.0": {
+                "en": "Code refactorings raising requirements (node >=18, js-controller>=5.0.19) and dependency updates.",
+                "de": "Code-Refactorings und damit verbundene neue Mindestanforderungen (node >=18, js-controller>=5.0.19) sowie Updates von Abhängigkeiten.",
+                "ru": "Кодовые рефакторинговые требования (node >=18, js-controller>=5.0.19) и обновления зависимостей.",
+                "pt": "Refactorings de código levantando requisitos (node >=18, js-controller>=5.0.19) e atualizações de dependência.",
+                "nl": "Code refactorings verhogende vereisten (node >= 18, js-controller>=5.01.19) en afhankelijkheidsupdates.",
+                "fr": "Refacturations de code augmentant les exigences (noeud >=18, js-controller>=5.0.19) et mises à jour de dépendance.",
+                "it": "Refactorings codice requisiti di sollevamento (nodo >=18, js-controller>=5.0.19) e aggiornamenti di dipendenza.",
+                "es": "Refactorings Code raising requirements (node √18, js-controller confianza=5.0.19) y actualizaciones de dependencia.",
+                "pl": "Wymagania dotyczące refakturowania kodu (węzeł > = 18, kontroler js- controller > = 5.0.19) oraz aktualizacje zależności.",
+                "uk": "Вимоги до рефакторингу коду (node>=18, js-controller>=5.0.19) та оновлення залежностей.",
+                "zh-cn": "代码重构提高要求(节点QQ18,js-controlerQQ5.0.19)和依赖性更新."
+            },
             "1.5.5": {
                 "en": "Dependency updates.",
                 "de": "Abhängigkeitsaktualisierungen.",
