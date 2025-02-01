@@ -68,7 +68,7 @@
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.16.0",
+    "typescript-eslint": "^8.22.0",
     "yarn-upgrade-all": "^0.7.4"
   },
   "main": "build/main.js",
