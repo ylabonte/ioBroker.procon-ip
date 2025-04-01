@@ -1167,7 +1167,7 @@ color-convert@^2.0.1:
   dependencies:
     color-name "~1.1.4"
 
-color-loggers@^0.3.1:
+color-loggers@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/color-loggers/-/color-loggers-0.3.2.tgz#04b12224f4ef3f78c1bdfb238f2cee50f72d7e51"
   integrity sha512-asfXyY1/9N+Cxt30jb0PFy5tccybuMnWVc9J8EJuYoJVlcsUshn+pt2QuyUB3BWKMXVvEH8jgLrCFs11Am8QZA==
@@ -3123,12 +3123,12 @@ yargs@^17.4.1, yargs@^17.7.2:
     y18n "^5.0.5"
     yargs-parser "^21.1.1"
 
-yarn-upgrade-all@^0.7.4:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/yarn-upgrade-all/-/yarn-upgrade-all-0.7.4.tgz#bb23ca31e2b7028ef973fe48c882b24288988ad6"
-  integrity sha512-poqeMyl5LD+xkw9YN322UHqctTf/N6FLpLsAVUllZqGcntEYkDuKL5r4p+zB67z5MaLs8F3qpPNlc9jNjXSABw==
+yarn-upgrade-all@^0.7.5:
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/yarn-upgrade-all/-/yarn-upgrade-all-0.7.5.tgz#dc0a8335234298a6d548d0956d78c45471aa34e8"
+  integrity sha512-yC2DgKX2Vzeb4LznSHukF/U5AapE7i/A4cBoh8P2FsEy1RBPaXEdd320ZK5Phgj6/Y/1pmFkP36S7GxS0YrzCg==
   dependencies:
-    color-loggers "^0.3.1"
+    color-loggers "^0.3.2"
 
 yn@3.1.1:
   version "3.1.1"
