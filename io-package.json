@@ -136,12 +136,12 @@
         "supportCustoms": false,
         "dependencies": [
             {
-                "js-controller": ">=5.0.19"
+                "js-controller": ">=7.0.7"
             }
         ],
         "globalDependencies": [
             {
-                "admin": ">=5.1.13"
+                "admin": ">=7.6.17"
             }
         ],
         "licenseInformation": {
