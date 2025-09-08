@@ -1,0 +1,50 @@
+{
+  "name": "ioBroker procon-ip",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "eslint.useFlatConfig": true,
+        "files.eol": "\n",
+        "typescript.tsserver.experimental.enableProjectDiagnostics": true
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "EditorConfig.EditorConfig",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "FORCE_COLOR": "1"
+  },
+  "forwardPorts": [
+    8081,
+    8082
+  ],
+  "portsAttributes": {
+    "8081": {
+      "label": "ioBroker Admin"
+    },
+    "8082": {
+      "label": "ioBroker Web/Info"
+    }
+  },
+  "remoteUser": "node",
+  "updateContentCommand": "npm install",
+  "postCreateCommand": "npm install && npm run build",
+  "postStartCommand": "[ -d build ] || npm run build",
+  "postAttachCommand": {
+    "server": "echo 'Run npm watch for incremental builds'"
+  },
+  "runArgs": [
+    "--init"
+  ],
+  "shutdownAction": "stopContainer"
+}

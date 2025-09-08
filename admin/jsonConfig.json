@@ -1,105 +1,121 @@
 {
   "i18n": true,
-  "type": "panel",
+  "type": "tabs",
+  "tabsStyle": {
+    "width": "calc(100% - 100px)"
+  },
   "items": {
-    "controllerUrl": {
-      "type": "text",
-      "label": "Controller Base-URL",
-      "help": "Please enter a valid url including the 'http://' or 'https://'.",
-      "placeholder": "http://<controller-url>",
-      "validator": "/^https?:\\\/\\\/.+/i.test(data.controllerUrl)",
-      "validatorErrorText": "Must start with 'http://' or 'https://'",
-      "validatorNoSaveOnError": true,
-      "xs": 12,
-      "sm": 8,
-      "md": 5,
-      "lg": 3,
-      "newLine": true
-    },
-    "basicAuth": {
-      "type": "checkbox",
-      "label": "Use basic auth",
-      "default": true,
-      "xs": 4,
-      "sm": 4,
-      "md": 3,
-      "lg": 3
-    },
-    "username": {
-      "type": "text",
-      "label": "Username",
-      "placeholder": "admin",
-      "hidden": "!data.basicAuth",
-      "xs": 12,
-      "sm": 6,
-      "md": 4,
-      "lg": 3,
-      "newLine": true
-    },
-    "password": {
-      "type": "password",
-      "label": "Password",
-      "visible": true,
-      "hidden": "!data.basicAuth",
-      "xs": 12,
-      "sm": 6,
-      "md": 4,
-      "lg": 3
-    },
-    "serviceBehaviorDescription": {
-      "type": "staticText",
-      "text": "The following options allow you to adjust the data update/request behavior of this adapter.",
-      "style": {
-        "marginTop": 36,
-        "marginBottom": 24
-      },
-      "newLine": true
-    },
-    "updateInterval": {
-      "type": "number",
-      "label": "Update interval (ms)",
-      "help": "Time between receiving data and next query in milliseconds.",
-      "validatorErrorText": "Please keep it reasonably between 500 and 60000 milliseconds (0.5 sec and 1 min).",
-      "validatorNoSaveOnError": true,
-      "default": 3000,
-      "min": 250,
-      "max": 60000,
-      "step": 250,
-      "xs": 12,
-      "sm": 4,
-      "md": 3,
-      "lg": 2,
-      "newLine": true
-    },
-    "requestTimeout": {
-      "type": "number",
-      "label": "Request timeout (ms)",
-      "help": "Time to wait for an answer of the ProCnn.IP in milliseconds.",
-      "validatorErrorText": "Keep it reasonably between 250 and 10000 milliseconds (0.25 sec and 10 sec).",
-      "validatorNoSaveOnError": true,
-      "default": 2000,
-      "min": 250,
-      "max": 10000,
-      "step": 250,
-      "xs": 12,
-      "sm": 4,
-      "md": 3,
-      "lg": 2
-    },
-    "errorTolerance": {
-      "type": "number",
-      "label": "Max tolerable errors",
-      "help": "Example: '3' means 'Wait for 3 consecutive failing requests before writing an error to the log'.",
-      "validatorErrorText": "Keep it reasonable between 1 and 100.",
-      "validatorNoSaveOnError": true,
-      "default": 3,
-      "min": 1,
-      "max": 100,
-      "step": 1,
-      "xs": 12,
-      "sm": 4,
-      "md": 2,
-      "lg": 2
+    "setup": {
+      "type": "panel",
+      "label": "Setup",
+      "items": {
+        "controllerUrl": {
+          "type": "text",
+          "label": "Controller Base-URL",
+          "help": "Please enter a valid url including the 'http://' or 'https://'.",
+          "placeholder": "http://<controller-url>",
+          "validator": "/^https?:\\\/\\\/.+/i.test(data.controllerUrl)",
+          "validatorErrorText": "Must start with 'http://' or 'https://'",
+          "validatorNoSaveOnError": true,
+          "xs": 12,
+          "sm": 8,
+          "md": 5,
+          "lg": 3,
+          "xl": 3,
+          "newLine": true
+        },
+        "basicAuth": {
+          "type": "checkbox",
+          "label": "Use basic auth",
+          "default": true,
+          "xs": 4,
+          "sm": 4,
+          "md": 3,
+          "lg": 3,
+          "xl": 3
+        },
+        "username": {
+          "type": "text",
+          "label": "Username",
+          "placeholder": "admin",
+          "hidden": "!data.basicAuth",
+          "xs": 12,
+          "sm": 6,
+          "md": 4,
+          "lg": 3,
+          "xl": 3,
+          "newLine": true
+        },
+        "password": {
+          "type": "password",
+          "label": "Password",
+          "visible": true,
+          "hidden": "!data.basicAuth",
+          "xs": 12,
+          "sm": 6,
+          "md": 4,
+          "lg": 3,
+          "xl": 3
+        },
+        "serviceBehaviorDescription": {
+          "type": "staticText",
+          "text": "The following options allow you to adjust the data update/request behavior of this adapter.",
+          "style": {
+            "marginTop": 36,
+            "marginBottom": 24
+          },
+          "newLine": true
+        },
+        "updateInterval": {
+          "type": "number",
+          "label": "Update interval (ms)",
+          "help": "Time between receiving data and next query in milliseconds.",
+          "validatorErrorText": "Please keep it reasonably between 500 and 60000 milliseconds (0.5 sec and 1 min).",
+          "validatorNoSaveOnError": true,
+          "default": 3000,
+          "min": 250,
+          "max": 60000,
+          "step": 250,
+          "xs": 12,
+          "sm": 4,
+          "md": 3,
+          "lg": 2,
+          "xl": 2,
+          "newLine": true
+        },
+        "requestTimeout": {
+          "type": "number",
+          "label": "Request timeout (ms)",
+          "help": "Time to wait for an answer of the ProCnn.IP in milliseconds.",
+          "validatorErrorText": "Keep it reasonably between 250 and 10000 milliseconds (0.25 sec and 10 sec).",
+          "validatorNoSaveOnError": true,
+          "default": 2000,
+          "min": 250,
+          "max": 10000,
+          "step": 250,
+          "xs": 12,
+          "sm": 4,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "errorTolerance": {
+          "type": "number",
+          "label": "Max tolerable errors",
+          "help": "Example: '3' means 'Wait for 3 consecutive failing requests before writing an error to the log'.",
+          "validatorErrorText": "Keep it reasonable between 1 and 100.",
+          "validatorNoSaveOnError": true,
+          "default": 3,
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "xs": 12,
+          "sm": 4,
+          "md": 2,
+          "lg": 2,
+          "xl": 2
+        }
+      }
     }
   }
 }

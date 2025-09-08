@@ -1,16 +1,19 @@
-version: '3'
-
 services:
   iobroker:
-#    restart: always
     image: iobroker/iobroker:latest
     container_name: iobroker
     hostname: iobroker
+    restart: unless-stopped
     ports:
       - "8081:8081"
+      - "8082:8082"
 #      - "9229:9229"
-#    volumes:
-#      - ../iobroker-data:/opt/iobroker/iobroker-data
-#      - ..:/opt/iobroker/node_modules/iobroker.procon-ip
-#      - ../../procon-ip:/opt/iobroker/node_modules/procon-ip
+    volumes:
+      - iobroker-data:/opt/iobroker/iobroker-data
+      - ../admin:/opt/iobroker/node_modules/iobroker.procon-ip/admin
+      - ../build:/opt/iobroker/node_modules/iobroker.procon-ip/build
+      - ../io-package.json:/opt/iobroker/node_modules/iobroker.procon-ip/io-package.json
 #    command: iobroker stop procon-ip && node --inspect-brk=0.0.0.0:9229 node_modules/iobroker.procon-ip/main.js --debug
+
+volumes:
+  iobroker-data:

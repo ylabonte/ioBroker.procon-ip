@@ -1,15 +1,15 @@
 import { Adapter, AdapterOptions } from '@iobroker/adapter-core';
 import {
-    CommandService,
     IServiceConfig,
-    GetStateService,
     IGetStateServiceConfig,
+    GetStateDataSysInfo,
+    GetStateDataObject,
+    CommandService,
+    GetStateService,
     UsrcfgCgiService,
     RelayDataInterpreter,
     GetStateCategory,
     GetStateData,
-    GetStateDataSysInfo,
-    GetStateDataObject,
     SetStateService,
 } from 'procon-ip';
 
@@ -78,14 +78,18 @@ class ProconIp extends Adapter {
         this._relayDataInterpreter = new RelayDataInterpreter(this.log);
         this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
         this._setStateService = new SetStateService(serviceConfig, this.log);
-        this._usrcfgCgiService = new UsrcfgCgiService(serviceConfig, this.log, this._getStateService,
-            this._relayDataInterpreter);
+        this._usrcfgCgiService = new UsrcfgCgiService(
+            serviceConfig,
+            this.log,
+            this._getStateService,
+            this._relayDataInterpreter,
+        );
         this._commandService = new CommandService(serviceConfig, this.log);
 
         this.log.debug(`GetStateService url: ${this._getStateService.url}`);
         this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
 
-        await this._getStateService.update().then(async (data) => {
+        await this._getStateService.update().then(async data => {
             this._stateData = data;
 
             // Set objects once on startup
@@ -104,7 +108,7 @@ class ProconIp extends Adapter {
                     connectionApproved = true;
 
                     // Set sys info states
-                    data.sysInfo.toArrayOfObjects().forEach((info) => {
+                    data.sysInfo.toArrayOfObjects().forEach(info => {
                         // Only update when value has changed
                         if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
                             this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
@@ -112,7 +116,7 @@ class ProconIp extends Adapter {
                                 `${this.name}.${this.instance}.info.system.${info.key}`,
                                 info.value.toString(),
                                 true,
-                            ).catch((e) => {
+                            ).catch(e => {
                                 this.log.error(`Failed setting state for '${info.key}': ${e}`);
                             });
                         }
@@ -121,7 +125,7 @@ class ProconIp extends Adapter {
                     this.updateAdvancedSysInfoStates(data.sysInfo);
 
                     // Set actual sensor and actor/relay object states
-                    data.objects.forEach((obj) => {
+                    data.objects.forEach(obj => {
                         this.log.silly(
                             `Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`,
                         );
@@ -210,19 +214,19 @@ class ProconIp extends Adapter {
         }
 
         if (id.endsWith('.auto')) {
-            this.relayToggleAuto(id, state).catch((e) => {
+            this.relayToggleAuto(id, state).catch(e => {
                 this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
         } else if (id.endsWith('.onOff')) {
-            this.relayToggleOnOff(id, state).catch((e) => {
+            this.relayToggleOnOff(id, state).catch(e => {
                 this.log.error(`Error on relay toggle (${id}): ${e}`);
             });
         } else if (id.endsWith('.dosageTimer')) {
-            this.setDosageTimer(id, state).catch((e) => {
+            this.setDosageTimer(id, state).catch(e => {
                 this.log.error(`Error on manual dosage (${id}): ${e}`);
             });
         } else if (id.endsWith('.timer')) {
-            this.setRelayTimer(id, state).catch((e) => {
+            this.setRelayTimer(id, state).catch(e => {
                 this.log.error(`Error on relay timer (${id}): ${e}`);
             });
         }
@@ -248,10 +252,9 @@ class ProconIp extends Adapter {
             } else if (onOffState.val) {
                 this.log.info(`Switching ${obj.native.label}: on`);
                 return this._usrcfgCgiService.setOn(getStateDataObject);
-            } else {
-                this.log.info(`Switching ${obj.native.label}: off`);
-                return this._usrcfgCgiService.setOff(getStateDataObject);
             }
+            this.log.info(`Switching ${obj.native.label}: off`);
+            return this._usrcfgCgiService.setOff(getStateDataObject);
         } catch (e: unknown) {
             if (e instanceof Error) {
                 this.log.error(`Error on switching operation: ${e.message}`);
@@ -296,7 +299,8 @@ class ProconIp extends Adapter {
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
         const relayId =
-            getStateDataObject.categoryId + (getStateDataObject.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 8 : 0);
+            getStateDataObject.categoryId +
+            (getStateDataObject.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 8 : 0);
         this._forceUpdate.push(getStateDataObject.id);
         try {
             const stateValNumber = state.val as number;
@@ -325,7 +329,8 @@ class ProconIp extends Adapter {
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
         const relayId =
-            getStateDataObject.categoryId + (getStateDataObject.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 9 : 1);
+            getStateDataObject.categoryId +
+            (getStateDataObject.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 9 : 1);
         this._forceUpdate.push(getStateDataObject.id);
         try {
             const stateValNumber = state.val as number;
@@ -347,7 +352,7 @@ class ProconIp extends Adapter {
                 `${this.name}.${this.instance}.info.system.phPlusDosageEnabled`,
                 sysInfo.isPhPlusDosageEnabled(),
                 true,
-            ).catch((e) => {
+            ).catch(e => {
                 this.log.error(
                     `Failed setting state for '${this.name}.${this.instance}.info.system.phPlusDosageEnabled': ${e}`,
                 );
@@ -356,7 +361,7 @@ class ProconIp extends Adapter {
                 `${this.name}.${this.instance}.info.system.phMinusDosageEnabled`,
                 sysInfo.isPhMinusDosageEnabled(),
                 true,
-            ).catch((e) => {
+            ).catch(e => {
                 this.log.error(
                     `Failed setting state for '${this.name}.${this.instance}.info.system.phMinusDosageEnabled': ${e}`,
                 );
@@ -365,7 +370,7 @@ class ProconIp extends Adapter {
                 `${this.name}.${this.instance}.info.system.chlorineDosageEnabled`,
                 sysInfo.isChlorineDosageEnabled(),
                 true,
-            ).catch((e) => {
+            ).catch(e => {
                 this.log.error(
                     `Failed setting state for '${this.name}.${this.instance}.info.system.chlorineDosageEnabled': ${e}`,
                 );
@@ -374,7 +379,7 @@ class ProconIp extends Adapter {
                 `${this.name}.${this.instance}.info.system.electrolysis`,
                 sysInfo.isElectrolysis(),
                 true,
-            ).catch((e) => {
+            ).catch(e => {
                 this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.electrolysis': ${e}`);
             });
         }
@@ -464,7 +469,7 @@ class ProconIp extends Adapter {
                 });
                 lastObjCategory = obj.category;
             }
-            this.setDataObjectNotExists(obj).catch((e) => {
+            this.setDataObjectNotExists(obj).catch(e => {
                 this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
             });
         }
@@ -515,11 +520,14 @@ class ProconIp extends Adapter {
             }
 
             try {
-                await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
-                    type: 'state',
-                    common: common,
-                    native: obj,
-                });
+                await this.setObjectNotExists(
+                    `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
+                    {
+                        type: 'state',
+                        common: common,
+                        native: obj,
+                    },
+                );
             } catch (e: unknown) {
                 if (e instanceof Error) {
                     this.log.error(`Failed setting object '${obj.label}': ${e.message}`);
@@ -592,11 +600,14 @@ class ProconIp extends Adapter {
                 write: true,
             } as ioBroker.StateCommon;
 
-            await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`, {
-                type: 'state',
-                common: commonDosageTimerState,
-                native: obj,
-            });
+            await this.setObjectNotExists(
+                `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`,
+                {
+                    type: 'state',
+                    common: commonDosageTimerState,
+                    native: obj,
+                },
+            );
         } else {
             const commonGenericRelayTimerState = {
                 name: obj.label,
@@ -615,12 +626,12 @@ class ProconIp extends Adapter {
     }
 
     private setDataState(obj: GetStateDataObject): void {
-        for (const field of Object.keys(obj).filter((field) => this._objectStateFields.indexOf(field) > -1)) {
-            this.setStateAsync(
+        for (const field of Object.keys(obj).filter(field => this._objectStateFields.indexOf(field) > -1)) {
+            this.setState(
                 `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
                 obj[field] as ioBroker.StateValue,
                 true,
-            ).catch((e) => {
+            ).catch(e => {
                 this.log.error(`Failed setting state for '${obj.label}': ${e}`);
             });
         }
@@ -635,18 +646,18 @@ class ProconIp extends Adapter {
     }
 
     private setRelayDataState(obj: GetStateDataObject): void {
-        this.setStateAsync(
+        this.setState(
             `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`,
             this._relayDataInterpreter.isAuto(obj),
             true,
-        ).catch((e) => {
+        ).catch(e => {
             this.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
         });
-        this.setStateAsync(
+        this.setState(
             `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`,
             this._relayDataInterpreter.isOn(obj),
             true,
-        ).catch((e) => {
+        ).catch(e => {
             this.log.error(`Failed setting onOff switch state for '${obj.label}': ${e}`);
         });
     }

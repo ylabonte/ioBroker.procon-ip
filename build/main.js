@@ -186,10 +186,9 @@ class ProconIp extends import_adapter_core.Adapter {
       } else if (onOffState.val) {
         this.log.info(`Switching ${obj.native.label}: on`);
         return this._usrcfgCgiService.setOn(getStateDataObject);
-      } else {
-        this.log.info(`Switching ${obj.native.label}: off`);
-        return this._usrcfgCgiService.setOff(getStateDataObject);
       }
+      this.log.info(`Switching ${obj.native.label}: off`);
+      return this._usrcfgCgiService.setOff(getStateDataObject);
     } catch (e) {
       if (e instanceof Error) {
         this.log.error(`Error on switching operation: ${e.message}`);
@@ -434,11 +433,14 @@ class ProconIp extends import_adapter_core.Adapter {
           continue;
       }
       try {
-        await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`, {
-          type: "state",
-          common,
-          native: obj
-        });
+        await this.setObjectNotExists(
+          `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
+          {
+            type: "state",
+            common,
+            native: obj
+          }
+        );
       } catch (e) {
         if (e instanceof Error) {
           this.log.error(`Failed setting object '${obj.label}': ${e.message}`);
@@ -497,11 +499,14 @@ class ProconIp extends import_adapter_core.Adapter {
         read: false,
         write: true
       };
-      await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`, {
-        type: "state",
-        common: commonDosageTimerState,
-        native: obj
-      });
+      await this.setObjectNotExists(
+        `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`,
+        {
+          type: "state",
+          common: commonDosageTimerState,
+          native: obj
+        }
+      );
     } else {
       const commonGenericRelayTimerState = {
         name: obj.label,
@@ -519,7 +524,7 @@ class ProconIp extends import_adapter_core.Adapter {
   }
   setDataState(obj) {
     for (const field of Object.keys(obj).filter((field2) => this._objectStateFields.indexOf(field2) > -1)) {
-      this.setStateAsync(
+      this.setState(
         `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
         obj[field],
         true
@@ -532,14 +537,14 @@ class ProconIp extends import_adapter_core.Adapter {
     }
   }
   setRelayDataState(obj) {
-    this.setStateAsync(
+    this.setState(
       `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`,
       this._relayDataInterpreter.isAuto(obj),
       true
     ).catch((e) => {
       this.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
     });
-    this.setStateAsync(
+    this.setState(
       `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`,
       this._relayDataInterpreter.isOn(obj),
       true
