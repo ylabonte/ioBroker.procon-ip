@@ -92,6 +92,8 @@ If you want to support this adapter or say thank you, you can:
 
 - Raise minimum required js-controller version to 7.0.7.
 - Raise minimum required node version to 22.
+- Remove calls to deprecated methods.
+- Minor code cleanup.
 - Dependency updates.
 
 ### 1.6.0 (2024-09-08)
