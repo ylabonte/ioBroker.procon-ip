@@ -90,8 +90,9 @@ If you want to support this adapter or say thank you, you can:
 
 ### 1.7.0 (2025-09-08)
 
+- Satisfy latest requirements demanded by the ioBroker-Bot.
 - Raise minimum required js-controller version to 7.0.7.
-- Raise minimum required node version to 22.
+- Raise minimum required admin version to 7.6.17.
 - Remove calls to deprecated methods.
 - Minor code cleanup.
 - Dependency updates.
