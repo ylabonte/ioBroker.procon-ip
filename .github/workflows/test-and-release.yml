@@ -69,9 +69,6 @@ jobs:
             - uses: ioBroker/testing-action-deploy@master
               with:
                   node-version: '22.x'
-                  install-command: 'yarn'
-                  package-cache: 'yarn'
                   build: true
-                  build-command: 'yarn run build'
                   npm-token: ${{ secrets.NPM_TOKEN }}
                   github-token: ${{ secrets.GITHUB_TOKEN }}
