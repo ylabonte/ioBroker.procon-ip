@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "procon-ip",
-        "version": "1.6.0",
+        "version": "1.7.0",
         "news": {
+            "1.7.0": {
+                "en": "Satisfy latest ioBroker-Bot requirements, raise minimum versions (js-controller 7.0.7, admin 7.6.17), remove deprecated calls, clean up code, update dependencies.",
+                "de": "Erfüllen Sie die neuesten Anforderungen des ioBroker-Bots, erhöhen Sie die Mindestversionen (js-controller 7.0.7, admin 7.6.17), entfernen Sie veraltete Aufrufe, bereinigen Sie den Code, aktualisieren Sie Abhängigkeiten.",
+                "ru": "Удовлетворение последних требований ioBroker-Bot, повышение минимальных версий (js-controller 7.0.7, admin 7.6.17), удаление устаревших вызовов, очистка кода, обновление зависимостей.",
+                "pt": "Atender aos requisitos mais recentes do ioBroker-Bot, elevar as versões mínimas (js-controller 7.0.7, admin 7.6.17), remover chamadas obsoletas, limpar o código e atualizar as dependências.",
+                "nl": "Voldoe aan de nieuwste eisen van de ioBroker-Bot, verhoog de minimale versies (js-controller 7.0.7, admin 7.6.17), verwijder verouderde aanroepen, optimaliseer de code, update afhankelijkheden.",
+                "fr": "Satisfaire aux dernières exigences du ioBroker-Bot, élever les versions minimales (js-controller 7.0.7, admin 7.6.17), supprimer les appels obsolètes, nettoyer le code, mettre à jour les dépendances.",
+                "it": "Soddisfare i requisiti più recenti di ioBroker-Bot, aumentare le versioni minime (js-controller 7.0.7, admin 7.6.17), rimuovere le chiamate deprecate, pulire il codice, aggiornare le dipendenze.",
+                "es": "Cumplir con los requisitos más recientes del bot de ioBroker, aumentar las versiones mínimas (js-controller 7.0.7, admin 7.6.17), eliminar llamadas obsoletas, limpiar el código y actualizar las dependencias.",
+                "pl": "Dostosuj się do najnowszych wymagań ioBroker-Bota, podnieś minimalne wersje (js-controller 7.0.7, admin 7.6.17), usuń wycofane wywołania, oczyść kod, zaktualizuj zależności.",
+                "uk": "Відповідайте останнім вимогам ioBroker-Bot, підвищуйте мінімальні версії (js-controller 7.0.7, admin 7.6.17), видаліть застарілі виклики, очистіть код, оновіть залежності.",
+                "zh-cn": "满足最新的ioBroker-Bot需求，提高最低版本要求（js-controller 7.0.7，admin 7.6.17），移除不推荐的调用，清理代码，更新依赖项。"
+            },
             "1.6.0": {
                 "en": "Code refactorings raising requirements (node >=20, js-controller>=5.0.19) and dependency updates.",
                 "de": "Code-Refactorings und damit verbundene neue Mindestanforderungen (node >=20, js-controller>=5.0.19) sowie Updates von Abhängigkeiten.",
