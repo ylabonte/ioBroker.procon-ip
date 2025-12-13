@@ -289,4 +289,4 @@ If you want to support this adapter or say thank you, you can:
 
 The MIT License (MIT)
 
-Copyright (c) 2019-2024 ylabonte <yannic.labonte@gmail.com>
+Copyright (c) 2019-2025 ylabonte <yannic.labonte@gmail.com>
