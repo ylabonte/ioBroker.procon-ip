@@ -88,6 +88,9 @@ If you want to support this adapter or say thank you, you can:
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 1.7.0 (2025-09-20)
 
 - Satisfy latest requirements demanded by the ioBroker-Bot.
