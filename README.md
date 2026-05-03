@@ -316,6 +316,8 @@ If you want to support this adapter or say thank you, you can:
 - Writable states for relays not configured for dosage control to toggle
   on/off.
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 The MIT License (MIT)
