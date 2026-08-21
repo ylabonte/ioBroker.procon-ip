@@ -2,14 +2,21 @@
 var import_adapter_core = require("@iobroker/adapter-core");
 var import_procon_ip = require("procon-ip");
 class ProconIp extends import_adapter_core.Adapter {
+  _relayDataInterpreter;
+  _getStateService;
+  _setStateService;
+  _usrcfgCgiService;
+  _commandService;
+  _forceUpdate;
+  _stateData;
+  _bootstrapped = false;
+  _objectStateFields = ["value", "category", "label", "unit", "displayValue", "active"];
+  _timeout = null;
   constructor(options = {}) {
     super({
       ...options,
       name: "procon-ip"
     });
-    this._bootstrapped = false;
-    this._objectStateFields = ["value", "category", "label", "unit", "displayValue", "active"];
-    this._timeout = null;
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
