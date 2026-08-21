@@ -88,6 +88,13 @@ If you want to support this adapter or say thank you, you can:
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+
+- Raised the minimum Node.js version to 22 (Node 20 is end-of-life).
+- Updated the ProCon.IP library to 2.x, replacing its axios HTTP client with a leaner implementation and typed error handling.
+- Updated all dependencies and shrank the security-advisory backlog.
+- Maintenance: adopted npm Trusted Publishing (OIDC), modernized the CI workflow, grouped Dependabot updates, and applied the latest ioBroker repository-checker fixes.
+
 ### 1.7.0 (2025-09-20)
 
 - Satisfy latest requirements demanded by the ioBroker-Bot.
