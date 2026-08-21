@@ -202,7 +202,7 @@ class ProconIp extends import_adapter_core.Adapter {
       } else {
         this.log.error(`Error on switching operation: ${String(e)}`);
       }
-      return -1;
+      return;
     }
   }
   async relayToggleOnOff(objectId, state) {

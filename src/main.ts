@@ -232,7 +232,7 @@ class ProconIp extends Adapter {
         }
     }
 
-    private async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<number> {
+    private async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<void> {
         const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, '.onOff'));
         if (!onOffState) {
             throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
@@ -262,7 +262,7 @@ class ProconIp extends Adapter {
                 this.log.error(`Error on switching operation: ${String(e)}`);
             }
 
-            return -1;
+            return;
         }
     }
 
