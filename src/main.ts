@@ -112,7 +112,7 @@ class ProconIp extends Adapter {
                         // Only update when value has changed
                         if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
                             this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-                            this.setStateAsync(
+                            this.setState(
                                 `${this.name}.${this.instance}.info.system.${info.key}`,
                                 info.value.toString(),
                                 true,
@@ -348,7 +348,7 @@ class ProconIp extends Adapter {
     private updateAdvancedSysInfoStates(sysInfo: GetStateDataSysInfo): void {
         if (!this._bootstrapped || sysInfo.dosageControl !== this._stateData.sysInfo.dosageControl) {
             this.log.debug('Updating advanced sys info states');
-            this.setStateAsync(
+            this.setState(
                 `${this.name}.${this.instance}.info.system.phPlusDosageEnabled`,
                 sysInfo.isPhPlusDosageEnabled(),
                 true,
@@ -357,7 +357,7 @@ class ProconIp extends Adapter {
                     `Failed setting state for '${this.name}.${this.instance}.info.system.phPlusDosageEnabled': ${e}`,
                 );
             });
-            this.setStateAsync(
+            this.setState(
                 `${this.name}.${this.instance}.info.system.phMinusDosageEnabled`,
                 sysInfo.isPhMinusDosageEnabled(),
                 true,
@@ -366,7 +366,7 @@ class ProconIp extends Adapter {
                     `Failed setting state for '${this.name}.${this.instance}.info.system.phMinusDosageEnabled': ${e}`,
                 );
             });
-            this.setStateAsync(
+            this.setState(
                 `${this.name}.${this.instance}.info.system.chlorineDosageEnabled`,
                 sysInfo.isChlorineDosageEnabled(),
                 true,
@@ -375,7 +375,7 @@ class ProconIp extends Adapter {
                     `Failed setting state for '${this.name}.${this.instance}.info.system.chlorineDosageEnabled': ${e}`,
                 );
             });
-            this.setStateAsync(
+            this.setState(
                 `${this.name}.${this.instance}.info.system.electrolysis`,
                 sysInfo.isElectrolysis(),
                 true,
