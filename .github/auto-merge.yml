@@ -1,15 +1,16 @@
+# Auto-merge rules for Dependabot PRs.
+# Consumed by iobroker-bot-orga/action-automerge-dependabot
+# (see .github/workflows/dependabot-auto-merge.yml).
+#
+# Supported update_type values: semver:patch, semver:minor, semver:major
+# (hierarchical: semver:minor also matches patch). These rules intentionally
+# mirror the action's safe defaults: patch for production, minor+patch for
+# development; major updates are never auto-merged and are left for review.
 - match:
-    # Only merge patches for production dependencies
+    # Production dependencies: only auto-merge patch releases
     dependency_type: production
     update_type: "semver:patch"
 - match:
-    # Except for security fixes, here we allow minor patches
-    dependency_type: production
-    update_type: "security:minor"
-- match:
-    # and development dependencies can have a minor update, too
+    # Development dependencies: auto-merge minor and patch releases
     dependency_type: development
     update_type: "semver:minor"
-
-# The syntax is based on the legacy dependabot v1 automerged_updates syntax, see:
-# https://dependabot.com/docs/config-file/#automerged_updates

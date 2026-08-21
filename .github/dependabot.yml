@@ -1,22 +1,54 @@
+# Dependabot configuration.
+#
+# Updates are grouped into consolidated PRs to avoid a flood of single-dependency
+# PRs. Minor and patch updates are grouped per dependency type; major updates are
+# intentionally left ungrouped so they get an individual PR and a manual review.
+#
+# The npm cooldown delays normal updates by 7 days (security updates are exempt).
+# Note: cooldown is not supported for the github-actions ecosystem.
+# Reference: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 version: 2
 updates:
-  - package-ecosystem: npm
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: monthly
-      time: "04:00"
-      timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+      interval: 'monthly'
+      time: '04:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 10
     assignees:
-      - ylabonte
-    versioning-strategy: increase
+      - 'ylabonte'
+    versioning-strategy: 'increase'
+    cooldown:
+      default-days: 7
+    ignore:
+      # @types/node should track the Node.js engines range, not the newest release
+      - dependency-name: '@types/node'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+    groups:
+      production-dependencies:
+        dependency-type: 'production'
+        update-types:
+          - 'minor'
+          - 'patch'
+      development-dependencies:
+        dependency-type: 'development'
+        update-types:
+          - 'minor'
+          - 'patch'
 
-  - package-ecosystem: github-actions
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: monthly
-      time: "04:00"
-      timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+      interval: 'monthly'
+      time: '04:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 10
     assignees:
-      - ylabonte
+      - 'ylabonte'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
