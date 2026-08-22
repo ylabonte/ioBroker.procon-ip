@@ -80,6 +80,22 @@ Useful links for the approach will be
   I had started from and
 - the [guide for adapter developers](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md).
 
+### Local testing with dev-server
+
+For hands-on testing against a real ProCon.IP controller, use
+[`@iobroker/dev-server`](https://github.com/ioBroker/dev-server). It spins up a
+throwaway local ioBroker instance (js-controller + admin UI) and runs this
+adapter from your local build:
+
+```bash
+npm i -g @iobroker/dev-server   # once, globally
+npm run dev:setup               # creates the local .dev-server/ profile (git-ignored)
+npm run dev                     # builds, runs, admin UI at http://localhost:8081
+```
+
+Configure the instance with your controller URL in the admin UI. `npm run dev`
+rebuilds and reloads the adapter on source changes.
+
 ## Donation
 
 If you want to support this adapter or say thank you, you can:
