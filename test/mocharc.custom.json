@@ -1,4 +1,6 @@
 {
   "require": ["test/mocha.setup.mjs", "ts-node/register", "source-map-support/register"],
-  "watch-files": ["src/**/*.test.ts", "src/**/*.test.mts"]
+  "extension": ["ts", "mts"],
+  "spec": ["src/**/*.test.{ts,mts}"],
+  "watch-files": ["src/**/*.test.{ts,mts}"]
 }
