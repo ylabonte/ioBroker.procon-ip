@@ -62,7 +62,7 @@ class ProconIp extends import_adapter_core.Adapter {
   async onReady() {
     let connectionApproved = false;
     let connectErrorLogged = false;
-    await this.setState("info.connection", false, true);
+    await this.setStateChangedAsync("info.connection", false, true);
     if (this.config.controllerUrl.length < 1 || !(0, import_mapping.isValidURL)(this.config.controllerUrl)) {
       this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
       return;
@@ -98,7 +98,7 @@ class ProconIp extends import_adapter_core.Adapter {
     this._statePublisher = new import_state_publisher.StatePublisher({
       log: this.log,
       namespace: this.namespace,
-      setState: async (id, value, ack) => this.setState(id, value, ack),
+      setStateChanged: async (id, value, ack) => this.setStateChangedAsync(id, value, ack),
       getObject: (id) => this.getObjectAsync(id),
       setObject: async (id, obj) => this.setObject(id, obj),
       getStatesOf: (id) => this.getStatesOfAsync(id),
@@ -161,11 +161,11 @@ class ProconIp extends import_adapter_core.Adapter {
           this.log.silly(`Updating data object for next comparison`);
           this._stateData = data;
           this._bootstrapped = true;
-          this.setState("info.connection", true, true).catch(() => {
+          this.setStateChangedAsync("info.connection", true, true).catch(() => {
           });
         },
         (e) => {
-          this.setState("info.connection", false, true).catch(() => {
+          this.setStateChangedAsync("info.connection", false, true).catch(() => {
           });
           if (!connectionApproved && !connectErrorLogged) {
             connectErrorLogged = true;
@@ -199,7 +199,7 @@ class ProconIp extends import_adapter_core.Adapter {
     var _a;
     try {
       (_a = this._getStateService) == null ? void 0 : _a.stop();
-      this.setState("info.connection", false, true).catch(() => {
+      this.setStateChangedAsync("info.connection", false, true).catch(() => {
       });
     } catch (e) {
       this.log.error(`Failed to stop GetState service: ${String(e)}`);

@@ -1,5 +1,5 @@
 /**
- * Unit tests for StatePublisher. setState / getObject / setObject / getStatesOf
+ * Unit tests for StatePublisher. setStateChanged / getObject / setObject / getStatesOf
  * and the relay interpreter are injected as stubs — no live adapter.
  */
 
@@ -15,7 +15,7 @@ import { StatePublisher, type StatePublisherDeps } from './state-publisher';
 
 interface Harness {
     publisher: StatePublisher;
-    setState: sinon.SinonStub;
+    setStateChanged: sinon.SinonStub;
     setObject: sinon.SinonStub;
     getObject: sinon.SinonStub;
     getStatesOf: sinon.SinonStub;
@@ -26,7 +26,7 @@ interface Harness {
 
 // Assemble a StatePublisher with stubbed I/O.
 function harness(opts?: { isExtRelaysEnabled?: boolean }): Harness {
-    const setState = sinon.stub().resolves();
+    const setStateChanged = sinon.stub().resolves();
     const setObject = sinon.stub().resolves();
     const getObject = sinon.stub().resolves({ _id: 'x', type: 'channel', common: { name: 'old' }, native: {} });
     const getStatesOf = sinon.stub().resolves([{ _id: 'x.value', common: { name: 'old' } }]);
@@ -36,14 +36,23 @@ function harness(opts?: { isExtRelaysEnabled?: boolean }): Harness {
     const deps: StatePublisherDeps = {
         log,
         namespace: 'procon-ip.0',
-        setState,
+        setStateChanged,
         getObject,
         setObject,
         getStatesOf,
         relayDataInterpreter: { isAuto, isOn } as unknown as RelayDataInterpreter,
         isExtRelaysEnabled: () => opts?.isExtRelaysEnabled ?? true,
     };
-    return { publisher: new StatePublisher(deps), setState, setObject, getObject, getStatesOf, isAuto, isOn, log };
+    return {
+        publisher: new StatePublisher(deps),
+        setStateChanged,
+        setObject,
+        getObject,
+        getStatesOf,
+        isAuto,
+        isOn,
+        log,
+    };
 }
 
 // A GetStateDataObject-shaped fixture.
@@ -61,7 +70,7 @@ function dataObj(o: Partial<GetStateDataObject>): GetStateDataObject {
     } as unknown as GetStateDataObject;
 }
 
-// The (id, value) pairs passed to setState.
+// The (id, value) pairs passed to setStateChanged.
 function writes(stub: sinon.SinonStub): Array<[string, unknown]> {
     return stub.getCalls().map(c => [c.args[0] as string, c.args[1]]);
 }
@@ -70,7 +79,7 @@ describe('StatePublisher.publishSysInfoState', () => {
     it('writes info.system.<key> with the stringified value (ack)', () => {
         const h = harness();
         h.publisher.publishSysInfoState('phValue', 7);
-        expect(h.setState.calledOnceWithExactly('procon-ip.0.info.system.phValue', '7', true)).to.be.true;
+        expect(h.setStateChanged.calledOnceWithExactly('procon-ip.0.info.system.phValue', '7', true)).to.be.true;
     });
 });
 
@@ -86,7 +95,7 @@ describe('StatePublisher.publishAdvancedSysInfo', () => {
     it('publishes all four flags on the first (not-yet-bootstrapped) pass', () => {
         const h = harness();
         h.publisher.publishAdvancedSysInfo(sysInfo, { bootstrapped: false, previousDosageControl: 5 });
-        const ids = writes(h.setState).map(w => w[0]);
+        const ids = writes(h.setStateChanged).map(w => w[0]);
         expect(ids).to.have.members([
             'procon-ip.0.info.system.phPlusDosageEnabled',
             'procon-ip.0.info.system.phMinusDosageEnabled',
@@ -97,12 +106,12 @@ describe('StatePublisher.publishAdvancedSysInfo', () => {
     it('skips publishing when bootstrapped and the dosage-control byte is unchanged', () => {
         const h = harness();
         h.publisher.publishAdvancedSysInfo(sysInfo, { bootstrapped: true, previousDosageControl: 5 });
-        expect(h.setState.called).to.be.false;
+        expect(h.setStateChanged.called).to.be.false;
     });
     it('publishes when the dosage-control byte changed', () => {
         const h = harness();
         h.publisher.publishAdvancedSysInfo(sysInfo, { bootstrapped: true, previousDosageControl: 4 });
-        expect(h.setState.callCount).to.equal(4);
+        expect(h.setStateChanged.callCount).to.equal(4);
     });
 });
 
@@ -110,7 +119,7 @@ describe('StatePublisher.publishDataState', () => {
     it('writes the six published field states', () => {
         const h = harness();
         h.publisher.publishDataState(dataObj({ category: 'temperatures', categoryId: 0 }));
-        const ids = writes(h.setState).map(w => w[0]);
+        const ids = writes(h.setStateChanged).map(w => w[0]);
         expect(ids).to.include('procon-ip.0.temperatures.0.value');
         expect(ids).to.include('procon-ip.0.temperatures.0.label');
         expect(ids).to.include('procon-ip.0.temperatures.0.active');
@@ -119,14 +128,14 @@ describe('StatePublisher.publishDataState', () => {
     it('also writes relay switch states for a relay', () => {
         const h = harness();
         h.publisher.publishDataState(dataObj({ category: 'relays', categoryId: 2 }));
-        const ids = writes(h.setState).map(w => w[0]);
+        const ids = writes(h.setStateChanged).map(w => w[0]);
         expect(ids).to.include('procon-ip.0.relays.2.auto');
         expect(ids).to.include('procon-ip.0.relays.2.onOff');
     });
     it('skips relay switch states for external relays when disabled', () => {
         const h = harness({ isExtRelaysEnabled: false });
         h.publisher.publishDataState(dataObj({ category: String(GetStateCategory.EXTERNAL_RELAYS), categoryId: 0 }));
-        const ids = writes(h.setState).map(w => w[0]);
+        const ids = writes(h.setStateChanged).map(w => w[0]);
         expect(ids.some(i => i.endsWith('.auto'))).to.be.false;
     });
 });
@@ -135,7 +144,7 @@ describe('StatePublisher.publishRelayState', () => {
     it('writes auto (isAuto) and onOff (isOn) values', () => {
         const h = harness();
         h.publisher.publishRelayState(dataObj({ category: 'relays', categoryId: 2 }));
-        const pairs = writes(h.setState);
+        const pairs = writes(h.setStateChanged);
         expect(pairs).to.deep.include(['procon-ip.0.relays.2.auto', true]);
         expect(pairs).to.deep.include(['procon-ip.0.relays.2.onOff', false]);
     });

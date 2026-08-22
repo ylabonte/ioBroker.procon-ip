@@ -4,7 +4,7 @@
  * and object-name updates. The "when to publish" decisions (change detection,
  * force-update) stay in the adapter's poll callback; this collaborator owns the
  * "how to write" I/O, injected via {@link StatePublisherDeps} for testability.
- * Part B will swap `setState` → `setStateChanged` here in one place.
+ * Writes go through `setStateChanged`, so unchanged values emit no state events.
  */
 
 import {
@@ -24,8 +24,11 @@ export interface StatePublisherDeps {
     log: { debug(message: string): void; error(message: string): void };
     /** The adapter namespace, e.g. `procon-ip.0`. */
     namespace: string;
-    /** Write a state value (adapter `setState`). */
-    setState(id: string, value: ioBroker.StateValue, ack: boolean): Promise<unknown>;
+    /**
+     * Write a state value only if it changed (adapter `setStateChanged`) —
+     * keeps the poll loop from emitting redundant state events every cycle.
+     */
+    setStateChanged(id: string, value: ioBroker.StateValue, ack: boolean): Promise<unknown>;
     /** Resolve an ioBroker object by full id (adapter `getObjectAsync`). */
     getObject(id: string): Promise<ioBroker.Object | null | undefined>;
     /** Overwrite an ioBroker object (adapter `setObject`). */
@@ -71,7 +74,7 @@ export class StatePublisher {
      */
     public publishSysInfoState(key: string, value: number | string): void {
         this.deps.log.debug(`Updating sys info state ${key}: ${value}`);
-        this.deps.setState(this.id('info', 'system', key), String(value), true).catch(e => {
+        this.deps.setStateChanged(this.id('info', 'system', key), String(value), true).catch(e => {
             this.deps.log.error(`Failed setting state for '${key}': ${e}`);
         });
     }
@@ -100,7 +103,7 @@ export class StatePublisher {
             ['electrolysis', sysInfo.isElectrolysis()],
         ];
         for (const [key, value] of flags) {
-            this.deps.setState(this.id('info', 'system', key), value, true).catch(e => {
+            this.deps.setStateChanged(this.id('info', 'system', key), value, true).catch(e => {
                 this.deps.log.error(`Failed setting state for '${this.id('info', 'system', key)}': ${e}`);
             });
         }
@@ -114,7 +117,7 @@ export class StatePublisher {
     public publishDataState(obj: GetStateDataObject): void {
         for (const field of Object.keys(obj).filter(f => PUBLISHED_FIELDS.indexOf(f) > -1)) {
             this.deps
-                .setState(this.id(obj.category, obj.categoryId, field), obj[field] as ioBroker.StateValue, true)
+                .setStateChanged(this.id(obj.category, obj.categoryId, field), obj[field] as ioBroker.StateValue, true)
                 .catch(e => {
                     this.deps.log.error(`Failed setting state for '${obj.label}': ${e}`);
                 });
@@ -131,12 +134,20 @@ export class StatePublisher {
      */
     public publishRelayState(obj: GetStateDataObject): void {
         this.deps
-            .setState(this.id(obj.category, obj.categoryId, 'auto'), this.deps.relayDataInterpreter.isAuto(obj), true)
+            .setStateChanged(
+                this.id(obj.category, obj.categoryId, 'auto'),
+                this.deps.relayDataInterpreter.isAuto(obj),
+                true,
+            )
             .catch(e => {
                 this.deps.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
             });
         this.deps
-            .setState(this.id(obj.category, obj.categoryId, 'onOff'), this.deps.relayDataInterpreter.isOn(obj), true)
+            .setStateChanged(
+                this.id(obj.category, obj.categoryId, 'onOff'),
+                this.deps.relayDataInterpreter.isOn(obj),
+                true,
+            )
             .catch(e => {
                 this.deps.log.error(`Failed setting onOff switch state for '${obj.label}': ${e}`);
             });

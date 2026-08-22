@@ -46,7 +46,7 @@ class StatePublisher {
    */
   publishSysInfoState(key, value) {
     this.deps.log.debug(`Updating sys info state ${key}: ${value}`);
-    this.deps.setState(this.id("info", "system", key), String(value), true).catch((e) => {
+    this.deps.setStateChanged(this.id("info", "system", key), String(value), true).catch((e) => {
       this.deps.log.error(`Failed setting state for '${key}': ${e}`);
     });
   }
@@ -71,7 +71,7 @@ class StatePublisher {
       ["electrolysis", sysInfo.isElectrolysis()]
     ];
     for (const [key, value] of flags) {
-      this.deps.setState(this.id("info", "system", key), value, true).catch((e) => {
+      this.deps.setStateChanged(this.id("info", "system", key), value, true).catch((e) => {
         this.deps.log.error(`Failed setting state for '${this.id("info", "system", key)}': ${e}`);
       });
     }
@@ -83,7 +83,7 @@ class StatePublisher {
    */
   publishDataState(obj) {
     for (const field of Object.keys(obj).filter((f) => PUBLISHED_FIELDS.indexOf(f) > -1)) {
-      this.deps.setState(this.id(obj.category, obj.categoryId, field), obj[field], true).catch((e) => {
+      this.deps.setStateChanged(this.id(obj.category, obj.categoryId, field), obj[field], true).catch((e) => {
         this.deps.log.error(`Failed setting state for '${obj.label}': ${e}`);
       });
     }
@@ -97,10 +97,18 @@ class StatePublisher {
    * @param obj the relay data object.
    */
   publishRelayState(obj) {
-    this.deps.setState(this.id(obj.category, obj.categoryId, "auto"), this.deps.relayDataInterpreter.isAuto(obj), true).catch((e) => {
+    this.deps.setStateChanged(
+      this.id(obj.category, obj.categoryId, "auto"),
+      this.deps.relayDataInterpreter.isAuto(obj),
+      true
+    ).catch((e) => {
       this.deps.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
     });
-    this.deps.setState(this.id(obj.category, obj.categoryId, "onOff"), this.deps.relayDataInterpreter.isOn(obj), true).catch((e) => {
+    this.deps.setStateChanged(
+      this.id(obj.category, obj.categoryId, "onOff"),
+      this.deps.relayDataInterpreter.isOn(obj),
+      true
+    ).catch((e) => {
       this.deps.log.error(`Failed setting onOff switch state for '${obj.label}': ${e}`);
     });
   }

@@ -71,7 +71,7 @@ export class ProconIp extends Adapter {
     private async onReady(): Promise<void> {
         let connectionApproved = false;
         let connectErrorLogged = false;
-        await this.setState('info.connection', false, true);
+        await this.setStateChangedAsync('info.connection', false, true);
 
         if (this.config.controllerUrl.length < 1 || !isValidURL(this.config.controllerUrl)) {
             this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
@@ -112,7 +112,7 @@ export class ProconIp extends Adapter {
         this._statePublisher = new StatePublisher({
             log: this.log,
             namespace: this.namespace,
-            setState: async (id, value, ack) => this.setState(id, value, ack),
+            setStateChanged: async (id, value, ack) => this.setStateChangedAsync(id, value, ack),
             getObject: id => this.getObjectAsync(id),
             setObject: async (id, obj) => this.setObject(id, obj),
             getStatesOf: id => this.getStatesOfAsync(id),
@@ -198,10 +198,10 @@ export class ProconIp extends Adapter {
                     this.log.silly(`Updating data object for next comparison`);
                     this._stateData = data;
                     this._bootstrapped = true;
-                    this.setState('info.connection', true, true).catch(() => {});
+                    this.setStateChangedAsync('info.connection', true, true).catch(() => {});
                 },
                 (e: unknown) => {
-                    this.setState('info.connection', false, true).catch(() => {});
+                    this.setStateChangedAsync('info.connection', false, true).catch(() => {});
                     // Keep the polling loop running so the adapter recovers on its
                     // own once the controller becomes reachable again. Log the
                     // "cannot connect yet" warning only once per outage.
@@ -242,7 +242,7 @@ export class ProconIp extends Adapter {
         try {
             // Stop the service loop (this also handles the info.connection state)
             this._getStateService?.stop();
-            this.setState('info.connection', false, true).catch(() => {});
+            this.setStateChangedAsync('info.connection', false, true).catch(() => {});
         } catch (e: unknown) {
             this.log.error(`Failed to stop GetState service: ${String(e)}`);
         } finally {
