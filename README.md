@@ -87,8 +87,7 @@ If you want to support this adapter or say thank you, you can:
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 144px !important;" >](https://www.buymeacoffee.com/ylabonte)
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 1.8.0 (2026-08-22)
 
 - Raised the minimum Node.js version to 22 (Node 20 is end-of-life).
 - Updated the ProCon.IP library to 2.x, replacing its axios HTTP client with a leaner implementation and typed error handling.

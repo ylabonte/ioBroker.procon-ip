@@ -1,209 +1,209 @@
 {
-    "common": {
-        "name": "procon-ip",
-        "version": "1.7.0",
-        "news": {
-            "1.7.0": {
-                "en": "Satisfy latest ioBroker-Bot requirements, raise minimum versions (js-controller 7.0.7, admin 7.6.17), remove deprecated calls, clean up code, update dependencies.",
-                "de": "Erfüllen Sie die neuesten Anforderungen des ioBroker-Bots, erhöhen Sie die Mindestversionen (js-controller 7.0.7, admin 7.6.17), entfernen Sie veraltete Aufrufe, bereinigen Sie den Code, aktualisieren Sie Abhängigkeiten.",
-                "ru": "Удовлетворение последних требований ioBroker-Bot, повышение минимальных версий (js-controller 7.0.7, admin 7.6.17), удаление устаревших вызовов, очистка кода, обновление зависимостей.",
-                "pt": "Atender aos requisitos mais recentes do ioBroker-Bot, elevar as versões mínimas (js-controller 7.0.7, admin 7.6.17), remover chamadas obsoletas, limpar o código e atualizar as dependências.",
-                "nl": "Voldoe aan de nieuwste eisen van de ioBroker-Bot, verhoog de minimale versies (js-controller 7.0.7, admin 7.6.17), verwijder verouderde aanroepen, optimaliseer de code, update afhankelijkheden.",
-                "fr": "Satisfaire aux dernières exigences du ioBroker-Bot, élever les versions minimales (js-controller 7.0.7, admin 7.6.17), supprimer les appels obsolètes, nettoyer le code, mettre à jour les dépendances.",
-                "it": "Soddisfare i requisiti più recenti di ioBroker-Bot, aumentare le versioni minime (js-controller 7.0.7, admin 7.6.17), rimuovere le chiamate deprecate, pulire il codice, aggiornare le dipendenze.",
-                "es": "Cumplir con los requisitos más recientes del bot de ioBroker, aumentar las versiones mínimas (js-controller 7.0.7, admin 7.6.17), eliminar llamadas obsoletas, limpiar el código y actualizar las dependencias.",
-                "pl": "Dostosuj się do najnowszych wymagań ioBroker-Bota, podnieś minimalne wersje (js-controller 7.0.7, admin 7.6.17), usuń wycofane wywołania, oczyść kod, zaktualizuj zależności.",
-                "uk": "Відповідайте останнім вимогам ioBroker-Bot, підвищуйте мінімальні версії (js-controller 7.0.7, admin 7.6.17), видаліть застарілі виклики, очистіть код, оновіть залежності.",
-                "zh-cn": "满足最新的ioBroker-Bot需求，提高最低版本要求（js-controller 7.0.7，admin 7.6.17），移除不推荐的调用，清理代码，更新依赖项。"
-            },
-            "1.6.0": {
-                "en": "Code refactorings raising requirements (node >=20, js-controller>=5.0.19) and dependency updates.",
-                "de": "Code-Refactorings und damit verbundene neue Mindestanforderungen (node >=20, js-controller>=5.0.19) sowie Updates von Abhängigkeiten.",
-                "ru": "Кодовые рефакторинговые требования (node >=20, js-controller>=5.0.19) и обновления зависимостей.",
-                "pt": "Refactorings de código levantando requisitos (node >=20, js-controller>=5.0.19) e atualizações de dependência.",
-                "nl": "Code refactorings verhogende vereisten (node >= 20, js-controller>=5.01.19) en afhankelijkheidsupdates.",
-                "fr": "Refacturations de code augmentant les exigences (noeud >=20, js-controller>=5.0.19) et mises à jour de dépendance.",
-                "it": "Refactorings codice requisiti di sollevamento (nodo >=20, js-controller>=5.0.19) e aggiornamenti di dipendenza.",
-                "es": "Refactorings Code raising requirements (node √20, js-controller confianza=5.0.19) y actualizaciones de dependencia.",
-                "pl": "Wymagania dotyczące refakturowania kodu (węzeł > = 20, kontroler js- controller > = 5.0.19) oraz aktualizacje zależności.",
-                "uk": "Вимоги до рефакторингу коду (node>=20, js-controller>=5.0.19) та оновлення залежностей.",
-                "zh-cn": "代码重构提高要求(节点QQ20,js-controlerQQ5.0.19)和依赖性更新."
-            },
-            "1.5.4": {
-                "en": "Dependency update and minor optimization in implementation.",
-                "de": "Abhängigkeitsaktualisierung und kleinere Optimierung in der Implementierung.",
-                "ru": "Обновление зависимости и незначительная оптимизация в реализации.",
-                "pt": "Atualização de dependência e menor otimização na implementação.",
-                "nl": "Dependency update en kleine optimalisatie in implementatie.",
-                "fr": "Mise à jour de la dépendance et optimisation mineure dans la mise en œuvre.",
-                "it": "Aggiornamento della dipendenza e ottimizzazione minore in implementazione.",
-                "es": "Actualización de la dependencia y menor optimización en la aplicación.",
-                "pl": "Aktualizacja zależności i mała optymalizacja w realizacji.",
-                "uk": "Оновлення та оптимізація залежностей в реалізації.",
-                "zh-cn": "实施中的依赖性更新和小优化."
-            },
-            "1.5.2": {
-                "en": "Minor UI changes in adapter config and dependency updates.",
-                "de": "Kleine Änderungen an der Konfigurationsoberfläche des Adapters und Abhängigkeitsaktualisierungen.",
-                "ru": "Незначительные изменения пользовательского интерфейса в конфигурации адаптера и обновления зависимостей.",
-                "pt": "Pequenas mudanças de interface de usuário nas atualizações de configuração e dependência do adaptador.",
-                "nl": "Kleine wijzigingen in adapterconfiguratie en afhankelijkheidsupdates.",
-                "fr": "Changements mineurs d'interface utilisateur dans la configuration de l'adaptateur et les mises à jour de dépendance.",
-                "it": "Minori modifiche dell'interfaccia utente negli aggiornamenti di configurazione e dipendenza dell'adattatore.",
-                "es": "Menor UI cambia en configuración de adaptador y actualizaciones de dependencia.",
-                "pl": "Mniejsze zmiany interfejsu użytkownika w aktualizacjach konfiguracji adaptera i zależności.",
-                "uk": "Мінор UI зміни в налаштуваннях адаптера та оновлення залежності.",
-                "zh-cn": "适配器配置和依赖性更新中小的UI变化."
-            },
-            "1.5.1": {
-                "en": "Code and translation files cleanup.",
-                "de": "Bereinigung von Code- und Übersetzungsdateien.",
-                "ru": "Очистка кода и файлов перевода.",
-                "pt": "Limpeza de arquivos de código e tradução.",
-                "nl": "Opschonen van code- en vertaalbestanden.",
-                "fr": "Nettoyage des fichiers de code et de traduction.",
-                "it": "Pulizia del codice e dei file di traduzione.",
-                "es": "Limpieza de archivos de código y traducción.",
-                "pl": "Czyszczenie kodu i plików tłumaczeń.",
-                "uk": "Очищення файлів коду та перекладу.",
-                "zh-cn": "代码和翻译文件清理。"
-            },
-            "1.5.0": {
-                "en": "Code base modernization, removing support for obsolete credential encryption.",
-                "de": "Modernisierung der Codebasis, Entfernung der Unterstützung für veraltete Anmeldeinformationsverschlüsselung.",
-                "ru": "Модернизация базы кода, удаление поддержки устаревшего шифрования учетных данных.",
-                "pt": "Modernização da base de código, removendo o suporte para criptografia de credenciais obsoletas.",
-                "nl": "Modernisering van de codebasis, waarbij de ondersteuning voor verouderde legitimatieversleuteling wordt verwijderd.",
-                "fr": "Modernisation de la base de code, suppression de la prise en charge du cryptage des informations d'identification obsolètes.",
-                "it": "Modernizzazione della base di codice, rimozione del supporto per la crittografia delle credenziali obsoleta.",
-                "es": "Modernización de la base de código, eliminando la compatibilidad con el cifrado de credenciales obsoletas.",
-                "pl": "Modernizacja bazy kodu, usunięcie obsługi przestarzałego szyfrowania poświadczeń.",
-                "uk": "Модернізація бази коду, усунення підтримки застарілого шифрування облікових даних.",
-                "zh-cn": "代码库现代化，删除对过时凭证加密的支持。"
-            },
-            "1.4.0": {
-                "en": "Add generic relay timers and update dependencies",
-                "de": "Einführung allgemeiner Relais-Timer und Aktualisierung von Abhängigkeiten",
-                "ru": "Добавьте таймеры генерических релей и обновляйте зависимости",
-                "pt": "Adicionar temporizadores de relé genéricos e dependências de atualização",
-                "nl": "Add generische relais timers en update afhankelijkheid",
-                "fr": "Ajouter les temps de relais génériques et mettre à jour les dépendances",
-                "it": "Aggiungi timer generici di relè e aggiorna le dipendenze",
-                "es": "Agregar cronogramas de relé genéricos y dependencias de actualización",
-                "pl": "Adddition timers and update Dependencyjność",
-                "uk": "Додавання генних таймерів реле та оновлення залежностей",
-                "zh-cn": "增加通用的延迟时间和最新频率"
-            }
-        },
-        "titleLang": {
-            "en": "ProCon.IP Pool Control",
-            "de": "ProCon.IP Poolsteuerung",
-            "ru": "ProCon.IP управления бассейном",
-            "pt": "ProCon.IP controle de piscina",
-            "nl": "ProCon.IP zwembadregeling",
-            "fr": "ProCon.IP le contrôle de la piscine",
-            "it": "ProCon.IP controllo piscina",
-            "es": "ProCon.IP control de la piscina",
-            "pl": "ProCon.IP sterowanie basenem",
-            "zh-cn": "ProCon.IP 池控制",
-            "uk": "Контроль пулу ProCon.IP"
-        },
-        "desc": {
-            "en": "ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. It is intended for integration with your ioBroker home automation, eg. to build logic that involves other devices or simply to be paired with your favorit voice assistant(s).",
-            "de": "ioBroker-Adapter zur grundlegenden Unterstützung der ProCon.IP-Schwimmbadsteuereinheit. Es ist für die Integration in Ihre ioBroker-Hausautomation vorgesehen, z. um eine Logik zu erstellen, an der andere Geräte beteiligt sind, oder um einfach mit Ihren bevorzugten Sprachassistenten gekoppelt zu werden.",
-            "ru": "Адаптер ioBroker для базовой поддержки блока управления бассейном ProCon.IP. Он предназначен для интеграции с домашней системой автоматизации ioBroker, например. создать логику, которая включает в себя другие устройства или просто быть в паре с вашим голосовым помощником.",
-            "pt": "Adaptador ioBroker para suporte básico da unidade de controle de piscinas ProCon.IP. Ele se destina à integração com sua automação residencial ioBroker, por exemplo. para criar lógica que envolva outros dispositivos ou simplesmente para emparelhar-se com seus assistentes de voz favoritos.",
-            "nl": "ioBroker-adapter voor basisondersteuning van de ProCon.IP zwembadbesturing. Het is bedoeld voor integratie met uw ioBroker-domotica, bijv. om logica op te bouwen die andere apparaten omvat of gewoon om te worden gekoppeld aan uw favoriete stemassistent (en).",
-            "fr": "Adaptateur ioBroker pour le support de base de l'unité de contrôle de piscine ProCon.IP. Il est destiné à être intégré à votre domotique ioBroker, par exemple. pour construire une logique qui implique d'autres appareils ou simplement pour être jumelé avec vos assistants vocaux préférés.",
-            "it": "adattatore ioBroker per il supporto di base dell'unità di controllo della piscina ProCon.IP. È destinato all'integrazione con l'automazione domestica ioBroker, ad es. per costruire una logica che coinvolga altri dispositivi o semplicemente per essere accoppiato con i tuoi assistenti vocali preferiti.",
-            "es": "Adaptador ioBroker para soporte básico de la unidad de control de piscina ProCon.IP. Está destinado a la integración con su domótica ioBroker, por ejemplo. para construir una lógica que involucre otros dispositivos o simplemente para que se vincule con su (s) asistente (s) de voz favorito (s).",
-            "pl": "Adapter ioBroker do podstawowej obsługi jednostki sterującej basenu ProCon.IP. Jest przeznaczony do integracji z automatyką domową ioBroker, np. zbudować logikę, która obejmuje inne urządzenia lub po prostu sparować ze swoimi ulubionymi asystentami głosowymi.",
-            "zh-cn": "ioBroker适配器，用于ProCon.IP游泳池控制单元的基本支持。它旨在与您的ioBroker家庭自动化集成，例如。建立涉及其他设备的逻辑，或者仅与您喜欢的语音助手配对。",
-            "uk": "Адаптер ioBroker для базової підтримки блоку керування басейном ProCon.IP. Він призначений для інтеграції з системою домашньої автоматизації ioBroker, наприклад. створювати логіку, яка залучає інші пристрої, або просто бути в парі з вашим улюбленим голосовим помічником(ами)."
-        },
-        "authors": [
-            "Yannic Labonte <yannic.labonte@gmail.com>"
-        ],
-        "keywords": [
-            "ProCon.IP",
-            "procon",
-            "pool-digital",
-            "swimming",
-            "pool"
-        ],
-        "platform": "Javascript/Node.js",
-        "icon": "procon-ip.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/procon-ip.png",
-        "readme": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "iot-systems",
-        "tier": 2,
-        "connectionType": "local",
-        "dataSource": "poll",
-        "compact": true,
-        "adminUI": {
-            "config": "json"
-        },
-        "supportCustoms": false,
-        "dependencies": [
-            {
-                "js-controller": ">=7.0.7"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.17"
-            }
-        ],
-        "licenseInformation": {
-            "license": "MIT",
-            "link": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/LICENSE",
-            "type": "free"
-        }
+  "common": {
+    "name": "procon-ip",
+    "version": "1.8.0",
+    "news": {
+      "1.8.0": {
+        "en": "Raised the minimum Node.js version to 22 (Node 20 is end-of-life).\nUpdated the ProCon.IP library to 2.x, replacing its axios HTTP client with a leaner implementation and typed error handling.\nUpdated all dependencies and shrank the security-advisory backlog.\nInternal cleanup: migrated off the deprecated `setStateAsync` API to `setState`.\nMaintenance: adopted npm Trusted Publishing (OIDC), modernized the CI workflow, grouped Dependabot updates, and applied the latest ioBroker repository-checker fixes.",
+        "de": "Die Mindestversion von Node.js wurde auf 22 angehoben (Node 20 wird nicht mehr unterstützt).\nDie ProCon.IP-Bibliothek wurde auf Version 2.x aktualisiert. Der axios HTTP-Client wurde durch eine schlankere Implementierung mit typisierter Fehlerbehandlung ersetzt.\nAlle Abhängigkeiten wurden aktualisiert und der Rückstand bei Sicherheitswarnungen reduziert.\nInterne Bereinigung: Die veraltete `setStateAsync`-API wurde durch `setState` ersetzt.\nWartung: Einführung von npm Trusted Publishing (OIDC), Modernisierung des CI-Workflows, Gruppierung von Dependabot-Updates und Anwendung der neuesten ioBroker repository-checker-Korrekturen.",
+        "ru": "Минимальная версия Node.js повышена до 22 (версия Node 20 снята с поддержки).\nОбновили библиотеку ProCon.IP до версии 2.x, заменив её HTTP-клиент axios на более компактную реализацию и типизированную обработку ошибок.\nОбновили все зависимости и сократили количество невыполненных запросов на рекомендации по безопасности.\nВнутренняя оптимизация: перешли с устаревшего API `setStateAsync` на `setState`.\nТехническое обслуживание: внедрена технология npm Trusted Publishing (OIDC), модернизирован рабочий процесс CI, сгруппированы обновления Dependabot и применены последние исправления для средства проверки репозитория ioBroker.",
+        "pt": "Aumentamos a versão mínima do Node.js para 22 (o Node 20 chegou ao fim de sua vida útil).\nAtualizei a biblioteca ProCon.IP para a versão 2.x, substituindo seu cliente HTTP axios por uma implementação mais enxuta e com tratamento de erros tipado.\nAtualizei todas as dependências e reduzi o backlog de avisos de segurança.\nLimpeza interna: migramos a API obsoleta `setStateAsync` para `setState`.\nManutenção: adotamos o npm Trusted Publishing (OIDC), modernizamos o fluxo de trabalho de CI, agrupamos as atualizações do Dependabot e aplicamos as correções mais recentes do verificador de repositório ioBroker.",
+        "nl": "De minimale Node.js-versie is verhoogd naar 22 (Node 20 wordt niet meer ondersteund).\nDe ProCon.IP-bibliotheek is bijgewerkt naar versie 2.x, waarbij de axios HTTP-client is vervangen door een gestroomlijndere implementatie met getypeerde foutafhandeling.\nAlle afhankelijkheden zijn bijgewerkt en de achterstand in beveiligingsadviezen is verkleind.\nInterne opruiming: de verouderde `setStateAsync`-API is vervangen door `setState`.\nOnderhoud: npm Trusted Publishing (OIDC) geïmplementeerd, de CI-workflow gemoderniseerd, Dependabot-updates gegroepeerd en de nieuwste fixes voor de ioBroker-repositorychecker toegepast.",
+        "fr": "La version minimale de Node.js a été relevée à 22 (Node 20 n'est plus pris en charge).\nMise à jour de la bibliothèque ProCon.IP vers la version 2.x, remplacement de son client HTTP axios par une implémentation plus légère et une gestion des erreurs typées.\nToutes les dépendances ont été mises à jour et le nombre de notifications de sécurité en attente a été réduit.\nNettoyage interne : migration de l’API obsolète `setStateAsync` vers `setState`.\nMaintenance : adoption de npm Trusted Publishing (OIDC), modernisation du flux de travail CI, regroupement des mises à jour de Dependabot et application des derniers correctifs du vérificateur de dépôt ioBroker.",
+        "it": "Abbiamo innalzato la versione minima di Node.js alla 22 (il supporto per Node 20 è terminato).\nAggiornata la libreria ProCon.IP alla versione 2.x, sostituendo il client HTTP axios con un'implementazione più snella e con gestione degli errori tipizzata.\nAggiornate tutte le dipendenze e ridotto l'arretrato degli avvisi di sicurezza.\nPulizia interna: migrata dall'API deprecata `setStateAsync` a `setState`.\nManutenzione: adottato npm Trusted Publishing (OIDC), modernizzato il flusso di lavoro CI, raggruppati gli aggiornamenti di Dependabot e applicate le ultime correzioni del repository-checker di ioBroker.",
+        "es": "Se ha elevado la versión mínima de Node.js a la 22 (Node 20 ha llegado al final de su ciclo de vida).\nSe actualizó la biblioteca ProCon.IP a la versión 2.x, reemplazando su cliente HTTP axios por una implementación más ligera y un manejo de errores tipado.\nSe actualizaron todas las dependencias y se redujo la acumulación de avisos de seguridad.\nLimpieza interna: se migró de la API `setStateAsync` obsoleta a `setState`.\nMantenimiento: se adoptó npm Trusted Publishing (OIDC), se modernizó el flujo de trabajo de CI, se agruparon las actualizaciones de Dependabot y se aplicaron las últimas correcciones del verificador de repositorios de ioBroker.",
+        "pl": "Podniesiono minimalną wersję Node.js do 22 (Node 20 jest już wycofany z użytku).\nZaktualizowano bibliotekę ProCon.IP do wersji 2.x, zastępując jej klienta HTTP Axios uproszczoną implementacją i obsługą błędów typizowanych.\nZaktualizowano wszystkie zależności i zmniejszono zaległości w zakresie zaleceń dotyczących bezpieczeństwa.\nWewnętrzne porządki: migracja z przestarzałego interfejsu API `setStateAsync` do `setState`.\nKonserwacja: wdrożono npm Trusted Publishing (OIDC), zmodernizowano przepływ pracy CI, zgrupowano aktualizacje Dependabot i zastosowano najnowsze poprawki modułu sprawdzającego repozytorium ioBroker.",
+        "uk": "Підвищено мінімальну версію Node.js до 22 (Node 20 більше не підтримується).\nОновлено бібліотеку ProCon.IP до версії 2.x, замінивши її HTTP-клієнт axios більш компактною реалізацією та обробкою типізованих помилок.\nОновлено всі залежності та зменшено кількість запитів на рекомендації щодо безпеки.\nВнутрішнє очищення: перенесено з застарілого API `setStateAsync` на `setState`.\nОбслуговування: впроваджено npm Trusted Publishing (OIDC), модернізовано робочий процес CI, згруповано оновлення Dependabot та застосовано останні виправлення перевірки репозиторію ioBroker.",
+        "zh-cn": "将最低 Node.js 版本提高到 22（Node 20 已停止维护）。\n将 ProCon.IP 库更新至 2.x 版本，用更精简的实现和类型化的错误处理替换了其 axios HTTP 客户端。\n更新了所有依赖项，并减少了安全公告积压数量。\n内部清理：从已弃用的 `setStateAsync` API 迁移到 `setState`。\n维护：采用了 npm Trusted Publishing (OIDC)，实现了 CI 工作流程现代化，对 Dependabot 更新进行了分组，并应用了最新的 ioBroker 存储库检查器修复程序。"
+      },
+      "1.7.0": {
+        "en": "Satisfy latest ioBroker-Bot requirements, raise minimum versions (js-controller 7.0.7, admin 7.6.17), remove deprecated calls, clean up code, update dependencies.",
+        "de": "Erfüllen Sie die neuesten Anforderungen des ioBroker-Bots, erhöhen Sie die Mindestversionen (js-controller 7.0.7, admin 7.6.17), entfernen Sie veraltete Aufrufe, bereinigen Sie den Code, aktualisieren Sie Abhängigkeiten.",
+        "ru": "Удовлетворение последних требований ioBroker-Bot, повышение минимальных версий (js-controller 7.0.7, admin 7.6.17), удаление устаревших вызовов, очистка кода, обновление зависимостей.",
+        "pt": "Atender aos requisitos mais recentes do ioBroker-Bot, elevar as versões mínimas (js-controller 7.0.7, admin 7.6.17), remover chamadas obsoletas, limpar o código e atualizar as dependências.",
+        "nl": "Voldoe aan de nieuwste eisen van de ioBroker-Bot, verhoog de minimale versies (js-controller 7.0.7, admin 7.6.17), verwijder verouderde aanroepen, optimaliseer de code, update afhankelijkheden.",
+        "fr": "Satisfaire aux dernières exigences du ioBroker-Bot, élever les versions minimales (js-controller 7.0.7, admin 7.6.17), supprimer les appels obsolètes, nettoyer le code, mettre à jour les dépendances.",
+        "it": "Soddisfare i requisiti più recenti di ioBroker-Bot, aumentare le versioni minime (js-controller 7.0.7, admin 7.6.17), rimuovere le chiamate deprecate, pulire il codice, aggiornare le dipendenze.",
+        "es": "Cumplir con los requisitos más recientes del bot de ioBroker, aumentar las versiones mínimas (js-controller 7.0.7, admin 7.6.17), eliminar llamadas obsoletas, limpiar el código y actualizar las dependencias.",
+        "pl": "Dostosuj się do najnowszych wymagań ioBroker-Bota, podnieś minimalne wersje (js-controller 7.0.7, admin 7.6.17), usuń wycofane wywołania, oczyść kod, zaktualizuj zależności.",
+        "uk": "Відповідайте останнім вимогам ioBroker-Bot, підвищуйте мінімальні версії (js-controller 7.0.7, admin 7.6.17), видаліть застарілі виклики, очистіть код, оновіть залежності.",
+        "zh-cn": "满足最新的ioBroker-Bot需求，提高最低版本要求（js-controller 7.0.7，admin 7.6.17），移除不推荐的调用，清理代码，更新依赖项。"
+      },
+      "1.6.0": {
+        "en": "Code refactorings raising requirements (node >=20, js-controller>=5.0.19) and dependency updates.",
+        "de": "Code-Refactorings und damit verbundene neue Mindestanforderungen (node >=20, js-controller>=5.0.19) sowie Updates von Abhängigkeiten.",
+        "ru": "Кодовые рефакторинговые требования (node >=20, js-controller>=5.0.19) и обновления зависимостей.",
+        "pt": "Refactorings de código levantando requisitos (node >=20, js-controller>=5.0.19) e atualizações de dependência.",
+        "nl": "Code refactorings verhogende vereisten (node >= 20, js-controller>=5.01.19) en afhankelijkheidsupdates.",
+        "fr": "Refacturations de code augmentant les exigences (noeud >=20, js-controller>=5.0.19) et mises à jour de dépendance.",
+        "it": "Refactorings codice requisiti di sollevamento (nodo >=20, js-controller>=5.0.19) e aggiornamenti di dipendenza.",
+        "es": "Refactorings Code raising requirements (node √20, js-controller confianza=5.0.19) y actualizaciones de dependencia.",
+        "pl": "Wymagania dotyczące refakturowania kodu (węzeł > = 20, kontroler js- controller > = 5.0.19) oraz aktualizacje zależności.",
+        "uk": "Вимоги до рефакторингу коду (node>=20, js-controller>=5.0.19) та оновлення залежностей.",
+        "zh-cn": "代码重构提高要求(节点QQ20,js-controlerQQ5.0.19)和依赖性更新."
+      },
+      "1.5.4": {
+        "en": "Dependency update and minor optimization in implementation.",
+        "de": "Abhängigkeitsaktualisierung und kleinere Optimierung in der Implementierung.",
+        "ru": "Обновление зависимости и незначительная оптимизация в реализации.",
+        "pt": "Atualização de dependência e menor otimização na implementação.",
+        "nl": "Dependency update en kleine optimalisatie in implementatie.",
+        "fr": "Mise à jour de la dépendance et optimisation mineure dans la mise en œuvre.",
+        "it": "Aggiornamento della dipendenza e ottimizzazione minore in implementazione.",
+        "es": "Actualización de la dependencia y menor optimización en la aplicación.",
+        "pl": "Aktualizacja zależności i mała optymalizacja w realizacji.",
+        "uk": "Оновлення та оптимізація залежностей в реалізації.",
+        "zh-cn": "实施中的依赖性更新和小优化."
+      },
+      "1.5.2": {
+        "en": "Minor UI changes in adapter config and dependency updates.",
+        "de": "Kleine Änderungen an der Konfigurationsoberfläche des Adapters und Abhängigkeitsaktualisierungen.",
+        "ru": "Незначительные изменения пользовательского интерфейса в конфигурации адаптера и обновления зависимостей.",
+        "pt": "Pequenas mudanças de interface de usuário nas atualizações de configuração e dependência do adaptador.",
+        "nl": "Kleine wijzigingen in adapterconfiguratie en afhankelijkheidsupdates.",
+        "fr": "Changements mineurs d'interface utilisateur dans la configuration de l'adaptateur et les mises à jour de dépendance.",
+        "it": "Minori modifiche dell'interfaccia utente negli aggiornamenti di configurazione e dipendenza dell'adattatore.",
+        "es": "Menor UI cambia en configuración de adaptador y actualizaciones de dependencia.",
+        "pl": "Mniejsze zmiany interfejsu użytkownika w aktualizacjach konfiguracji adaptera i zależności.",
+        "uk": "Мінор UI зміни в налаштуваннях адаптера та оновлення залежності.",
+        "zh-cn": "适配器配置和依赖性更新中小的UI变化."
+      },
+      "1.5.1": {
+        "en": "Code and translation files cleanup.",
+        "de": "Bereinigung von Code- und Übersetzungsdateien.",
+        "ru": "Очистка кода и файлов перевода.",
+        "pt": "Limpeza de arquivos de código e tradução.",
+        "nl": "Opschonen van code- en vertaalbestanden.",
+        "fr": "Nettoyage des fichiers de code et de traduction.",
+        "it": "Pulizia del codice e dei file di traduzione.",
+        "es": "Limpieza de archivos de código y traducción.",
+        "pl": "Czyszczenie kodu i plików tłumaczeń.",
+        "uk": "Очищення файлів коду та перекладу.",
+        "zh-cn": "代码和翻译文件清理。"
+      },
+      "1.5.0": {
+        "en": "Code base modernization, removing support for obsolete credential encryption.",
+        "de": "Modernisierung der Codebasis, Entfernung der Unterstützung für veraltete Anmeldeinformationsverschlüsselung.",
+        "ru": "Модернизация базы кода, удаление поддержки устаревшего шифрования учетных данных.",
+        "pt": "Modernização da base de código, removendo o suporte para criptografia de credenciais obsoletas.",
+        "nl": "Modernisering van de codebasis, waarbij de ondersteuning voor verouderde legitimatieversleuteling wordt verwijderd.",
+        "fr": "Modernisation de la base de code, suppression de la prise en charge du cryptage des informations d'identification obsolètes.",
+        "it": "Modernizzazione della base di codice, rimozione del supporto per la crittografia delle credenziali obsoleta.",
+        "es": "Modernización de la base de código, eliminando la compatibilidad con el cifrado de credenciales obsoletas.",
+        "pl": "Modernizacja bazy kodu, usunięcie obsługi przestarzałego szyfrowania poświadczeń.",
+        "uk": "Модернізація бази коду, усунення підтримки застарілого шифрування облікових даних.",
+        "zh-cn": "代码库现代化，删除对过时凭证加密的支持。"
+      }
     },
-    "encryptedNative": [
-        "controllerUrl",
-        "username",
-        "password"
-    ],
-    "protectedNative": [
-        "controllerUrl",
-        "username",
-        "password"
-    ],
-    "native": {
-        "controllerUrl": "",
-        "basicAuth": true,
-        "username": "",
-        "password": "",
-        "updateInterval": 3000,
-        "requestTimeout": 10000,
-        "errorTolerance": 10
+    "titleLang": {
+      "en": "ProCon.IP Pool Control",
+      "de": "ProCon.IP Poolsteuerung",
+      "ru": "ProCon.IP управления бассейном",
+      "pt": "ProCon.IP controle de piscina",
+      "nl": "ProCon.IP zwembadregeling",
+      "fr": "ProCon.IP le contrôle de la piscine",
+      "it": "ProCon.IP controllo piscina",
+      "es": "ProCon.IP control de la piscina",
+      "pl": "ProCon.IP sterowanie basenem",
+      "zh-cn": "ProCon.IP 池控制",
+      "uk": "Контроль пулу ProCon.IP"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Connection to the ProCon.IP",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
-    ]
+    "desc": {
+      "en": "ioBroker adapter for basic support of the ProCon.IP swimming pool control unit. It is intended for integration with your ioBroker home automation, eg. to build logic that involves other devices or simply to be paired with your favorit voice assistant(s).",
+      "de": "ioBroker-Adapter zur grundlegenden Unterstützung der ProCon.IP-Schwimmbadsteuereinheit. Es ist für die Integration in Ihre ioBroker-Hausautomation vorgesehen, z. um eine Logik zu erstellen, an der andere Geräte beteiligt sind, oder um einfach mit Ihren bevorzugten Sprachassistenten gekoppelt zu werden.",
+      "ru": "Адаптер ioBroker для базовой поддержки блока управления бассейном ProCon.IP. Он предназначен для интеграции с домашней системой автоматизации ioBroker, например. создать логику, которая включает в себя другие устройства или просто быть в паре с вашим голосовым помощником.",
+      "pt": "Adaptador ioBroker para suporte básico da unidade de controle de piscinas ProCon.IP. Ele se destina à integração com sua automação residencial ioBroker, por exemplo. para criar lógica que envolva outros dispositivos ou simplesmente para emparelhar-se com seus assistentes de voz favoritos.",
+      "nl": "ioBroker-adapter voor basisondersteuning van de ProCon.IP zwembadbesturing. Het is bedoeld voor integratie met uw ioBroker-domotica, bijv. om logica op te bouwen die andere apparaten omvat of gewoon om te worden gekoppeld aan uw favoriete stemassistent (en).",
+      "fr": "Adaptateur ioBroker pour le support de base de l'unité de contrôle de piscine ProCon.IP. Il est destiné à être intégré à votre domotique ioBroker, par exemple. pour construire une logique qui implique d'autres appareils ou simplement pour être jumelé avec vos assistants vocaux préférés.",
+      "it": "adattatore ioBroker per il supporto di base dell'unità di controllo della piscina ProCon.IP. È destinato all'integrazione con l'automazione domestica ioBroker, ad es. per costruire una logica che coinvolga altri dispositivi o semplicemente per essere accoppiato con i tuoi assistenti vocali preferiti.",
+      "es": "Adaptador ioBroker para soporte básico de la unidad de control de piscina ProCon.IP. Está destinado a la integración con su domótica ioBroker, por ejemplo. para construir una lógica que involucre otros dispositivos o simplemente para que se vincule con su (s) asistente (s) de voz favorito (s).",
+      "pl": "Adapter ioBroker do podstawowej obsługi jednostki sterującej basenu ProCon.IP. Jest przeznaczony do integracji z automatyką domową ioBroker, np. zbudować logikę, która obejmuje inne urządzenia lub po prostu sparować ze swoimi ulubionymi asystentami głosowymi.",
+      "zh-cn": "ioBroker适配器，用于ProCon.IP游泳池控制单元的基本支持。它旨在与您的ioBroker家庭自动化集成，例如。建立涉及其他设备的逻辑，或者仅与您喜欢的语音助手配对。",
+      "uk": "Адаптер ioBroker для базової підтримки блоку керування басейном ProCon.IP. Він призначений для інтеграції з системою домашньої автоматизації ioBroker, наприклад. створювати логіку, яка залучає інші пристрої, або просто бути в парі з вашим улюбленим голосовим помічником(ами)."
+    },
+    "authors": [
+      "Yannic Labonte <yannic.labonte@gmail.com>"
+    ],
+    "keywords": [
+      "ProCon.IP",
+      "procon",
+      "pool-digital",
+      "swimming",
+      "pool"
+    ],
+    "platform": "Javascript/Node.js",
+    "icon": "procon-ip.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ylabonte/ioBroker.procon-ip/master/admin/procon-ip.png",
+    "readme": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "iot-systems",
+    "tier": 2,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "compact": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "supportCustoms": false,
+    "dependencies": [
+      {
+        "js-controller": ">=7.0.7"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
+    ],
+    "licenseInformation": {
+      "license": "MIT",
+      "link": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/LICENSE",
+      "type": "free"
+    }
+  },
+  "encryptedNative": [
+    "controllerUrl",
+    "username",
+    "password"
+  ],
+  "protectedNative": [
+    "controllerUrl",
+    "username",
+    "password"
+  ],
+  "native": {
+    "controllerUrl": "",
+    "basicAuth": true,
+    "username": "",
+    "password": "",
+    "updateInterval": 3000,
+    "requestTimeout": 10000,
+    "errorTolerance": 10
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Connection to the ProCon.IP",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
