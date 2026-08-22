@@ -26,6 +26,7 @@ var import_procon_ip = require("procon-ip");
 var import_mapping = require("./mapping");
 var import_command_handler = require("./command-handler");
 var import_object_provisioner = require("./object-provisioner");
+var import_state_publisher = require("./state-publisher");
 class ProconIp extends import_adapter_core.Adapter {
   _relayDataInterpreter;
   _getStateService;
@@ -34,11 +35,11 @@ class ProconIp extends import_adapter_core.Adapter {
   _commandService;
   _commandHandler;
   _objectProvisioner;
+  _statePublisher;
   _forceUpdate;
   _stateData;
   _bootstrapped = false;
   _objectsCreated = false;
-  _objectStateFields = ["value", "category", "label", "unit", "displayValue", "active"];
   _timeout = null;
   /**
    * @param options adapter options forwarded to the ioBroker `Adapter` base;
@@ -94,6 +95,16 @@ class ProconIp extends import_adapter_core.Adapter {
       isDosageControl: (relayId) => this._getStateService.data.isDosageControl(relayId),
       isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled()
     });
+    this._statePublisher = new import_state_publisher.StatePublisher({
+      log: this.log,
+      namespace: this.namespace,
+      setState: async (id, value, ack) => this.setState(id, value, ack),
+      getObject: (id) => this.getObjectAsync(id),
+      setObject: async (id, obj) => this.setObject(id, obj),
+      getStatesOf: (id) => this.getStatesOfAsync(id),
+      relayDataInterpreter: this._relayDataInterpreter,
+      isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled()
+    });
     this.log.debug(`GetStateService url: ${this._getStateService.url}`);
     this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
     try {
@@ -114,17 +125,13 @@ class ProconIp extends import_adapter_core.Adapter {
           await this.bootstrapObjects(data);
           data.sysInfo.toArrayOfObjects().forEach((info) => {
             if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
-              this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
-              this.setState(
-                `${this.name}.${this.instance}.info.system.${info.key}`,
-                info.value.toString(),
-                true
-              ).catch((e) => {
-                this.log.error(`Failed setting state for '${info.key}': ${e}`);
-              });
+              this._statePublisher.publishSysInfoState(info.key, info.value);
             }
           });
-          this.updateAdvancedSysInfoStates(data.sysInfo);
+          this._statePublisher.publishAdvancedSysInfo(data.sysInfo, {
+            bootstrapped: this._bootstrapped,
+            previousDosageControl: this._stateData.sysInfo.dosageControl
+          });
           data.objects.forEach((obj) => {
             const previous = this._stateData.getDataObject(obj.id);
             this.log.silly(
@@ -140,12 +147,12 @@ class ProconIp extends import_adapter_core.Adapter {
             })) {
               if (previous && previous.label != obj.label) {
                 this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
-                this.updateObjectCommonName(obj).catch((e) => {
+                this._statePublisher.updateObjectCommonName(obj).catch((e) => {
                   this.log.error(`Failed fixing label for '${obj.label}': ${(0, import_mapping.errorMessage)(e)}`);
                 });
               }
               this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
-              this.setDataState(obj);
+              this._statePublisher.publishDataState(obj);
               if (forceObjStateUpdate > -1) {
                 this._forceUpdate.splice(forceObjStateUpdate, 1);
               }
@@ -213,90 +220,6 @@ class ProconIp extends import_adapter_core.Adapter {
       return;
     }
     this._commandHandler.dispatch(id, state);
-  }
-  updateAdvancedSysInfoStates(sysInfo) {
-    if (!this._bootstrapped || sysInfo.dosageControl !== this._stateData.sysInfo.dosageControl) {
-      this.log.debug("Updating advanced sys info states");
-      this.setState(
-        `${this.name}.${this.instance}.info.system.phPlusDosageEnabled`,
-        sysInfo.isPhPlusDosageEnabled(),
-        true
-      ).catch((e) => {
-        this.log.error(
-          `Failed setting state for '${this.name}.${this.instance}.info.system.phPlusDosageEnabled': ${e}`
-        );
-      });
-      this.setState(
-        `${this.name}.${this.instance}.info.system.phMinusDosageEnabled`,
-        sysInfo.isPhMinusDosageEnabled(),
-        true
-      ).catch((e) => {
-        this.log.error(
-          `Failed setting state for '${this.name}.${this.instance}.info.system.phMinusDosageEnabled': ${e}`
-        );
-      });
-      this.setState(
-        `${this.name}.${this.instance}.info.system.chlorineDosageEnabled`,
-        sysInfo.isChlorineDosageEnabled(),
-        true
-      ).catch((e) => {
-        this.log.error(
-          `Failed setting state for '${this.name}.${this.instance}.info.system.chlorineDosageEnabled': ${e}`
-        );
-      });
-      this.setState(
-        `${this.name}.${this.instance}.info.system.electrolysis`,
-        sysInfo.isElectrolysis(),
-        true
-      ).catch((e) => {
-        this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.electrolysis': ${e}`);
-      });
-    }
-  }
-  setDataState(obj) {
-    for (const field of Object.keys(obj).filter((field2) => this._objectStateFields.indexOf(field2) > -1)) {
-      this.setState(
-        `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
-        obj[field],
-        true
-      ).catch((e) => {
-        this.log.error(`Failed setting state for '${obj.label}': ${e}`);
-      });
-    }
-    if (obj.category === import_procon_ip.GetStateCategory.RELAYS || obj.category === import_procon_ip.GetStateCategory.EXTERNAL_RELAYS && this._stateData.sysInfo.isExtRelaysEnabled()) {
-      this.setRelayDataState(obj);
-    }
-  }
-  setRelayDataState(obj) {
-    this.setState(
-      `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`,
-      this._relayDataInterpreter.isAuto(obj),
-      true
-    ).catch((e) => {
-      this.log.error(`Failed setting auto/manual switch state for '${obj.label}': ${e}`);
-    });
-    this.setState(
-      `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`,
-      this._relayDataInterpreter.isOn(obj),
-      true
-    ).catch((e) => {
-      this.log.error(`Failed setting onOff switch state for '${obj.label}': ${e}`);
-    });
-  }
-  async updateObjectCommonName(obj) {
-    const objId = `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`;
-    const ioObj = await this.getObjectAsync(objId);
-    if (ioObj) {
-      ioObj.common.name = obj.label;
-      await this.setObject(objId, ioObj);
-    }
-    const objStates = await this.getStatesOfAsync(objId);
-    if (objStates) {
-      for (const state of objStates) {
-        state.common.name = obj.label;
-        await this.setObject(state._id, state);
-      }
-    }
   }
 }
 if (require.main !== module) {
