@@ -38,6 +38,7 @@ class ProconIp extends Adapter {
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
+    private _objectsCreated = false;
     private _objectStateFields = ['value', 'category', 'label', 'unit', 'displayValue', 'active'];
     private _timeout: NodeJS.Timeout | null = null;
 
@@ -58,6 +59,7 @@ class ProconIp extends Adapter {
      */
     private async onReady(): Promise<void> {
         let connectionApproved = false;
+        let connectErrorLogged = false;
         await this.setState('info.connection', false, true);
 
         if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
@@ -65,11 +67,10 @@ class ProconIp extends Adapter {
             return;
         }
 
+        // procon-ip 2.x reads `controllerUrl` (inherited from this.config) and
+        // `timeout`; the old `baseUrl` input is no longer consumed (the service
+        // derives its base URL from controllerUrl), so it is not set here.
         const serviceConfig = Object.defineProperties(Object.create(this.config), {
-            baseUrl: {
-                value: this.config.controllerUrl,
-                writable: true,
-            },
             timeout: {
                 value: this.config.requestTimeout,
                 writable: true,
@@ -89,23 +90,31 @@ class ProconIp extends Adapter {
         this.log.debug(`GetStateService url: ${this._getStateService.url}`);
         this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
 
-        await this._getStateService.update().then(async data => {
-            this._stateData = data;
-
-            // Set objects once on startup
-            if (!this._bootstrapped) {
-                this.log.debug(`Initially setting adapter objects`);
-                await this.setSysInfoObjectsNotExists(data.sysInfo);
-                await this.setStateDataObjectsNotExists(data.objects);
-            }
-        });
+        // Initial fetch + object bootstrap. If the controller is unreachable at
+        // startup, do not abort: keep going and let the polling loop below retry
+        // and bootstrap on the first successful poll (resilient startup).
+        try {
+            const initialData = await this._getStateService.update();
+            this._stateData = initialData;
+            await this.bootstrapObjects(initialData);
+        } catch (e: unknown) {
+            this.log.warn(
+                `Could not reach the controller at startup (${
+                    e instanceof Error ? e.message : String(e)
+                }). Will keep polling until it becomes available.`,
+            );
+        }
 
         this._timeout = setTimeout(() => {
             // Start the actual service
             this._getStateService.start(
-                (data: GetStateData) => {
+                async (data: GetStateData) => {
                     this.log.silly(`Start processing new GetState.csv`);
                     connectionApproved = true;
+                    connectErrorLogged = false;
+
+                    // Create objects on the first successful poll if startup couldn't
+                    await this.bootstrapObjects(data);
 
                     // Set sys info states
                     data.sysInfo.toArrayOfObjects().forEach(info => {
@@ -126,25 +135,21 @@ class ProconIp extends Adapter {
 
                     // Set actual sensor and actor/relay object states
                     data.objects.forEach(obj => {
+                        // `previous` is undefined until the first successful poll
+                        // has populated `_stateData` (e.g. after a failed startup).
+                        const previous = this._stateData.getDataObject(obj.id);
                         this.log.silly(
-                            `Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`,
+                            `Processing '${obj.label}' (${obj.category}) — current value: ${obj.displayValue}`,
                         );
-                        this.log.silly(
-                            `this._stateData.getDataObject(obj.id).value: ${
-                                this._stateData.getDataObject(obj.id).value
-                            }`,
-                        );
-                        this.log.silly(`obj.value: ${obj.value}`);
 
                         // Only update when value has changed or update is forced (on state change)
                         const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
                         if (
                             !this._bootstrapped ||
                             forceObjStateUpdate >= 0 ||
-                            (this._stateData.getDataObject(obj.id) &&
-                                this._stateData.getDataObject(obj.id).value != obj.value)
+                            (previous && previous.value != obj.value)
                         ) {
-                            if (this._stateData.getDataObject(obj.id).label != obj.label) {
+                            if (previous && previous.label != obj.label) {
                                 this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
                                 this.updateObjectCommonName(obj).catch((e: unknown) => {
                                     if (e instanceof Error) {
@@ -156,7 +161,7 @@ class ProconIp extends Adapter {
                             }
                             this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
                             this.setDataState(obj);
-                            if (this._forceUpdate[forceObjStateUpdate]) {
+                            if (forceObjStateUpdate > -1) {
                                 this._forceUpdate.splice(forceObjStateUpdate, 1);
                             }
                         }
@@ -169,13 +174,16 @@ class ProconIp extends Adapter {
                 },
                 (e: unknown) => {
                     this.setState('info.connection', false, true).catch(() => {});
-                    if (!connectionApproved) {
-                        if (e instanceof Error) {
-                            this.log.error(`Could not connect to the controller: ${e.message}`);
-                        } else {
-                            this.log.error(`Could not connect to the controller: ${String(e)}`);
-                        }
-                        this._getStateService?.stop();
+                    // Keep the polling loop running so the adapter recovers on its
+                    // own once the controller becomes reachable again. Log the
+                    // "cannot connect yet" warning only once per outage.
+                    if (!connectionApproved && !connectErrorLogged) {
+                        connectErrorLogged = true;
+                        this.log.warn(
+                            `Could not connect to the controller (${
+                                e instanceof Error ? e.message : String(e)
+                            }). Retrying until it becomes available.`,
+                        );
                     }
                 },
             );
@@ -183,6 +191,22 @@ class ProconIp extends Adapter {
 
         this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
         this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+    }
+
+    /**
+     * Create the adapter's objects. Runs once — either on startup or, if the
+     * controller was unreachable then, on the first successful poll.
+     *
+     * @param data the current controller state used to derive the objects
+     */
+    private async bootstrapObjects(data: GetStateData): Promise<void> {
+        if (this._objectsCreated) {
+            return;
+        }
+        this.log.debug(`Initially setting adapter objects`);
+        await this.setSysInfoObjectsNotExists(data.sysInfo);
+        await this.setStateDataObjectsNotExists(data.objects);
+        this._objectsCreated = true;
     }
 
     // Is called when adapter shuts down - callback has to be called under any circumstances!

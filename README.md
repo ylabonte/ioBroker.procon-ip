@@ -103,6 +103,15 @@ If you want to support this adapter or say thank you, you can:
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 144px !important;" >](https://www.buymeacoffee.com/ylabonte)
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+
+- **Fixed relay and DMX switching**, which had silently stopped working since 1.8.0's move to the ProCon.IP 2.x library: the controller accepted a write with `200 OK` but ignored it. Updated the library to 2.1.1, which sends the exact HTTP request format the controller's firmware requires. Reads were never affected.
+- Resilient startup: the adapter now comes up and keeps polling until the controller becomes reachable, instead of staying inactive when the controller was offline at boot time.
+- Fixed a corner case in the forced-update handling that could keep a relay flagged for updates.
+- Aligned the admin configuration defaults with the adapter's effective runtime defaults and fixed a help-text typo.
+- Maintenance: fixed the unit-test runner so tests actually execute, trimmed the CI test matrix, bumped CI actions (checkout/codeql), and pinned `@types/node` to the supported Node baseline.
+
 ### 1.8.0 (2026-08-22)
 
 - Raised the minimum Node.js version to 22 (Node 20 is end-of-life).
