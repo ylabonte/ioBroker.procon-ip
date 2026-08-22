@@ -142,6 +142,8 @@
     "tier": 2,
     "connectionType": "local",
     "dataSource": "poll",
+    "encryptedNative": ["password", "username"],
+    "protectedNative": ["password", "username"],
     "compact": true,
     "adminUI": {
       "config": "json"
