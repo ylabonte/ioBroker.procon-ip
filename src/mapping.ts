@@ -314,3 +314,32 @@ export function relayOnOffStateCommon(
 export function relayTimerStateCommon(obj: GetStateDataObject): ioBroker.StateCommon {
     return { name: obj.label, type: 'number', role: 'value.interval', read: false, write: true };
 }
+
+/**
+ * `common` for a single DMX channel: a writable 8-bit dimmer (0 = off).
+ *
+ * @param name the channel name, e.g. `CH01`.
+ * @returns the writable numeric dimmer `common` (0–255).
+ */
+export function dmxChannelStateCommon(name: string): ioBroker.StateCommon {
+    return { name, type: 'number', role: 'level.dimmer', read: true, write: true, min: 0, max: 255 };
+}
+
+/**
+ * The 0-based DMX channel index encoded in a `…dmx.CH<nn>` state id, or `null`
+ * when the id is not a DMX channel. `CH01` → 0 … `CH16` → 15.
+ *
+ * @param id the full state id whose change was observed.
+ * @returns the 0-based channel index, or `null`.
+ */
+export function dmxChannelIndexFromId(id: string): number | null {
+    const match = /\.dmx\.CH(\d{2})$/.exec(id);
+    if (!match) {
+        return null;
+    }
+    const oneBased = Number(match[1]);
+    if (!Number.isInteger(oneBased) || oneBased < 1 || oneBased > 16) {
+        return null;
+    }
+    return oneBased - 1;
+}

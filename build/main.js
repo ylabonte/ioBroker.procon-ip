@@ -27,6 +27,7 @@ var import_mapping = require("./mapping");
 var import_command_handler = require("./command-handler");
 var import_object_provisioner = require("./object-provisioner");
 var import_state_publisher = require("./state-publisher");
+var import_dmx_controller = require("./dmx-controller");
 class ProconIp extends import_adapter_core.Adapter {
   _relayDataInterpreter;
   _getStateService;
@@ -36,6 +37,7 @@ class ProconIp extends import_adapter_core.Adapter {
   _commandHandler;
   _objectProvisioner;
   _statePublisher;
+  _dmxController;
   _forceUpdate;
   _stateData;
   _bootstrapped = false;
@@ -109,6 +111,20 @@ class ProconIp extends import_adapter_core.Adapter {
       relayDataInterpreter: this._relayDataInterpreter,
       isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled()
     });
+    if (this.config.dmxEnabled) {
+      this._dmxController = new import_dmx_controller.DmxController({
+        log: this.log,
+        namespace: this.namespace,
+        getDmxService: new import_procon_ip.GetDmxService(serviceConfig, this.log),
+        dmxService: new import_procon_ip.DmxService(serviceConfig, this.log),
+        setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
+        ackCommand: (id, value) => {
+          void this.setState(id, value, true).catch(() => {
+          });
+        },
+        now: () => Date.now()
+      });
+    }
     this.log.debug(`GetStateService url: ${this._getStateService.url}`);
     this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
     try {
@@ -162,6 +178,9 @@ class ProconIp extends import_adapter_core.Adapter {
         this.log.silly(`Updating data object for next comparison`);
         this._stateData = data;
         this._bootstrapped = true;
+        if (this._dmxController) {
+          await this._dmxController.poll();
+        }
         this.setStateChangedAsync("info.connection", true, true).catch(() => {
         });
       },
@@ -181,6 +200,9 @@ class ProconIp extends import_adapter_core.Adapter {
         this.subscribeStates(`${category}.*.${suffix}`);
       }
     }
+    if (this.config.dmxEnabled) {
+      this.subscribeStates("dmx.*");
+    }
   }
   /**
    * Create the adapter's objects. Runs once — either on startup or, if the
@@ -195,6 +217,9 @@ class ProconIp extends import_adapter_core.Adapter {
     this.log.debug(`Initially setting adapter objects`);
     await this._objectProvisioner.provisionSysInfo(data.sysInfo);
     await this._objectProvisioner.provisionStateData(data.objects);
+    if (this.config.dmxEnabled) {
+      await this._objectProvisioner.provisionDmx();
+    }
     this._objectsCreated = true;
   }
   // Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -212,11 +237,18 @@ class ProconIp extends import_adapter_core.Adapter {
   }
   // Is called if a subscribed state changes
   onStateChange(id, state) {
+    var _a;
     if (!state) {
       this.log.info(`state ${id} deleted`);
       return;
     }
     if (state.ack) {
+      return;
+    }
+    if ((_a = this._dmxController) == null ? void 0 : _a.isDmxChannel(id)) {
+      this._dmxController.handleWrite(id, state.val).catch((e) => {
+        this.log.error(`Error on DMX write (${id}): ${e}`);
+      });
       return;
     }
     this._commandHandler.dispatch(id, state);

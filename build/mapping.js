@@ -23,6 +23,8 @@ __export(mapping_exports, {
   buildServiceConfig: () => buildServiceConfig,
   classifyCommand: () => classifyCommand,
   dataFieldStateCommon: () => dataFieldStateCommon,
+  dmxChannelIndexFromId: () => dmxChannelIndexFromId,
+  dmxChannelStateCommon: () => dmxChannelStateCommon,
   errorMessage: () => errorMessage,
   isExternalRelay: () => isExternalRelay,
   isLightLabel: () => isLightLabel,
@@ -158,6 +160,20 @@ function relayOnOffStateCommon(obj, isLight, isDosageRelay) {
 function relayTimerStateCommon(obj) {
   return { name: obj.label, type: "number", role: "value.interval", read: false, write: true };
 }
+function dmxChannelStateCommon(name) {
+  return { name, type: "number", role: "level.dimmer", read: true, write: true, min: 0, max: 255 };
+}
+function dmxChannelIndexFromId(id) {
+  const match = /\.dmx\.CH(\d{2})$/.exec(id);
+  if (!match) {
+    return null;
+  }
+  const oneBased = Number(match[1]);
+  if (!Number.isInteger(oneBased) || oneBased < 1 || oneBased > 16) {
+    return null;
+  }
+  return oneBased - 1;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   booleanFlagStateCommon,
@@ -165,6 +181,8 @@ function relayTimerStateCommon(obj) {
   buildServiceConfig,
   classifyCommand,
   dataFieldStateCommon,
+  dmxChannelIndexFromId,
+  dmxChannelStateCommon,
   errorMessage,
   isExternalRelay,
   isLightLabel,

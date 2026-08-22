@@ -7,11 +7,14 @@ import {
     RelayDataInterpreter,
     GetStateData,
     SetStateService,
+    GetDmxService,
+    DmxService,
 } from 'procon-ip';
 import { buildServiceConfig, errorMessage, isValidURL, shouldUpdateState } from './mapping';
 import { CommandHandler } from './command-handler';
 import { ObjectProvisioner } from './object-provisioner';
 import { StatePublisher } from './state-publisher';
+import { DmxController } from './dmx-controller';
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -25,6 +28,7 @@ declare global {
             updateInterval: number;
             requestTimeout: number;
             errorTolerance: number;
+            dmxEnabled: boolean;
         }
     }
 }
@@ -43,6 +47,7 @@ export class ProconIp extends Adapter {
     private _commandHandler!: CommandHandler;
     private _objectProvisioner!: ObjectProvisioner;
     private _statePublisher!: StatePublisher;
+    private _dmxController?: DmxController;
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
@@ -122,6 +127,19 @@ export class ProconIp extends Adapter {
             relayDataInterpreter: this._relayDataInterpreter,
             isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled(),
         });
+        if (this.config.dmxEnabled) {
+            this._dmxController = new DmxController({
+                log: this.log,
+                namespace: this.namespace,
+                getDmxService: new GetDmxService(serviceConfig, this.log),
+                dmxService: new DmxService(serviceConfig, this.log),
+                setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
+                ackCommand: (id, value) => {
+                    void this.setState(id, value, true).catch(() => {});
+                },
+                now: () => Date.now(),
+            });
+        }
 
         this.log.debug(`GetStateService url: ${this._getStateService.url}`);
         this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
@@ -200,6 +218,9 @@ export class ProconIp extends Adapter {
                 this.log.silly(`Updating data object for next comparison`);
                 this._stateData = data;
                 this._bootstrapped = true;
+                if (this._dmxController) {
+                    await this._dmxController.poll();
+                }
                 this.setStateChangedAsync('info.connection', true, true).catch(() => {});
             },
             (e: unknown) => {
@@ -225,6 +246,9 @@ export class ProconIp extends Adapter {
                 this.subscribeStates(`${category}.*.${suffix}`);
             }
         }
+        if (this.config.dmxEnabled) {
+            this.subscribeStates('dmx.*');
+        }
     }
 
     /**
@@ -240,6 +264,9 @@ export class ProconIp extends Adapter {
         this.log.debug(`Initially setting adapter objects`);
         await this._objectProvisioner.provisionSysInfo(data.sysInfo);
         await this._objectProvisioner.provisionStateData(data.objects);
+        if (this.config.dmxEnabled) {
+            await this._objectProvisioner.provisionDmx();
+        }
         this._objectsCreated = true;
     }
 
@@ -265,6 +292,13 @@ export class ProconIp extends Adapter {
         }
         if (state.ack) {
             // The state is already acknowledged -> no need to change anything
+            return;
+        }
+
+        if (this._dmxController?.isDmxChannel(id)) {
+            this._dmxController.handleWrite(id, state.val as number).catch(e => {
+                this.log.error(`Error on DMX write (${id}): ${e}`);
+            });
             return;
         }
 

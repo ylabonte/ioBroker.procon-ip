@@ -106,6 +106,21 @@ class ObjectProvisioner {
     });
   }
   /**
+   * Create/heal the `dmx` channel and its 16 writable channel states
+   * (`dmx.CH01` … `dmx.CH16`). Only called when DMX is enabled in the config.
+   */
+  async provisionDmx() {
+    await this.provision(this.id("dmx"), { type: "channel", common: { name: "DMX512" }, native: {} });
+    for (let i = 0; i < 16; i++) {
+      const name = `CH${String(i + 1).padStart(2, "0")}`;
+      await this.provision(this.id("dmx", name), {
+        type: "state",
+        common: (0, import_mapping.dmxChannelStateCommon)(name),
+        native: { dmxChannelIndex: i }
+      });
+    }
+  }
+  /**
    * Create/heal a channel per category and the states for each data object.
    *
    * @param objects the controller data objects.

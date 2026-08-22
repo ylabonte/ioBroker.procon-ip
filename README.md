@@ -103,6 +103,15 @@ If you want to support this adapter or say thank you, you can:
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 144px !important;" >](https://www.buymeacoffee.com/ylabonte)
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+
+- **DMX512 lighting support (opt-in).** Enable "DMX512 channels" in the adapter settings to expose the controller's 16 DMX channels as writable 0–255 dimmer states (`dmx.CH01` … `dmx.CH16`).
+- **Self-healing object definitions.** Objects are now updated on upgrade (via `extendObject`, versioned), so improved roles/types reach existing installations — while your custom object names are preserved.
+- **Fewer redundant events.** State values are written only when they actually change, and relay/dosage/timer commands are acknowledged immediately once the controller confirms them.
+- Subscriptions are narrowed to the writable command states, and the boolean status flags now use the `indicator` role.
+- Large internal refactor for testability: the monolithic adapter was split into a thin shell plus focused, unit-tested modules with a CI coverage gate. No functional change from this part.
+
 ### 1.8.1 (2026-08-22)
 
 - **Fixed relay and DMX switching**, which had silently stopped working since 1.8.0's move to the ProCon.IP 2.x library: the controller accepted a write with `200 OK` but ignored it. Updated the library to 2.1.1, which sends the exact HTTP request format the controller's firmware requires. Reads were never affected.

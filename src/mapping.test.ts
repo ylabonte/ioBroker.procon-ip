@@ -24,6 +24,8 @@ import {
     relayAutoStateCommon,
     relayOnOffStateCommon,
     relayTimerStateCommon,
+    dmxChannelStateCommon,
+    dmxChannelIndexFromId,
 } from './mapping';
 
 // Build a GetStateDataObject-shaped fixture for the `common` builders.
@@ -315,5 +317,32 @@ describe('mapping.relayTimerStateCommon', () => {
             read: false,
             write: true,
         });
+    });
+});
+
+describe('mapping.dmxChannelStateCommon', () => {
+    it('is a writable 0-255 dimmer named after the channel', () => {
+        expect(dmxChannelStateCommon('CH03')).to.deep.equal({
+            name: 'CH03',
+            type: 'number',
+            role: 'level.dimmer',
+            read: true,
+            write: true,
+            min: 0,
+            max: 255,
+        });
+    });
+});
+
+describe('mapping.dmxChannelIndexFromId', () => {
+    it('maps CH01..CH16 to 0-based indices', () => {
+        expect(dmxChannelIndexFromId('procon-ip.0.dmx.CH01')).to.equal(0);
+        expect(dmxChannelIndexFromId('procon-ip.0.dmx.CH16')).to.equal(15);
+    });
+    it('returns null for non-DMX ids and out-of-range channels', () => {
+        expect(dmxChannelIndexFromId('procon-ip.0.relays.2.onOff')).to.be.null;
+        expect(dmxChannelIndexFromId('procon-ip.0.dmx.CH00')).to.be.null;
+        expect(dmxChannelIndexFromId('procon-ip.0.dmx.CH17')).to.be.null;
+        expect(dmxChannelIndexFromId('procon-ip.0.dmx.CH1')).to.be.null;
     });
 });

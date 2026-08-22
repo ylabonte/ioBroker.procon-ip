@@ -173,3 +173,15 @@ describe('ObjectProvisioner relay objects', () => {
         expect(idsFrom(h.extendObject).some(i => i.endsWith('.auto'))).to.be.false;
     });
 });
+
+describe('ObjectProvisioner.provisionDmx', () => {
+    it('creates the dmx channel and the 16 channel states (CH01..CH16)', async () => {
+        const h = harness();
+        await h.provisioner.provisionDmx();
+        const ids = idsFrom(h.extendObject);
+        expect(ids).to.include('procon-ip.0.dmx');
+        expect(ids).to.include('procon-ip.0.dmx.CH01');
+        expect(ids).to.include('procon-ip.0.dmx.CH16');
+        expect(ids.filter(i => /\.dmx\.CH\d{2}$/.test(i))).to.have.lengthOf(16);
+    });
+});
