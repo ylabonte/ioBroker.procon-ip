@@ -13,15 +13,14 @@ import {
 } from 'procon-ip';
 import {
     buildServiceConfig,
-    classifyCommand,
     errorMessage,
     isLightLabel,
     isTemperatureCategory,
     isValidURL,
     relayControlId,
-    relayTimerId,
     shouldUpdateState,
 } from './mapping';
+import { CommandHandler } from './command-handler';
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -50,6 +49,7 @@ export class ProconIp extends Adapter {
     private _setStateService!: SetStateService;
     private _usrcfgCgiService!: UsrcfgCgiService;
     private _commandService!: CommandService;
+    private _commandHandler!: CommandHandler;
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
@@ -100,6 +100,16 @@ export class ProconIp extends Adapter {
             this._relayDataInterpreter,
         );
         this._commandService = new CommandService(serviceConfig, this.log);
+        this._commandHandler = new CommandHandler({
+            log: this.log,
+            getObject: id => this.getObjectAsync(id),
+            getState: id => this.getStateAsync(id),
+            getStateData: () => this._stateData,
+            markForceUpdate: id => this._forceUpdate.push(id),
+            usrcfgCgiService: this._usrcfgCgiService,
+            commandService: this._commandService,
+            setStateService: this._setStateService,
+        });
 
         this.log.debug(`GetStateService url: ${this._getStateService.url}`);
         this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
@@ -251,120 +261,7 @@ export class ProconIp extends Adapter {
             return;
         }
 
-        switch (classifyCommand(id)) {
-            case 'auto':
-                this.relayToggleAuto(id, state).catch(e => {
-                    this.log.error(`Error on relay toggle (${id}): ${e}`);
-                });
-                break;
-            case 'onOff':
-                this.relayToggleOnOff(id, state).catch(e => {
-                    this.log.error(`Error on relay toggle (${id}): ${e}`);
-                });
-                break;
-            case 'dosageTimer':
-                this.setDosageTimer(id, state).catch(e => {
-                    this.log.error(`Error on manual dosage (${id}): ${e}`);
-                });
-                break;
-            case 'timer':
-                this.setRelayTimer(id, state).catch(e => {
-                    this.log.error(`Error on relay timer (${id}): ${e}`);
-                });
-                break;
-        }
-    }
-
-    private async relayToggleAuto(objectId: string, state: ioBroker.State): Promise<void> {
-        const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, '.onOff'));
-        if (!onOffState) {
-            throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
-        }
-
-        const obj = await this.getObjectAsync(objectId);
-        if (!obj) {
-            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-        }
-
-        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-        this._forceUpdate.push(getStateDataObject.id);
-        try {
-            if (state.val) {
-                this.log.info(`Switching ${obj.native.label}: auto`);
-                return this._usrcfgCgiService.setAuto(getStateDataObject);
-            } else if (onOffState.val) {
-                this.log.info(`Switching ${obj.native.label}: on`);
-                return this._usrcfgCgiService.setOn(getStateDataObject);
-            }
-            this.log.info(`Switching ${obj.native.label}: off`);
-            return this._usrcfgCgiService.setOff(getStateDataObject);
-        } catch (e: unknown) {
-            this.log.error(`Error on switching operation: ${errorMessage(e)}`);
-            return;
-        }
-    }
-
-    private async relayToggleOnOff(objectId: string, state: ioBroker.State): Promise<void> {
-        const obj = await this.getObjectAsync(objectId);
-        if (!obj) {
-            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-        }
-
-        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-        this._forceUpdate.push(getStateDataObject.id);
-        try {
-            if (state.val) {
-                this.log.info(`Switching ${obj.native.label}: on`);
-                await this._usrcfgCgiService.setOn(getStateDataObject);
-            } else {
-                this.log.info(`Switching ${obj.native.label}: off`);
-                await this._usrcfgCgiService.setOff(getStateDataObject);
-            }
-        } catch (e: unknown) {
-            this.log.error(`Error on switching operation: ${errorMessage(e)}`);
-        }
-    }
-
-    private async setDosageTimer(objectId: string, state: ioBroker.State): Promise<void> {
-        const obj = await this.getObjectAsync(objectId);
-        if (!obj) {
-            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-        }
-
-        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-        const relayId = relayControlId(getStateDataObject);
-        this._forceUpdate.push(getStateDataObject.id);
-        try {
-            const stateValNumber = state.val as number;
-            if (relayId === this._stateData.getChlorineDosageControlId()) {
-                await this._commandService.setChlorineDosage(stateValNumber);
-            } else if (relayId === this._stateData.getPhMinusDosageControlId()) {
-                await this._commandService.setPhMinusDosage(stateValNumber);
-            } else if (relayId === this._stateData.getPhPlusDosageControlId()) {
-                await this._commandService.setPhPlusDosage(stateValNumber);
-            }
-            this.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
-        } catch (e: unknown) {
-            this.log.error(`Error setting dosage timer: ${errorMessage(e)}`);
-        }
-    }
-
-    private async setRelayTimer(objectId: string, state: ioBroker.State): Promise<void> {
-        const obj = await this.getObjectAsync(objectId);
-        if (!obj) {
-            throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-        }
-
-        const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-        const relayId = relayTimerId(getStateDataObject);
-        this._forceUpdate.push(getStateDataObject.id);
-        try {
-            const stateValNumber = state.val as number;
-            await this._setStateService.setTimer(relayId, stateValNumber);
-            this.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
-        } catch (e: unknown) {
-            this.log.error(`Error setting relay timer: ${errorMessage(e)}`);
-        }
+        this._commandHandler.dispatch(id, state);
     }
 
     private updateAdvancedSysInfoStates(sysInfo: GetStateDataSysInfo): void {

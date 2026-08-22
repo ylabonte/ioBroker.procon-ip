@@ -24,12 +24,14 @@ module.exports = __toCommonJS(main_exports);
 var import_adapter_core = require("@iobroker/adapter-core");
 var import_procon_ip = require("procon-ip");
 var import_mapping = require("./mapping");
+var import_command_handler = require("./command-handler");
 class ProconIp extends import_adapter_core.Adapter {
   _relayDataInterpreter;
   _getStateService;
   _setStateService;
   _usrcfgCgiService;
   _commandService;
+  _commandHandler;
   _forceUpdate;
   _stateData;
   _bootstrapped = false;
@@ -73,6 +75,16 @@ class ProconIp extends import_adapter_core.Adapter {
       this._relayDataInterpreter
     );
     this._commandService = new import_procon_ip.CommandService(serviceConfig, this.log);
+    this._commandHandler = new import_command_handler.CommandHandler({
+      log: this.log,
+      getObject: (id) => this.getObjectAsync(id),
+      getState: (id) => this.getStateAsync(id),
+      getStateData: () => this._stateData,
+      markForceUpdate: (id) => this._forceUpdate.push(id),
+      usrcfgCgiService: this._usrcfgCgiService,
+      commandService: this._commandService,
+      setStateService: this._setStateService
+    });
     this.log.debug(`GetStateService url: ${this._getStateService.url}`);
     this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
     try {
@@ -191,111 +203,7 @@ class ProconIp extends import_adapter_core.Adapter {
     if (state.ack) {
       return;
     }
-    switch ((0, import_mapping.classifyCommand)(id)) {
-      case "auto":
-        this.relayToggleAuto(id, state).catch((e) => {
-          this.log.error(`Error on relay toggle (${id}): ${e}`);
-        });
-        break;
-      case "onOff":
-        this.relayToggleOnOff(id, state).catch((e) => {
-          this.log.error(`Error on relay toggle (${id}): ${e}`);
-        });
-        break;
-      case "dosageTimer":
-        this.setDosageTimer(id, state).catch((e) => {
-          this.log.error(`Error on manual dosage (${id}): ${e}`);
-        });
-        break;
-      case "timer":
-        this.setRelayTimer(id, state).catch((e) => {
-          this.log.error(`Error on relay timer (${id}): ${e}`);
-        });
-        break;
-    }
-  }
-  async relayToggleAuto(objectId, state) {
-    const onOffState = await this.getStateAsync(objectId.replace(/\.auto$/, ".onOff"));
-    if (!onOffState) {
-      throw new Error(`Cannot get onOff state to toggle '${objectId}'`);
-    }
-    const obj = await this.getObjectAsync(objectId);
-    if (!obj) {
-      throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-    }
-    const getStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-    this._forceUpdate.push(getStateDataObject.id);
-    try {
-      if (state.val) {
-        this.log.info(`Switching ${obj.native.label}: auto`);
-        return this._usrcfgCgiService.setAuto(getStateDataObject);
-      } else if (onOffState.val) {
-        this.log.info(`Switching ${obj.native.label}: on`);
-        return this._usrcfgCgiService.setOn(getStateDataObject);
-      }
-      this.log.info(`Switching ${obj.native.label}: off`);
-      return this._usrcfgCgiService.setOff(getStateDataObject);
-    } catch (e) {
-      this.log.error(`Error on switching operation: ${(0, import_mapping.errorMessage)(e)}`);
-      return;
-    }
-  }
-  async relayToggleOnOff(objectId, state) {
-    const obj = await this.getObjectAsync(objectId);
-    if (!obj) {
-      throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-    }
-    const getStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-    this._forceUpdate.push(getStateDataObject.id);
-    try {
-      if (state.val) {
-        this.log.info(`Switching ${obj.native.label}: on`);
-        await this._usrcfgCgiService.setOn(getStateDataObject);
-      } else {
-        this.log.info(`Switching ${obj.native.label}: off`);
-        await this._usrcfgCgiService.setOff(getStateDataObject);
-      }
-    } catch (e) {
-      this.log.error(`Error on switching operation: ${(0, import_mapping.errorMessage)(e)}`);
-    }
-  }
-  async setDosageTimer(objectId, state) {
-    const obj = await this.getObjectAsync(objectId);
-    if (!obj) {
-      throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-    }
-    const getStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-    const relayId = (0, import_mapping.relayControlId)(getStateDataObject);
-    this._forceUpdate.push(getStateDataObject.id);
-    try {
-      const stateValNumber = state.val;
-      if (relayId === this._stateData.getChlorineDosageControlId()) {
-        await this._commandService.setChlorineDosage(stateValNumber);
-      } else if (relayId === this._stateData.getPhMinusDosageControlId()) {
-        await this._commandService.setPhMinusDosage(stateValNumber);
-      } else if (relayId === this._stateData.getPhPlusDosageControlId()) {
-        await this._commandService.setPhPlusDosage(stateValNumber);
-      }
-      this.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
-    } catch (e) {
-      this.log.error(`Error setting dosage timer: ${(0, import_mapping.errorMessage)(e)}`);
-    }
-  }
-  async setRelayTimer(objectId, state) {
-    const obj = await this.getObjectAsync(objectId);
-    if (!obj) {
-      throw new Error(`Cannot handle state change for non-existent object '${objectId}'`);
-    }
-    const getStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-    const relayId = (0, import_mapping.relayTimerId)(getStateDataObject);
-    this._forceUpdate.push(getStateDataObject.id);
-    try {
-      const stateValNumber = state.val;
-      await this._setStateService.setTimer(relayId, stateValNumber);
-      this.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
-    } catch (e) {
-      this.log.error(`Error setting relay timer: ${(0, import_mapping.errorMessage)(e)}`);
-    }
+    this._commandHandler.dispatch(id, state);
   }
   updateAdvancedSysInfoStates(sysInfo) {
     if (!this._bootstrapped || sysInfo.dosageControl !== this._stateData.sysInfo.dosageControl) {
