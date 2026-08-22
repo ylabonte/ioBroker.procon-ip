@@ -1,6 +1,5 @@
 import { Adapter, AdapterOptions } from '@iobroker/adapter-core';
 import {
-    IServiceConfig,
     IGetStateServiceConfig,
     GetStateDataSysInfo,
     GetStateDataObject,
@@ -12,6 +11,17 @@ import {
     GetStateData,
     SetStateService,
 } from 'procon-ip';
+import {
+    buildServiceConfig,
+    classifyCommand,
+    errorMessage,
+    isLightLabel,
+    isTemperatureCategory,
+    isValidURL,
+    relayControlId,
+    relayTimerId,
+    shouldUpdateState,
+} from './mapping';
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -29,7 +39,12 @@ declare global {
     }
 }
 
-class ProconIp extends Adapter {
+/**
+ * ProCon.IP pool-controller adapter: polls the controller's state into ioBroker
+ * objects/states and relays user-driven relay, dosage and timer commands back to
+ * the controller. Pure, adapter-independent decision logic lives in `./mapping`.
+ */
+export class ProconIp extends Adapter {
     private _relayDataInterpreter!: RelayDataInterpreter;
     private _getStateService!: GetStateService;
     private _setStateService!: SetStateService;
@@ -42,6 +57,10 @@ class ProconIp extends Adapter {
     private _objectStateFields = ['value', 'category', 'label', 'unit', 'displayValue', 'active'];
     private _timeout: NodeJS.Timeout | null = null;
 
+    /**
+     * @param options adapter options forwarded to the ioBroker `Adapter` base;
+     *   the adapter name is always `procon-ip`.
+     */
     public constructor(options: Partial<AdapterOptions> = {}) {
         super({
             ...options,
@@ -62,7 +81,7 @@ class ProconIp extends Adapter {
         let connectErrorLogged = false;
         await this.setState('info.connection', false, true);
 
-        if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
+        if (this.config.controllerUrl.length < 1 || !isValidURL(this.config.controllerUrl)) {
             this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
             return;
         }
@@ -70,12 +89,7 @@ class ProconIp extends Adapter {
         // procon-ip 2.x reads `controllerUrl` (inherited from this.config) and
         // `timeout`; the old `baseUrl` input is no longer consumed (the service
         // derives its base URL from controllerUrl), so it is not set here.
-        const serviceConfig = Object.defineProperties(Object.create(this.config), {
-            timeout: {
-                value: this.config.requestTimeout,
-                writable: true,
-            },
-        }) as IServiceConfig;
+        const serviceConfig = buildServiceConfig(this.config);
         this._relayDataInterpreter = new RelayDataInterpreter(this.log);
         this._getStateService = new GetStateService(serviceConfig as IGetStateServiceConfig, this.log);
         this._setStateService = new SetStateService(serviceConfig, this.log);
@@ -145,18 +159,18 @@ class ProconIp extends Adapter {
                         // Only update when value has changed or update is forced (on state change)
                         const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
                         if (
-                            !this._bootstrapped ||
-                            forceObjStateUpdate >= 0 ||
-                            (previous && previous.value != obj.value)
+                            shouldUpdateState({
+                                bootstrapped: this._bootstrapped,
+                                forced: forceObjStateUpdate >= 0,
+                                hasPrevious: !!previous,
+                                previousValue: previous?.value,
+                                currentValue: obj.value,
+                            })
                         ) {
                             if (previous && previous.label != obj.label) {
                                 this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
                                 this.updateObjectCommonName(obj).catch((e: unknown) => {
-                                    if (e instanceof Error) {
-                                        this.log.error(`Failed fixing label for '${obj.label}': ${e.message}`);
-                                    } else {
-                                        this.log.error(`Failed fixing label for '${obj.label}': ${String(e)}`);
-                                    }
+                                    this.log.error(`Failed fixing label for '${obj.label}': ${errorMessage(e)}`);
                                 });
                             }
                             this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
@@ -237,22 +251,27 @@ class ProconIp extends Adapter {
             return;
         }
 
-        if (id.endsWith('.auto')) {
-            this.relayToggleAuto(id, state).catch(e => {
-                this.log.error(`Error on relay toggle (${id}): ${e}`);
-            });
-        } else if (id.endsWith('.onOff')) {
-            this.relayToggleOnOff(id, state).catch(e => {
-                this.log.error(`Error on relay toggle (${id}): ${e}`);
-            });
-        } else if (id.endsWith('.dosageTimer')) {
-            this.setDosageTimer(id, state).catch(e => {
-                this.log.error(`Error on manual dosage (${id}): ${e}`);
-            });
-        } else if (id.endsWith('.timer')) {
-            this.setRelayTimer(id, state).catch(e => {
-                this.log.error(`Error on relay timer (${id}): ${e}`);
-            });
+        switch (classifyCommand(id)) {
+            case 'auto':
+                this.relayToggleAuto(id, state).catch(e => {
+                    this.log.error(`Error on relay toggle (${id}): ${e}`);
+                });
+                break;
+            case 'onOff':
+                this.relayToggleOnOff(id, state).catch(e => {
+                    this.log.error(`Error on relay toggle (${id}): ${e}`);
+                });
+                break;
+            case 'dosageTimer':
+                this.setDosageTimer(id, state).catch(e => {
+                    this.log.error(`Error on manual dosage (${id}): ${e}`);
+                });
+                break;
+            case 'timer':
+                this.setRelayTimer(id, state).catch(e => {
+                    this.log.error(`Error on relay timer (${id}): ${e}`);
+                });
+                break;
         }
     }
 
@@ -280,12 +299,7 @@ class ProconIp extends Adapter {
             this.log.info(`Switching ${obj.native.label}: off`);
             return this._usrcfgCgiService.setOff(getStateDataObject);
         } catch (e: unknown) {
-            if (e instanceof Error) {
-                this.log.error(`Error on switching operation: ${e.message}`);
-            } else {
-                this.log.error(`Error on switching operation: ${String(e)}`);
-            }
-
+            this.log.error(`Error on switching operation: ${errorMessage(e)}`);
             return;
         }
     }
@@ -307,11 +321,7 @@ class ProconIp extends Adapter {
                 await this._usrcfgCgiService.setOff(getStateDataObject);
             }
         } catch (e: unknown) {
-            if (e instanceof Error) {
-                this.log.error(`Error on switching operation: ${e.message}`);
-            } else {
-                this.log.error(`Error on switching operation: ${String(e)}`);
-            }
+            this.log.error(`Error on switching operation: ${errorMessage(e)}`);
         }
     }
 
@@ -322,9 +332,7 @@ class ProconIp extends Adapter {
         }
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-        const relayId =
-            getStateDataObject.categoryId +
-            (getStateDataObject.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 8 : 0);
+        const relayId = relayControlId(getStateDataObject);
         this._forceUpdate.push(getStateDataObject.id);
         try {
             const stateValNumber = state.val as number;
@@ -337,11 +345,7 @@ class ProconIp extends Adapter {
             }
             this.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
         } catch (e: unknown) {
-            if (e instanceof Error) {
-                this.log.error(`Error setting dosage timer: ${e.message}`);
-            } else {
-                this.log.error(`Error setting dosage timer: ${String(e)}`);
-            }
+            this.log.error(`Error setting dosage timer: ${errorMessage(e)}`);
         }
     }
 
@@ -352,20 +356,14 @@ class ProconIp extends Adapter {
         }
 
         const getStateDataObject: GetStateDataObject = this._stateData.getDataObject(Number(obj.native.id));
-        const relayId =
-            getStateDataObject.categoryId +
-            (getStateDataObject.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 9 : 1);
+        const relayId = relayTimerId(getStateDataObject);
         this._forceUpdate.push(getStateDataObject.id);
         try {
             const stateValNumber = state.val as number;
             await this._setStateService.setTimer(relayId, stateValNumber);
             this.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
         } catch (e: unknown) {
-            if (e instanceof Error) {
-                this.log.error(`Error setting relay timer: ${e.message}`);
-            } else {
-                this.log.error(`Error setting relay timer: ${String(e)}`);
-            }
+            this.log.error(`Error setting relay timer: ${errorMessage(e)}`);
         }
     }
 
@@ -518,7 +516,7 @@ class ProconIp extends Adapter {
 
             switch (field) {
                 case 'value':
-                    if (obj.category == String(GetStateCategory.TEMPERATURES)) {
+                    if (isTemperatureCategory(obj.category)) {
                         common.role = 'value.temperature';
                         common.unit = `°${obj.unit}`;
                         if (obj.active) {
@@ -553,11 +551,7 @@ class ProconIp extends Adapter {
                     },
                 );
             } catch (e: unknown) {
-                if (e instanceof Error) {
-                    this.log.error(`Failed setting object '${obj.label}': ${e.message}`);
-                } else {
-                    this.log.error(`Failed setting object '${obj.label}': ${String(e)}`);
-                }
+                this.log.error(`Failed setting object '${obj.label}': ${errorMessage(e)}`);
             }
         }
 
@@ -571,8 +565,8 @@ class ProconIp extends Adapter {
     }
 
     private async setRelayDataObject(obj: GetStateDataObject): Promise<void> {
-        const isLight = new RegExp('light|bulb|licht|leucht', 'i').test(obj.label);
-        const relayId = (obj.category === String(GetStateCategory.EXTERNAL_RELAYS) ? 8 : 0) + obj.categoryId;
+        const isLight = isLightLabel(obj.label);
+        const relayId = relayControlId(obj);
         const isDosageRelay = this._getStateService.data.isDosageControl(relayId);
         const commonAuto = {
             name: obj.label,
@@ -699,15 +693,6 @@ class ProconIp extends Adapter {
                 state.common.name = obj.label;
                 await this.setObject(state._id, state);
             }
-        }
-    }
-
-    private static isValidURL(url: string): boolean {
-        try {
-            new URL(url);
-            return true;
-        } catch {
-            return false;
         }
     }
 }
