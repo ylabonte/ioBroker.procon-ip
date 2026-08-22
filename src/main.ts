@@ -11,21 +11,9 @@ import {
     GetStateData,
     SetStateService,
 } from 'procon-ip';
-import {
-    booleanFlagStateCommon,
-    buildServiceConfig,
-    dataFieldStateCommon,
-    errorMessage,
-    isLightLabel,
-    isValidURL,
-    relayAutoStateCommon,
-    relayControlId,
-    relayOnOffStateCommon,
-    relayTimerStateCommon,
-    shouldUpdateState,
-    sysInfoStateCommon,
-} from './mapping';
+import { buildServiceConfig, errorMessage, isValidURL, shouldUpdateState } from './mapping';
 import { CommandHandler } from './command-handler';
+import { ObjectProvisioner } from './object-provisioner';
 
 // Augment the adapter.config object with the actual types
 declare global {
@@ -55,6 +43,7 @@ export class ProconIp extends Adapter {
     private _usrcfgCgiService!: UsrcfgCgiService;
     private _commandService!: CommandService;
     private _commandHandler!: CommandHandler;
+    private _objectProvisioner!: ObjectProvisioner;
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
@@ -114,6 +103,13 @@ export class ProconIp extends Adapter {
             usrcfgCgiService: this._usrcfgCgiService,
             commandService: this._commandService,
             setStateService: this._setStateService,
+        });
+        this._objectProvisioner = new ObjectProvisioner({
+            log: this.log,
+            namespace: this.namespace,
+            setObjectNotExists: async (id, obj) => this.setObjectNotExists(id, obj),
+            isDosageControl: relayId => this._getStateService.data.isDosageControl(relayId),
+            isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled(),
         });
 
         this.log.debug(`GetStateService url: ${this._getStateService.url}`);
@@ -233,8 +229,8 @@ export class ProconIp extends Adapter {
             return;
         }
         this.log.debug(`Initially setting adapter objects`);
-        await this.setSysInfoObjectsNotExists(data.sysInfo);
-        await this.setStateDataObjectsNotExists(data.objects);
+        await this._objectProvisioner.provisionSysInfo(data.sysInfo);
+        await this._objectProvisioner.provisionStateData(data.objects);
         this._objectsCreated = true;
     }
 
@@ -307,132 +303,6 @@ export class ProconIp extends Adapter {
                 this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.electrolysis': ${e}`);
             });
         }
-    }
-
-    private async setSysInfoObjectsNotExists(data: GetStateDataSysInfo): Promise<void> {
-        await this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
-            type: 'channel',
-            common: {
-                name: 'SysInfo',
-            },
-            native: {},
-        });
-        for (const sysInfo of data.toArrayOfObjects()) {
-            await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
-                type: 'state',
-                common: sysInfoStateCommon(sysInfo.key),
-                native: {},
-            });
-        }
-
-        await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, {
-            type: 'state',
-            common: booleanFlagStateCommon('pH+ enabled'),
-            native: {},
-        });
-
-        await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, {
-            type: 'state',
-            common: booleanFlagStateCommon('pH- enabled'),
-            native: {},
-        });
-
-        await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, {
-            type: 'state',
-            common: booleanFlagStateCommon('CL enabled'),
-            native: {},
-        });
-
-        await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.electrolysis`, {
-            type: 'state',
-            common: booleanFlagStateCommon('Electrolysis'),
-            native: {},
-        });
-    }
-
-    private async setStateDataObjectsNotExists(objects: GetStateDataObject[]): Promise<void> {
-        let lastObjCategory = '';
-        for (const obj of objects) {
-            if (lastObjCategory !== obj.category) {
-                await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}`, {
-                    type: 'channel',
-                    common: {
-                        name: obj.category,
-                    },
-                    native: {},
-                });
-                lastObjCategory = obj.category;
-            }
-            this.setDataObjectNotExists(obj).catch(e => {
-                this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
-            });
-        }
-    }
-
-    private async setDataObjectNotExists(obj: GetStateDataObject): Promise<void> {
-        await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
-            type: 'channel',
-            common: {
-                name: obj.label,
-            },
-            native: {},
-        });
-        for (const field of Object.keys(obj)) {
-            const common = dataFieldStateCommon(obj, field);
-            if (!common) {
-                continue;
-            }
-
-            try {
-                await this.setObjectNotExists(
-                    `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
-                    {
-                        type: 'state',
-                        common: common,
-                        native: obj,
-                    },
-                );
-            } catch (e: unknown) {
-                this.log.error(`Failed setting object '${obj.label}': ${errorMessage(e)}`);
-            }
-        }
-
-        if (
-            (obj.category as GetStateCategory) === GetStateCategory.RELAYS ||
-            ((obj.category as GetStateCategory) === GetStateCategory.EXTERNAL_RELAYS &&
-                this._stateData.sysInfo.isExtRelaysEnabled())
-        ) {
-            await this.setRelayDataObject(obj);
-        }
-    }
-
-    private async setRelayDataObject(obj: GetStateDataObject): Promise<void> {
-        const isLight = isLightLabel(obj.label);
-        const relayId = relayControlId(obj);
-        const isDosageRelay = this._getStateService.data.isDosageControl(relayId);
-
-        await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
-            type: 'state',
-            common: relayAutoStateCommon(obj, isLight),
-            native: obj,
-        });
-        await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
-            type: 'state',
-            common: relayOnOffStateCommon(obj, isLight, isDosageRelay),
-            native: obj,
-        });
-
-        // Dosage relays get a `.dosageTimer`, the rest a `.timer`; both states
-        // share the same numeric-interval definition.
-        const timerChannel = isDosageRelay ? 'dosageTimer' : 'timer';
-        await this.setObjectNotExists(
-            `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${timerChannel}`,
-            {
-                type: 'state',
-                common: relayTimerStateCommon(obj),
-                native: obj,
-            },
-        );
     }
 
     private setDataState(obj: GetStateDataObject): void {

@@ -25,6 +25,7 @@ var import_adapter_core = require("@iobroker/adapter-core");
 var import_procon_ip = require("procon-ip");
 var import_mapping = require("./mapping");
 var import_command_handler = require("./command-handler");
+var import_object_provisioner = require("./object-provisioner");
 class ProconIp extends import_adapter_core.Adapter {
   _relayDataInterpreter;
   _getStateService;
@@ -32,6 +33,7 @@ class ProconIp extends import_adapter_core.Adapter {
   _usrcfgCgiService;
   _commandService;
   _commandHandler;
+  _objectProvisioner;
   _forceUpdate;
   _stateData;
   _bootstrapped = false;
@@ -84,6 +86,13 @@ class ProconIp extends import_adapter_core.Adapter {
       usrcfgCgiService: this._usrcfgCgiService,
       commandService: this._commandService,
       setStateService: this._setStateService
+    });
+    this._objectProvisioner = new import_object_provisioner.ObjectProvisioner({
+      log: this.log,
+      namespace: this.namespace,
+      setObjectNotExists: async (id, obj) => this.setObjectNotExists(id, obj),
+      isDosageControl: (relayId) => this._getStateService.data.isDosageControl(relayId),
+      isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled()
     });
     this.log.debug(`GetStateService url: ${this._getStateService.url}`);
     this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
@@ -174,8 +183,8 @@ class ProconIp extends import_adapter_core.Adapter {
       return;
     }
     this.log.debug(`Initially setting adapter objects`);
-    await this.setSysInfoObjectsNotExists(data.sysInfo);
-    await this.setStateDataObjectsNotExists(data.objects);
+    await this._objectProvisioner.provisionSysInfo(data.sysInfo);
+    await this._objectProvisioner.provisionStateData(data.objects);
     this._objectsCreated = true;
   }
   // Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -243,114 +252,6 @@ class ProconIp extends import_adapter_core.Adapter {
         this.log.error(`Failed setting state for '${this.name}.${this.instance}.info.electrolysis': ${e}`);
       });
     }
-  }
-  async setSysInfoObjectsNotExists(data) {
-    await this.setObjectNotExists(`${this.name}.${this.instance}.info.system`, {
-      type: "channel",
-      common: {
-        name: "SysInfo"
-      },
-      native: {}
-    });
-    for (const sysInfo of data.toArrayOfObjects()) {
-      await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
-        type: "state",
-        common: (0, import_mapping.sysInfoStateCommon)(sysInfo.key),
-        native: {}
-      });
-    }
-    await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, {
-      type: "state",
-      common: (0, import_mapping.booleanFlagStateCommon)("pH+ enabled"),
-      native: {}
-    });
-    await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, {
-      type: "state",
-      common: (0, import_mapping.booleanFlagStateCommon)("pH- enabled"),
-      native: {}
-    });
-    await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, {
-      type: "state",
-      common: (0, import_mapping.booleanFlagStateCommon)("CL enabled"),
-      native: {}
-    });
-    await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.electrolysis`, {
-      type: "state",
-      common: (0, import_mapping.booleanFlagStateCommon)("Electrolysis"),
-      native: {}
-    });
-  }
-  async setStateDataObjectsNotExists(objects) {
-    let lastObjCategory = "";
-    for (const obj of objects) {
-      if (lastObjCategory !== obj.category) {
-        await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}`, {
-          type: "channel",
-          common: {
-            name: obj.category
-          },
-          native: {}
-        });
-        lastObjCategory = obj.category;
-      }
-      this.setDataObjectNotExists(obj).catch((e) => {
-        this.log.error(`Failed setting objects for '${obj.label}': ${e}`);
-      });
-    }
-  }
-  async setDataObjectNotExists(obj) {
-    await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}`, {
-      type: "channel",
-      common: {
-        name: obj.label
-      },
-      native: {}
-    });
-    for (const field of Object.keys(obj)) {
-      const common = (0, import_mapping.dataFieldStateCommon)(obj, field);
-      if (!common) {
-        continue;
-      }
-      try {
-        await this.setObjectNotExists(
-          `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${field}`,
-          {
-            type: "state",
-            common,
-            native: obj
-          }
-        );
-      } catch (e) {
-        this.log.error(`Failed setting object '${obj.label}': ${(0, import_mapping.errorMessage)(e)}`);
-      }
-    }
-    if (obj.category === import_procon_ip.GetStateCategory.RELAYS || obj.category === import_procon_ip.GetStateCategory.EXTERNAL_RELAYS && this._stateData.sysInfo.isExtRelaysEnabled()) {
-      await this.setRelayDataObject(obj);
-    }
-  }
-  async setRelayDataObject(obj) {
-    const isLight = (0, import_mapping.isLightLabel)(obj.label);
-    const relayId = (0, import_mapping.relayControlId)(obj);
-    const isDosageRelay = this._getStateService.data.isDosageControl(relayId);
-    await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
-      type: "state",
-      common: (0, import_mapping.relayAutoStateCommon)(obj, isLight),
-      native: obj
-    });
-    await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
-      type: "state",
-      common: (0, import_mapping.relayOnOffStateCommon)(obj, isLight, isDosageRelay),
-      native: obj
-    });
-    const timerChannel = isDosageRelay ? "dosageTimer" : "timer";
-    await this.setObjectNotExists(
-      `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${timerChannel}`,
-      {
-        type: "state",
-        common: (0, import_mapping.relayTimerStateCommon)(obj),
-        native: obj
-      }
-    );
   }
   setDataState(obj) {
     for (const field of Object.keys(obj).filter((field2) => this._objectStateFields.indexOf(field2) > -1)) {
