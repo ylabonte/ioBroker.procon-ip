@@ -25,6 +25,10 @@ admin/i18n/*/flat.txt
 # ci stuff
 iobroker-data/
 
+# ai agents
+.claude/settings.local.json
+.claude/worktrees/
+
 
 ########################################
 ##  _____                             ##
