@@ -18,18 +18,24 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var mapping_exports = {};
 __export(mapping_exports, {
+  booleanFlagStateCommon: () => booleanFlagStateCommon,
   buildId: () => buildId,
   buildServiceConfig: () => buildServiceConfig,
   classifyCommand: () => classifyCommand,
+  dataFieldStateCommon: () => dataFieldStateCommon,
   errorMessage: () => errorMessage,
   isExternalRelay: () => isExternalRelay,
   isLightLabel: () => isLightLabel,
   isRelayCategory: () => isRelayCategory,
   isTemperatureCategory: () => isTemperatureCategory,
   isValidURL: () => isValidURL,
+  relayAutoStateCommon: () => relayAutoStateCommon,
   relayControlId: () => relayControlId,
+  relayOnOffStateCommon: () => relayOnOffStateCommon,
   relayTimerId: () => relayTimerId,
-  shouldUpdateState: () => shouldUpdateState
+  relayTimerStateCommon: () => relayTimerStateCommon,
+  shouldUpdateState: () => shouldUpdateState,
+  sysInfoStateCommon: () => sysInfoStateCommon
 });
 module.exports = __toCommonJS(mapping_exports);
 var import_procon_ip = require("procon-ip");
@@ -91,19 +97,86 @@ function buildServiceConfig(config) {
     }
   });
 }
+function sysInfoStateCommon(key) {
+  return { name: key, type: "string", role: "state", read: true, write: false };
+}
+function booleanFlagStateCommon(name) {
+  return { name, type: "boolean", role: "state", read: true, write: false };
+}
+function dataFieldStateCommon(obj, field) {
+  const common = {
+    name: obj.label,
+    type: typeof obj[field],
+    role: "value",
+    read: true,
+    write: false
+  };
+  switch (field) {
+    case "value":
+      if (isTemperatureCategory(obj.category)) {
+        common.role = "value.temperature";
+        common.unit = `\xB0${obj.unit}`;
+        if (obj.active) {
+          common.smartName = { de: obj.label, en: obj.label, smartType: "THERMOSTAT" };
+        }
+      }
+      break;
+    case "category":
+    case "label":
+    case "unit":
+    case "displayValue":
+      common.role = "text";
+      break;
+    case "active":
+      common.role = "indicator";
+      break;
+    default:
+      return null;
+  }
+  return common;
+}
+function relayAutoStateCommon(obj, isLight) {
+  return {
+    name: obj.label,
+    type: "boolean",
+    role: "switch.mode.auto",
+    read: true,
+    write: true,
+    smartName: obj.active ? { de: `${obj.label} auto`, en: `${obj.label} auto`, smartType: isLight ? "LIGHT" : "SWITCH" } : {}
+  };
+}
+function relayOnOffStateCommon(obj, isLight, isDosageRelay) {
+  return {
+    name: obj.label,
+    type: "boolean",
+    role: isLight ? "switch.light" : "switch",
+    read: true,
+    write: !isDosageRelay,
+    smartName: obj.active && !isDosageRelay ? { de: obj.label, en: obj.label, smartType: isLight ? "LIGHT" : "SWITCH" } : {}
+  };
+}
+function relayTimerStateCommon(obj) {
+  return { name: obj.label, type: "number", role: "value.interval", read: false, write: true };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  booleanFlagStateCommon,
   buildId,
   buildServiceConfig,
   classifyCommand,
+  dataFieldStateCommon,
   errorMessage,
   isExternalRelay,
   isLightLabel,
   isRelayCategory,
   isTemperatureCategory,
   isValidURL,
+  relayAutoStateCommon,
   relayControlId,
+  relayOnOffStateCommon,
   relayTimerId,
-  shouldUpdateState
+  relayTimerStateCommon,
+  shouldUpdateState,
+  sysInfoStateCommon
 });
 //# sourceMappingURL=mapping.js.map

@@ -12,13 +12,18 @@ import {
     SetStateService,
 } from 'procon-ip';
 import {
+    booleanFlagStateCommon,
     buildServiceConfig,
+    dataFieldStateCommon,
     errorMessage,
     isLightLabel,
-    isTemperatureCategory,
     isValidURL,
+    relayAutoStateCommon,
     relayControlId,
+    relayOnOffStateCommon,
+    relayTimerStateCommon,
     shouldUpdateState,
+    sysInfoStateCommon,
 } from './mapping';
 import { CommandHandler } from './command-handler';
 
@@ -315,62 +320,32 @@ export class ProconIp extends Adapter {
         for (const sysInfo of data.toArrayOfObjects()) {
             await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
                 type: 'state',
-                common: {
-                    name: sysInfo.key,
-                    type: 'string',
-                    role: 'state',
-                    read: true,
-                    write: false,
-                },
+                common: sysInfoStateCommon(sysInfo.key),
                 native: {},
             });
         }
 
         await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, {
             type: 'state',
-            common: {
-                name: 'pH+ enabled',
-                type: 'boolean',
-                role: 'state',
-                read: true,
-                write: false,
-            },
+            common: booleanFlagStateCommon('pH+ enabled'),
             native: {},
         });
 
         await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, {
             type: 'state',
-            common: {
-                name: 'pH- enabled',
-                type: 'boolean',
-                role: 'state',
-                read: true,
-                write: false,
-            },
+            common: booleanFlagStateCommon('pH- enabled'),
             native: {},
         });
 
         await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, {
             type: 'state',
-            common: {
-                name: 'CL enabled',
-                type: 'boolean',
-                role: 'state',
-                read: true,
-                write: false,
-            },
+            common: booleanFlagStateCommon('CL enabled'),
             native: {},
         });
 
         await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.electrolysis`, {
             type: 'state',
-            common: {
-                name: 'Electrolysis',
-                type: 'boolean',
-                role: 'state',
-                read: true,
-                write: false,
-            },
+            common: booleanFlagStateCommon('Electrolysis'),
             native: {},
         });
     }
@@ -403,39 +378,9 @@ export class ProconIp extends Adapter {
             native: {},
         });
         for (const field of Object.keys(obj)) {
-            const common = {
-                name: obj.label,
-                type: typeof obj[field],
-                role: 'value',
-                read: true,
-                write: false,
-            } as ioBroker.StateCommon;
-
-            switch (field) {
-                case 'value':
-                    if (isTemperatureCategory(obj.category)) {
-                        common.role = 'value.temperature';
-                        common.unit = `°${obj.unit}`;
-                        if (obj.active) {
-                            common.smartName = {
-                                de: obj.label,
-                                en: obj.label,
-                                smartType: 'THERMOSTAT',
-                            };
-                        }
-                    }
-                    break;
-                case 'category':
-                case 'label':
-                case 'unit':
-                case 'displayValue':
-                    common.role = 'text';
-                    break;
-                case 'active':
-                    common.role = 'indicator';
-                    break;
-                default:
-                    continue;
+            const common = dataFieldStateCommon(obj, field);
+            if (!common) {
+                continue;
             }
 
             try {
@@ -465,79 +410,29 @@ export class ProconIp extends Adapter {
         const isLight = isLightLabel(obj.label);
         const relayId = relayControlId(obj);
         const isDosageRelay = this._getStateService.data.isDosageControl(relayId);
-        const commonAuto = {
-            name: obj.label,
-            type: 'boolean',
-            role: 'switch.mode.auto',
-            read: true,
-            write: true,
-            smartName: obj.active
-                ? {
-                      de: `${obj.label} auto`,
-                      en: `${obj.label} auto`,
-                      smartType: isLight ? 'LIGHT' : 'SWITCH',
-                  }
-                : {},
-        } as ioBroker.StateCommon;
-        const commonOnOff = {
-            name: obj.label,
-            type: 'boolean',
-            role: isLight ? 'switch.light' : 'switch',
-            read: true,
-            write: !isDosageRelay,
-            smartName:
-                obj.active && !isDosageRelay
-                    ? {
-                          de: obj.label,
-                          en: obj.label,
-                          smartType: isLight ? 'LIGHT' : 'SWITCH',
-                      }
-                    : {},
-        } as ioBroker.StateCommon;
 
         await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
             type: 'state',
-            common: commonAuto,
+            common: relayAutoStateCommon(obj, isLight),
             native: obj,
         });
         await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
             type: 'state',
-            common: commonOnOff,
+            common: relayOnOffStateCommon(obj, isLight, isDosageRelay),
             native: obj,
         });
 
-        if (isDosageRelay) {
-            const commonDosageTimerState = {
-                name: obj.label,
-                type: 'number',
-                role: 'value.interval',
-                read: false,
-                write: true,
-            } as ioBroker.StateCommon;
-
-            await this.setObjectNotExists(
-                `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`,
-                {
-                    type: 'state',
-                    common: commonDosageTimerState,
-                    native: obj,
-                },
-            );
-        } else {
-            const commonGenericRelayTimerState = {
-                name: obj.label,
-                type: 'number',
-                role: 'value.interval',
-                read: false,
-                write: true,
-            } as ioBroker.StateCommon;
-
-            await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.timer`, {
+        // Dosage relays get a `.dosageTimer`, the rest a `.timer`; both states
+        // share the same numeric-interval definition.
+        const timerChannel = isDosageRelay ? 'dosageTimer' : 'timer';
+        await this.setObjectNotExists(
+            `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${timerChannel}`,
+            {
                 type: 'state',
-                common: commonGenericRelayTimerState,
+                common: relayTimerStateCommon(obj),
                 native: obj,
-            });
-        }
+            },
+        );
     }
 
     private setDataState(obj: GetStateDataObject): void {

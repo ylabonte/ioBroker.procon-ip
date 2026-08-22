@@ -187,3 +187,130 @@ export function buildServiceConfig(config: { requestTimeout: number }): IService
         },
     }) as IServiceConfig;
 }
+
+// ---------------------------------------------------------------------------
+// Object `common` builders — pure shaping of ioBroker state definitions. These
+// mirror the inline `common` blocks the provisioner used to build; extracting
+// them keeps the object definitions in one tested place (and makes the upcoming
+// `extendObject` migration a change of the writer, not the shapes).
+// ---------------------------------------------------------------------------
+
+/**
+ * `common` for a raw string sysinfo state (e.g. `info.system.<key>`).
+ *
+ * @param key the sysinfo key, used as the state name.
+ * @returns the read-only string state `common`.
+ */
+export function sysInfoStateCommon(key: string): ioBroker.StateCommon {
+    return { name: key, type: 'string', role: 'state', read: true, write: false };
+}
+
+/**
+ * `common` for a boolean sysinfo flag (dosage-enabled flags, electrolysis).
+ *
+ * @param name the human-readable flag name.
+ * @returns the read-only boolean state `common`.
+ */
+export function booleanFlagStateCommon(name: string): ioBroker.StateCommon {
+    return { name, type: 'boolean', role: 'state', read: true, write: false };
+}
+
+/**
+ * `common` for one field of a data object, or `null` when the field is not a
+ * published field. Mirrors the inline field switch: `value` (with temperature
+ * special-casing), the text fields, and the `active` indicator.
+ *
+ * @param obj the controller data object.
+ * @param field the field key being published.
+ * @returns the state `common`, or `null` to skip the field.
+ */
+export function dataFieldStateCommon(obj: GetStateDataObject, field: string): ioBroker.StateCommon | null {
+    const common = {
+        name: obj.label,
+        type: typeof obj[field],
+        role: 'value',
+        read: true,
+        write: false,
+    } as ioBroker.StateCommon;
+
+    switch (field) {
+        case 'value':
+            if (isTemperatureCategory(obj.category)) {
+                common.role = 'value.temperature';
+                common.unit = `°${obj.unit}`;
+                if (obj.active) {
+                    common.smartName = { de: obj.label, en: obj.label, smartType: 'THERMOSTAT' };
+                }
+            }
+            break;
+        case 'category':
+        case 'label':
+        case 'unit':
+        case 'displayValue':
+            common.role = 'text';
+            break;
+        case 'active':
+            common.role = 'indicator';
+            break;
+        default:
+            return null;
+    }
+    return common;
+}
+
+/**
+ * `common` for a relay's `.auto` switch state.
+ *
+ * @param obj the relay data object.
+ * @param isLight whether the relay label looks like a light (affects smartType).
+ * @returns the writable auto-switch `common`.
+ */
+export function relayAutoStateCommon(obj: GetStateDataObject, isLight: boolean): ioBroker.StateCommon {
+    return {
+        name: obj.label,
+        type: 'boolean',
+        role: 'switch.mode.auto',
+        read: true,
+        write: true,
+        smartName: obj.active
+            ? { de: `${obj.label} auto`, en: `${obj.label} auto`, smartType: isLight ? 'LIGHT' : 'SWITCH' }
+            : {},
+    };
+}
+
+/**
+ * `common` for a relay's `.onOff` switch state. Dosage relays are read-only
+ * (they are driven by the dosage timer) and carry no smartName.
+ *
+ * @param obj the relay data object.
+ * @param isLight whether the relay label looks like a light.
+ * @param isDosageRelay whether the relay is a dosage-control relay.
+ * @returns the on/off-switch `common`.
+ */
+export function relayOnOffStateCommon(
+    obj: GetStateDataObject,
+    isLight: boolean,
+    isDosageRelay: boolean,
+): ioBroker.StateCommon {
+    return {
+        name: obj.label,
+        type: 'boolean',
+        role: isLight ? 'switch.light' : 'switch',
+        read: true,
+        write: !isDosageRelay,
+        smartName:
+            obj.active && !isDosageRelay
+                ? { de: obj.label, en: obj.label, smartType: isLight ? 'LIGHT' : 'SWITCH' }
+                : {},
+    };
+}
+
+/**
+ * `common` for a relay's timer / dosage-timer state (both share this shape).
+ *
+ * @param obj the relay data object.
+ * @returns the writable numeric interval `common`.
+ */
+export function relayTimerStateCommon(obj: GetStateDataObject): ioBroker.StateCommon {
+    return { name: obj.label, type: 'number', role: 'value.interval', read: false, write: true };
+}

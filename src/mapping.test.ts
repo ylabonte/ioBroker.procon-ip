@@ -4,7 +4,7 @@
  */
 
 import { expect } from 'chai';
-import { GetStateCategory } from 'procon-ip';
+import { GetStateCategory, type GetStateDataObject } from 'procon-ip';
 import {
     errorMessage,
     isValidURL,
@@ -18,7 +18,28 @@ import {
     shouldUpdateState,
     buildId,
     buildServiceConfig,
+    sysInfoStateCommon,
+    booleanFlagStateCommon,
+    dataFieldStateCommon,
+    relayAutoStateCommon,
+    relayOnOffStateCommon,
+    relayTimerStateCommon,
 } from './mapping';
+
+// Build a GetStateDataObject-shaped fixture for the `common` builders.
+function dataObj(overrides: Partial<GetStateDataObject> = {}): GetStateDataObject {
+    return {
+        id: 0,
+        category: 'relays',
+        categoryId: 0,
+        label: 'Relay 1',
+        value: 1,
+        unit: 'C',
+        displayValue: '1',
+        active: true,
+        ...overrides,
+    } as unknown as GetStateDataObject;
+}
 
 const RELAYS = String(GetStateCategory.RELAYS);
 const EXTERNAL = String(GetStateCategory.EXTERNAL_RELAYS);
@@ -188,5 +209,111 @@ describe('mapping.buildServiceConfig', () => {
         const svc = buildServiceConfig(config);
         expect(Object.prototype.hasOwnProperty.call(svc, 'timeout')).to.be.true;
         expect(Object.keys(svc)).to.not.include('timeout');
+    });
+});
+
+describe('mapping.sysInfoStateCommon', () => {
+    it('is a read-only string state named after the key', () => {
+        expect(sysInfoStateCommon('phValue')).to.deep.equal({
+            name: 'phValue',
+            type: 'string',
+            role: 'state',
+            read: true,
+            write: false,
+        });
+    });
+});
+
+describe('mapping.booleanFlagStateCommon', () => {
+    it('is a read-only boolean state with the given name', () => {
+        expect(booleanFlagStateCommon('CL enabled')).to.deep.equal({
+            name: 'CL enabled',
+            type: 'boolean',
+            role: 'state',
+            read: true,
+            write: false,
+        });
+    });
+});
+
+describe('mapping.dataFieldStateCommon', () => {
+    it('returns null for non-published fields', () => {
+        expect(dataFieldStateCommon(dataObj(), 'somethingElse')).to.be.null;
+    });
+    it('shapes the text fields with role text', () => {
+        for (const field of ['category', 'label', 'unit', 'displayValue']) {
+            expect(dataFieldStateCommon(dataObj(), field)?.role, field).to.equal('text');
+        }
+    });
+    it('shapes the active field as an indicator', () => {
+        expect(dataFieldStateCommon(dataObj(), 'active')?.role).to.equal('indicator');
+    });
+    it('shapes a plain value field as role value with the value type and no unit', () => {
+        const c = dataFieldStateCommon(dataObj({ value: 42 }), 'value');
+        expect(c?.role).to.equal('value');
+        expect(c?.type).to.equal('number');
+        expect(c?.unit).to.be.undefined;
+    });
+    it('special-cases an active temperature value (role/unit/thermostat smartName)', () => {
+        const c = dataFieldStateCommon(
+            dataObj({ category: String(GetStateCategory.TEMPERATURES), unit: 'C', active: true, label: 'Pool' }),
+            'value',
+        );
+        expect(c?.role).to.equal('value.temperature');
+        expect(c?.unit).to.equal('°C');
+        expect(c?.smartName).to.deep.equal({ de: 'Pool', en: 'Pool', smartType: 'THERMOSTAT' });
+    });
+    it('omits the thermostat smartName for an inactive temperature', () => {
+        const c = dataFieldStateCommon(
+            dataObj({ category: String(GetStateCategory.TEMPERATURES), active: false }),
+            'value',
+        );
+        expect(c?.role).to.equal('value.temperature');
+        expect(c?.smartName).to.be.undefined;
+    });
+});
+
+describe('mapping.relayAutoStateCommon', () => {
+    it('is a writable auto switch; an active light relay gets a LIGHT smartName', () => {
+        const c = relayAutoStateCommon(dataObj({ label: 'Pool Light', active: true }), true);
+        expect(c.role).to.equal('switch.mode.auto');
+        expect(c.write).to.be.true;
+        expect(c.smartName).to.deep.equal({ de: 'Pool Light auto', en: 'Pool Light auto', smartType: 'LIGHT' });
+    });
+    it('uses SWITCH smartType for an active non-light relay', () => {
+        const c = relayAutoStateCommon(dataObj({ label: 'Pump', active: true }), false);
+        expect(c.smartName).to.deep.equal({ de: 'Pump auto', en: 'Pump auto', smartType: 'SWITCH' });
+    });
+    it('gives inactive relays an empty smartName', () => {
+        expect(relayAutoStateCommon(dataObj({ active: false }), false).smartName).to.deep.equal({});
+    });
+});
+
+describe('mapping.relayOnOffStateCommon', () => {
+    it('uses switch.light for lights and switch otherwise', () => {
+        expect(relayOnOffStateCommon(dataObj(), true, false).role).to.equal('switch.light');
+        expect(relayOnOffStateCommon(dataObj(), false, false).role).to.equal('switch');
+    });
+    it('is read-only with an empty smartName for dosage relays', () => {
+        const c = relayOnOffStateCommon(dataObj({ active: true }), false, true);
+        expect(c.write).to.be.false;
+        expect(c.smartName).to.deep.equal({});
+    });
+    it('is writable with a smartName for an active non-dosage relay', () => {
+        const c = relayOnOffStateCommon(dataObj({ label: 'Pump', active: true }), false, false);
+        expect(c.write).to.be.true;
+        expect(c.smartName).to.deep.equal({ de: 'Pump', en: 'Pump', smartType: 'SWITCH' });
+    });
+});
+
+describe('mapping.relayTimerStateCommon', () => {
+    it('is a writable, non-readable numeric interval', () => {
+        expect(relayTimerStateCommon(dataObj({ label: 'Pump' }))).to.deep.equal({
+            name: 'Pump',
+            type: 'number',
+            role: 'value.interval',
+            read: false,
+            write: true,
+        });
     });
 });

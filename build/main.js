@@ -255,58 +255,28 @@ class ProconIp extends import_adapter_core.Adapter {
     for (const sysInfo of data.toArrayOfObjects()) {
       await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.${sysInfo.key}`, {
         type: "state",
-        common: {
-          name: sysInfo.key,
-          type: "string",
-          role: "state",
-          read: true,
-          write: false
-        },
+        common: (0, import_mapping.sysInfoStateCommon)(sysInfo.key),
         native: {}
       });
     }
     await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phPlusDosageEnabled`, {
       type: "state",
-      common: {
-        name: "pH+ enabled",
-        type: "boolean",
-        role: "state",
-        read: true,
-        write: false
-      },
+      common: (0, import_mapping.booleanFlagStateCommon)("pH+ enabled"),
       native: {}
     });
     await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.phMinusDosageEnabled`, {
       type: "state",
-      common: {
-        name: "pH- enabled",
-        type: "boolean",
-        role: "state",
-        read: true,
-        write: false
-      },
+      common: (0, import_mapping.booleanFlagStateCommon)("pH- enabled"),
       native: {}
     });
     await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.chlorineDosageEnabled`, {
       type: "state",
-      common: {
-        name: "CL enabled",
-        type: "boolean",
-        role: "state",
-        read: true,
-        write: false
-      },
+      common: (0, import_mapping.booleanFlagStateCommon)("CL enabled"),
       native: {}
     });
     await this.setObjectNotExists(`${this.name}.${this.instance}.info.system.electrolysis`, {
       type: "state",
-      common: {
-        name: "Electrolysis",
-        type: "boolean",
-        role: "state",
-        read: true,
-        write: false
-      },
+      common: (0, import_mapping.booleanFlagStateCommon)("Electrolysis"),
       native: {}
     });
   }
@@ -337,38 +307,9 @@ class ProconIp extends import_adapter_core.Adapter {
       native: {}
     });
     for (const field of Object.keys(obj)) {
-      const common = {
-        name: obj.label,
-        type: typeof obj[field],
-        role: "value",
-        read: true,
-        write: false
-      };
-      switch (field) {
-        case "value":
-          if ((0, import_mapping.isTemperatureCategory)(obj.category)) {
-            common.role = "value.temperature";
-            common.unit = `\xB0${obj.unit}`;
-            if (obj.active) {
-              common.smartName = {
-                de: obj.label,
-                en: obj.label,
-                smartType: "THERMOSTAT"
-              };
-            }
-          }
-          break;
-        case "category":
-        case "label":
-        case "unit":
-        case "displayValue":
-          common.role = "text";
-          break;
-        case "active":
-          common.role = "indicator";
-          break;
-        default:
-          continue;
+      const common = (0, import_mapping.dataFieldStateCommon)(obj, field);
+      if (!common) {
+        continue;
       }
       try {
         await this.setObjectNotExists(
@@ -391,70 +332,25 @@ class ProconIp extends import_adapter_core.Adapter {
     const isLight = (0, import_mapping.isLightLabel)(obj.label);
     const relayId = (0, import_mapping.relayControlId)(obj);
     const isDosageRelay = this._getStateService.data.isDosageControl(relayId);
-    const commonAuto = {
-      name: obj.label,
-      type: "boolean",
-      role: "switch.mode.auto",
-      read: true,
-      write: true,
-      smartName: obj.active ? {
-        de: `${obj.label} auto`,
-        en: `${obj.label} auto`,
-        smartType: isLight ? "LIGHT" : "SWITCH"
-      } : {}
-    };
-    const commonOnOff = {
-      name: obj.label,
-      type: "boolean",
-      role: isLight ? "switch.light" : "switch",
-      read: true,
-      write: !isDosageRelay,
-      smartName: obj.active && !isDosageRelay ? {
-        de: obj.label,
-        en: obj.label,
-        smartType: isLight ? "LIGHT" : "SWITCH"
-      } : {}
-    };
     await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.auto`, {
       type: "state",
-      common: commonAuto,
+      common: (0, import_mapping.relayAutoStateCommon)(obj, isLight),
       native: obj
     });
     await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.onOff`, {
       type: "state",
-      common: commonOnOff,
+      common: (0, import_mapping.relayOnOffStateCommon)(obj, isLight, isDosageRelay),
       native: obj
     });
-    if (isDosageRelay) {
-      const commonDosageTimerState = {
-        name: obj.label,
-        type: "number",
-        role: "value.interval",
-        read: false,
-        write: true
-      };
-      await this.setObjectNotExists(
-        `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.dosageTimer`,
-        {
-          type: "state",
-          common: commonDosageTimerState,
-          native: obj
-        }
-      );
-    } else {
-      const commonGenericRelayTimerState = {
-        name: obj.label,
-        type: "number",
-        role: "value.interval",
-        read: false,
-        write: true
-      };
-      await this.setObjectNotExists(`${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.timer`, {
+    const timerChannel = isDosageRelay ? "dosageTimer" : "timer";
+    await this.setObjectNotExists(
+      `${this.name}.${this.instance}.${obj.category}.${obj.categoryId}.${timerChannel}`,
+      {
         type: "state",
-        common: commonGenericRelayTimerState,
+        common: (0, import_mapping.relayTimerStateCommon)(obj),
         native: obj
-      });
-    }
+      }
+    );
   }
   setDataState(obj) {
     for (const field of Object.keys(obj).filter((field2) => this._objectStateFields.indexOf(field2) > -1)) {
