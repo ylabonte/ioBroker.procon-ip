@@ -78,16 +78,17 @@ class CommandHandler {
     try {
       if (state.val) {
         this.deps.log.info(`Switching ${obj.native.label}: auto`);
-        return this.deps.usrcfgCgiService.setAuto(dataObject);
+        await this.deps.usrcfgCgiService.setAuto(dataObject);
       } else if (onOffState.val) {
         this.deps.log.info(`Switching ${obj.native.label}: on`);
-        return this.deps.usrcfgCgiService.setOn(dataObject);
+        await this.deps.usrcfgCgiService.setOn(dataObject);
+      } else {
+        this.deps.log.info(`Switching ${obj.native.label}: off`);
+        await this.deps.usrcfgCgiService.setOff(dataObject);
       }
-      this.deps.log.info(`Switching ${obj.native.label}: off`);
-      return this.deps.usrcfgCgiService.setOff(dataObject);
+      this.deps.ackCommand(objectId, state.val);
     } catch (e) {
       this.deps.log.error(`Error on switching operation: ${(0, import_mapping.errorMessage)(e)}`);
-      return;
     }
   }
   /**
@@ -108,6 +109,7 @@ class CommandHandler {
         this.deps.log.info(`Switching ${obj.native.label}: off`);
         await this.deps.usrcfgCgiService.setOff(dataObject);
       }
+      this.deps.ackCommand(objectId, state.val);
     } catch (e) {
       this.deps.log.error(`Error on switching operation: ${(0, import_mapping.errorMessage)(e)}`);
     }
@@ -135,6 +137,7 @@ class CommandHandler {
         await this.deps.commandService.setPhPlusDosage(stateValNumber);
       }
       this.deps.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
+      this.deps.ackCommand(objectId, state.val);
     } catch (e) {
       this.deps.log.error(`Error setting dosage timer: ${(0, import_mapping.errorMessage)(e)}`);
     }
@@ -154,6 +157,7 @@ class CommandHandler {
       const stateValNumber = state.val;
       await this.deps.setStateService.setTimer(relayId, stateValNumber);
       this.deps.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
+      this.deps.ackCommand(objectId, state.val);
     } catch (e) {
       this.deps.log.error(`Error setting relay timer: ${(0, import_mapping.errorMessage)(e)}`);
     }

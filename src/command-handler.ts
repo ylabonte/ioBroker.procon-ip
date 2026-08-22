@@ -40,6 +40,12 @@ export interface CommandHandlerDeps {
     commandService: CommandService;
     /** Service issuing relay timer writes. */
     setStateService: SetStateService;
+    /**
+     * Acknowledge the command state with the requested value right after a
+     * successful controller write, so the UI reflects the command immediately
+     * instead of waiting for the next poll.
+     */
+    ackCommand(id: string, value: ioBroker.StateValue): void;
 }
 
 /**
@@ -107,16 +113,17 @@ export class CommandHandler {
         try {
             if (state.val) {
                 this.deps.log.info(`Switching ${obj.native.label}: auto`);
-                return this.deps.usrcfgCgiService.setAuto(dataObject);
+                await this.deps.usrcfgCgiService.setAuto(dataObject);
             } else if (onOffState.val) {
                 this.deps.log.info(`Switching ${obj.native.label}: on`);
-                return this.deps.usrcfgCgiService.setOn(dataObject);
+                await this.deps.usrcfgCgiService.setOn(dataObject);
+            } else {
+                this.deps.log.info(`Switching ${obj.native.label}: off`);
+                await this.deps.usrcfgCgiService.setOff(dataObject);
             }
-            this.deps.log.info(`Switching ${obj.native.label}: off`);
-            return this.deps.usrcfgCgiService.setOff(dataObject);
+            this.deps.ackCommand(objectId, state.val);
         } catch (e: unknown) {
             this.deps.log.error(`Error on switching operation: ${errorMessage(e)}`);
-            return;
         }
     }
 
@@ -138,6 +145,7 @@ export class CommandHandler {
                 this.deps.log.info(`Switching ${obj.native.label}: off`);
                 await this.deps.usrcfgCgiService.setOff(dataObject);
             }
+            this.deps.ackCommand(objectId, state.val);
         } catch (e: unknown) {
             this.deps.log.error(`Error on switching operation: ${errorMessage(e)}`);
         }
@@ -166,6 +174,7 @@ export class CommandHandler {
                 await this.deps.commandService.setPhPlusDosage(stateValNumber);
             }
             this.deps.log.info(`Setting dosage timer ${obj.native.label} for ${state.val} seconds`);
+            this.deps.ackCommand(objectId, state.val);
         } catch (e: unknown) {
             this.deps.log.error(`Error setting dosage timer: ${errorMessage(e)}`);
         }
@@ -186,6 +195,7 @@ export class CommandHandler {
             const stateValNumber = state.val as number;
             await this.deps.setStateService.setTimer(relayId, stateValNumber);
             this.deps.log.info(`Setting timer for ${obj.native.label} to ${state.val} seconds`);
+            this.deps.ackCommand(objectId, state.val);
         } catch (e: unknown) {
             this.deps.log.error(`Error setting relay timer: ${errorMessage(e)}`);
         }

@@ -35,6 +35,7 @@ interface Harness {
         setPhPlusDosage: sinon.SinonStub;
     };
     setStateService: { setTimer: sinon.SinonStub };
+    ackCommand: sinon.SinonStub;
     log: { info: sinon.SinonStub; error: sinon.SinonStub };
     getObject: sinon.SinonStub;
     getState: sinon.SinonStub;
@@ -59,6 +60,7 @@ function harness(opts: {
         setPhPlusDosage: sinon.stub().resolves(),
     };
     const setStateService = { setTimer: sinon.stub().resolves() };
+    const ackCommand = sinon.stub();
     const log = { info: sinon.stub(), error: sinon.stub() };
     const getObject = sinon.stub().resolves(makeObj(opts.dataObject.id, opts.dataObject.label));
     const getState = sinon.stub().resolves(makeState(false));
@@ -80,6 +82,7 @@ function harness(opts: {
         usrcfgCgiService: usrcfg as unknown as CommandHandlerDeps['usrcfgCgiService'],
         commandService: command as unknown as CommandHandlerDeps['commandService'],
         setStateService: setStateService as unknown as CommandHandlerDeps['setStateService'],
+        ackCommand,
     };
 
     return {
@@ -89,6 +92,7 @@ function harness(opts: {
         usrcfg,
         command,
         setStateService,
+        ackCommand,
         log,
         getObject,
         getState,
@@ -120,12 +124,13 @@ describe('CommandHandler.dispatch routing', () => {
 });
 
 describe('CommandHandler.relayToggleAuto', () => {
-    it('switches to auto when the value is truthy', async () => {
+    it('switches to auto when the value is truthy and acks the command', async () => {
         const h = harness({ dataObject: RELAY });
         await h.handler.relayToggleAuto('procon-ip.0.relays.2.auto', makeState(true));
         expect(h.usrcfg.setAuto.calledOnce).to.be.true;
         expect(h.usrcfg.setOn.called).to.be.false;
         expect(h.forced).to.deep.equal([RELAY.id]);
+        expect(h.ackCommand.calledOnceWithExactly('procon-ip.0.relays.2.auto', true)).to.be.true;
     });
     it('switches on when value falsy but current onOff is on', async () => {
         const h = harness({ dataObject: RELAY });
@@ -154,13 +159,12 @@ describe('CommandHandler.relayToggleAuto', () => {
             /non-existent object/,
         );
     });
-    it('propagates a switching-service rejection: the auto paths `return` the promise, so the inner catch is a no-op (behaviour preserved from the original — the dispatch-level catch logs it instead)', async () => {
+    it('awaits the switch, so a service rejection is logged (not propagated) and the command is not acked', async () => {
         const h = harness({ dataObject: RELAY });
         h.usrcfg.setAuto.rejects(new Error('offline'));
-        await expect(h.handler.relayToggleAuto('procon-ip.0.relays.2.auto', makeState(true))).to.be.rejectedWith(
-            /offline/,
-        );
-        expect(h.log.error.called).to.be.false;
+        await h.handler.relayToggleAuto('procon-ip.0.relays.2.auto', makeState(true));
+        expect(h.log.error.calledOnceWithExactly('Error on switching operation: offline')).to.be.true;
+        expect(h.ackCommand.called).to.be.false;
     });
 });
 

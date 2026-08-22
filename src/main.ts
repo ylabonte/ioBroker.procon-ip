@@ -101,6 +101,9 @@ export class ProconIp extends Adapter {
             usrcfgCgiService: this._usrcfgCgiService,
             commandService: this._commandService,
             setStateService: this._setStateService,
+            ackCommand: (id, value) => {
+                void this.setState(id, value, true).catch(() => {});
+            },
         });
         this._objectProvisioner = new ObjectProvisioner({
             log: this.log,
@@ -112,7 +115,7 @@ export class ProconIp extends Adapter {
         this._statePublisher = new StatePublisher({
             log: this.log,
             namespace: this.namespace,
-            setStateChanged: async (id, value, ack) => this.setStateChangedAsync(id, value, ack),
+            setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
             getObject: id => this.getObjectAsync(id),
             setObject: async (id, obj) => this.setObject(id, obj),
             getStatesOf: id => this.getStatesOfAsync(id),

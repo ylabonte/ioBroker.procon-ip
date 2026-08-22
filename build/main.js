@@ -86,7 +86,11 @@ class ProconIp extends import_adapter_core.Adapter {
       markForceUpdate: (id) => this._forceUpdate.push(id),
       usrcfgCgiService: this._usrcfgCgiService,
       commandService: this._commandService,
-      setStateService: this._setStateService
+      setStateService: this._setStateService,
+      ackCommand: (id, value) => {
+        void this.setState(id, value, true).catch(() => {
+        });
+      }
     });
     this._objectProvisioner = new import_object_provisioner.ObjectProvisioner({
       log: this.log,
@@ -98,7 +102,7 @@ class ProconIp extends import_adapter_core.Adapter {
     this._statePublisher = new import_state_publisher.StatePublisher({
       log: this.log,
       namespace: this.namespace,
-      setStateChanged: async (id, value, ack) => this.setStateChangedAsync(id, value, ack),
+      setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
       getObject: (id) => this.getObjectAsync(id),
       setObject: async (id, obj) => this.setObject(id, obj),
       getStatesOf: (id) => this.getStatesOfAsync(id),
