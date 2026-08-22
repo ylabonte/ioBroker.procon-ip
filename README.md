@@ -90,6 +90,7 @@ If you want to support this adapter or say thank you, you can:
 
 ### **WORK IN PROGRESS**
 
+- **Fixed relay and DMX switching**, which had silently stopped working since 1.8.0's move to the ProCon.IP 2.x library: the controller accepted a write with `200 OK` but ignored it. Updated the library to 2.1.1, which sends the exact HTTP request format the controller's firmware requires. Reads were never affected.
 - Resilient startup: the adapter now comes up and keeps polling until the controller becomes reachable, instead of staying inactive when the controller was offline at boot time.
 - Fixed a corner case in the forced-update handling that could keep a relay flagged for updates.
 - Aligned the admin configuration defaults with the adapter's effective runtime defaults and fixed a help-text typo.
