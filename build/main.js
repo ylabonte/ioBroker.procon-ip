@@ -10,6 +10,7 @@ class ProconIp extends import_adapter_core.Adapter {
   _forceUpdate;
   _stateData;
   _bootstrapped = false;
+  _objectsCreated = false;
   _objectStateFields = ["value", "category", "label", "unit", "displayValue", "active"];
   _timeout = null;
   constructor(options = {}) {
@@ -28,16 +29,13 @@ class ProconIp extends import_adapter_core.Adapter {
    */
   async onReady() {
     let connectionApproved = false;
+    let connectErrorLogged = false;
     await this.setState("info.connection", false, true);
     if (this.config.controllerUrl.length < 1 || !ProconIp.isValidURL(this.config.controllerUrl)) {
       this.log.warn(`Invalid controller URL ('${this.config.controllerUrl}') supplied.`);
       return;
     }
     const serviceConfig = Object.defineProperties(Object.create(this.config), {
-      baseUrl: {
-        value: this.config.controllerUrl,
-        writable: true
-      },
       timeout: {
         value: this.config.requestTimeout,
         writable: true
@@ -55,19 +53,22 @@ class ProconIp extends import_adapter_core.Adapter {
     this._commandService = new import_procon_ip.CommandService(serviceConfig, this.log);
     this.log.debug(`GetStateService url: ${this._getStateService.url}`);
     this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
-    await this._getStateService.update().then(async (data) => {
-      this._stateData = data;
-      if (!this._bootstrapped) {
-        this.log.debug(`Initially setting adapter objects`);
-        await this.setSysInfoObjectsNotExists(data.sysInfo);
-        await this.setStateDataObjectsNotExists(data.objects);
-      }
-    });
+    try {
+      const initialData = await this._getStateService.update();
+      this._stateData = initialData;
+      await this.bootstrapObjects(initialData);
+    } catch (e) {
+      this.log.warn(
+        `Could not reach the controller at startup (${e instanceof Error ? e.message : String(e)}). Will keep polling until it becomes available.`
+      );
+    }
     this._timeout = setTimeout(() => {
       this._getStateService.start(
-        (data) => {
+        async (data) => {
           this.log.silly(`Start processing new GetState.csv`);
           connectionApproved = true;
+          connectErrorLogged = false;
+          await this.bootstrapObjects(data);
           data.sysInfo.toArrayOfObjects().forEach((info) => {
             if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
               this.log.debug(`Updating sys info state ${info.key}: ${info.value}`);
@@ -82,16 +83,13 @@ class ProconIp extends import_adapter_core.Adapter {
           });
           this.updateAdvancedSysInfoStates(data.sysInfo);
           data.objects.forEach((obj) => {
+            const previous = this._stateData.getDataObject(obj.id);
             this.log.silly(
-              `Comparing previous and current value (${obj.displayValue}) for '${obj.label}' (${obj.category})`
+              `Processing '${obj.label}' (${obj.category}) \u2014 current value: ${obj.displayValue}`
             );
-            this.log.silly(
-              `this._stateData.getDataObject(obj.id).value: ${this._stateData.getDataObject(obj.id).value}`
-            );
-            this.log.silly(`obj.value: ${obj.value}`);
             const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
-            if (!this._bootstrapped || forceObjStateUpdate >= 0 || this._stateData.getDataObject(obj.id) && this._stateData.getDataObject(obj.id).value != obj.value) {
-              if (this._stateData.getDataObject(obj.id).label != obj.label) {
+            if (!this._bootstrapped || forceObjStateUpdate >= 0 || previous && previous.value != obj.value) {
+              if (previous && previous.label != obj.label) {
                 this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
                 this.updateObjectCommonName(obj).catch((e) => {
                   if (e instanceof Error) {
@@ -103,7 +101,7 @@ class ProconIp extends import_adapter_core.Adapter {
               }
               this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
               this.setDataState(obj);
-              if (this._forceUpdate[forceObjStateUpdate]) {
+              if (forceObjStateUpdate > -1) {
                 this._forceUpdate.splice(forceObjStateUpdate, 1);
               }
             }
@@ -115,22 +113,34 @@ class ProconIp extends import_adapter_core.Adapter {
           });
         },
         (e) => {
-          var _a;
           this.setState("info.connection", false, true).catch(() => {
           });
-          if (!connectionApproved) {
-            if (e instanceof Error) {
-              this.log.error(`Could not connect to the controller: ${e.message}`);
-            } else {
-              this.log.error(`Could not connect to the controller: ${String(e)}`);
-            }
-            (_a = this._getStateService) == null ? void 0 : _a.stop();
+          if (!connectionApproved && !connectErrorLogged) {
+            connectErrorLogged = true;
+            this.log.warn(
+              `Could not connect to the controller (${e instanceof Error ? e.message : String(e)}). Retrying until it becomes available.`
+            );
           }
         }
       );
     }, 300);
     this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
     this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+  }
+  /**
+   * Create the adapter's objects. Runs once — either on startup or, if the
+   * controller was unreachable then, on the first successful poll.
+   *
+   * @param data the current controller state used to derive the objects
+   */
+  async bootstrapObjects(data) {
+    if (this._objectsCreated) {
+      return;
+    }
+    this.log.debug(`Initially setting adapter objects`);
+    await this.setSysInfoObjectsNotExists(data.sysInfo);
+    await this.setStateDataObjectsNotExists(data.objects);
+    this._objectsCreated = true;
   }
   // Is called when adapter shuts down - callback has to be called under any circumstances!
   onUnload(callback) {
