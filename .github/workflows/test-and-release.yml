@@ -28,7 +28,7 @@ jobs:
         steps:
             - uses: ioBroker/testing-action-check@master
               with:
-                  node-version: '24.x'
+                  node-version: '26.x'
                   type-checking: true
                   lint: true
 
@@ -38,9 +38,16 @@ jobs:
 
         runs-on: ${{ matrix.os }}
         strategy:
+            # Sparse matrix: full OS coverage on one reference Node version,
+            # the other supported versions on ubuntu only (5 jobs instead of 9).
             matrix:
-                node-version: [22.x, 24.x]
+                node-version: ['24.x']
                 os: [ubuntu-latest, windows-latest, macos-latest]
+                include:
+                    - node-version: '22.x'
+                      os: ubuntu-latest
+                    - node-version: '26.x'
+                      os: ubuntu-latest
 
         steps:
             - uses: ioBroker/testing-action-adapter@master
@@ -70,6 +77,6 @@ jobs:
         steps:
             - uses: ioBroker/testing-action-deploy@master
               with:
-                  node-version: '24.x'
+                  node-version: '26.x'
                   build: true
                   github-token: ${{ secrets.GITHUB_TOKEN }}
