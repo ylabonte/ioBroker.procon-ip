@@ -212,7 +212,7 @@ export function sysInfoStateCommon(key: string): ioBroker.StateCommon {
  * @returns the read-only boolean state `common`.
  */
 export function booleanFlagStateCommon(name: string): ioBroker.StateCommon {
-    return { name, type: 'boolean', role: 'state', read: true, write: false };
+    return { name, type: 'boolean', role: 'indicator', read: true, write: false };
 }
 
 /**

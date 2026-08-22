@@ -94,7 +94,8 @@ class ProconIp extends import_adapter_core.Adapter {
     this._objectProvisioner = new import_object_provisioner.ObjectProvisioner({
       log: this.log,
       namespace: this.namespace,
-      setObjectNotExists: async (id, obj) => this.setObjectNotExists(id, obj),
+      getObject: (id) => this.getObjectAsync(id),
+      extendObject: (id, obj) => this.extendObjectAsync(id, obj),
       isDosageControl: (relayId) => this._getStateService.data.isDosageControl(relayId),
       isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled()
     });

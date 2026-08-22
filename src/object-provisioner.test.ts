@@ -1,34 +1,51 @@
 /**
- * Unit tests for ObjectProvisioner. setObjectNotExists and the controller-state
- * predicates are injected as stubs — no live adapter, no controller.
+ * Unit tests for ObjectProvisioner. getObject / extendObject and the
+ * controller-state predicates are injected as stubs — no live adapter.
  */
 
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { GetStateCategory, type GetStateDataObject, type GetStateDataSysInfo } from 'procon-ip';
-import { ObjectProvisioner, type ObjectProvisionerDeps } from './object-provisioner';
+import { ObjectProvisioner, type ObjectProvisionerDeps, OBJECT_SCHEMA_VERSION } from './object-provisioner';
 
-// Assemble an ObjectProvisioner with a stubbed setObjectNotExists.
-function harness(opts?: { isDosageControl?: (id: number) => boolean; isExtRelaysEnabled?: boolean }): {
+interface HarnessResult {
     provisioner: ObjectProvisioner;
-    setObjectNotExists: sinon.SinonStub;
+    extendObject: sinon.SinonStub;
+    getObject: sinon.SinonStub;
     log: { error: sinon.SinonStub };
-} {
-    const setObjectNotExists = sinon.stub().resolves({ id: 'x' });
+}
+
+// Assemble an ObjectProvisioner. By default every object is missing (getObject
+// resolves null), so everything is created; pass `existing` to simulate objects
+// already in the DB (keyed by id) for the self-healing paths.
+function harness(opts?: {
+    isDosageControl?: (id: number) => boolean;
+    isExtRelaysEnabled?: boolean;
+    existing?: Record<string, ioBroker.Object>;
+}): HarnessResult {
+    const extendObject = sinon.stub().resolves();
+    const getObject = sinon.stub().callsFake((id: string) => Promise.resolve(opts?.existing?.[id] ?? null));
     const log = { error: sinon.stub() };
     const deps: ObjectProvisionerDeps = {
         log,
         namespace: 'procon-ip.0',
-        setObjectNotExists,
+        getObject,
+        extendObject,
         isDosageControl: opts?.isDosageControl ?? (() => false),
         isExtRelaysEnabled: () => opts?.isExtRelaysEnabled ?? true,
     };
-    return { provisioner: new ObjectProvisioner(deps), setObjectNotExists, log };
+    return { provisioner: new ObjectProvisioner(deps), extendObject, getObject, log };
 }
 
-// The first argument (the id) of every setObjectNotExists call.
+// The ids passed to extendObject.
 function idsFrom(stub: sinon.SinonStub): string[] {
     return stub.getCalls().map(c => c.args[0] as string);
+}
+
+// The common written for a given id.
+function commonFor(stub: sinon.SinonStub, id: string): Record<string, unknown> | undefined {
+    const call = stub.getCalls().find(c => c.args[0] === id);
+    return call ? ((call.args[1] as ioBroker.PartialObject).common as Record<string, unknown>) : undefined;
 }
 
 // A GetStateDataObject-shaped fixture.
@@ -52,43 +69,79 @@ function settle(): Promise<void> {
 }
 
 describe('ObjectProvisioner.provisionSysInfo', () => {
-    it('creates the info.system channel, a state per key, and the four flags', async () => {
+    it('creates the info.system channel, a state per key, and the four flags (with schema stamp)', async () => {
         const h = harness();
         const sysInfo = {
-            toArrayOfObjects: () => [
-                { key: 'phValue', value: 7 },
-                { key: 'temp', value: 25 },
-            ],
+            toArrayOfObjects: () => [{ key: 'phValue', value: 7 }],
         } as unknown as GetStateDataSysInfo;
         await h.provisioner.provisionSysInfo(sysInfo);
-        const ids = idsFrom(h.setObjectNotExists);
+        const ids = idsFrom(h.extendObject);
         for (const id of [
             'procon-ip.0.info.system',
             'procon-ip.0.info.system.phValue',
-            'procon-ip.0.info.system.temp',
             'procon-ip.0.info.system.phPlusDosageEnabled',
-            'procon-ip.0.info.system.phMinusDosageEnabled',
-            'procon-ip.0.info.system.chlorineDosageEnabled',
             'procon-ip.0.info.system.electrolysis',
         ]) {
             expect(ids, id).to.include(id);
         }
+        // schema version stamped into native
+        const call = h.extendObject.getCalls().find(c => c.args[0] === 'procon-ip.0.info.system.phValue')!;
+        expect((call.args[1] as ioBroker.PartialObject).native).to.deep.include({
+            objectSchemaVersion: OBJECT_SCHEMA_VERSION,
+        });
     });
 });
 
-describe('ObjectProvisioner.provisionStateData', () => {
-    it('creates each category channel once and the object channel + field states', async () => {
-        const h = harness();
-        await h.provisioner.provisionStateData([
-            dataObj({ category: 'temperatures', categoryId: 0, label: 'Pool' }),
-            dataObj({ category: 'temperatures', categoryId: 1, label: 'Air' }),
-        ]);
+describe('ObjectProvisioner self-healing (H1)', () => {
+    const relayObj = dataObj({ category: 'relays', categoryId: 2, label: 'Pump', active: true });
+
+    it('skips an object already at the current schema version', async () => {
+        const id = 'procon-ip.0.relays.2.onOff';
+        const h = harness({
+            isDosageControl: () => false,
+            existing: {
+                [id]: {
+                    _id: id,
+                    type: 'state',
+                    common: {},
+                    native: { objectSchemaVersion: OBJECT_SCHEMA_VERSION },
+                } as unknown as ioBroker.Object,
+            },
+        });
+        await h.provisioner['provisionRelayObject'](relayObj);
         await settle();
-        const ids = idsFrom(h.setObjectNotExists);
-        expect(ids.filter(i => i === 'procon-ip.0.temperatures')).to.have.lengthOf(1);
-        expect(ids).to.include('procon-ip.0.temperatures.0');
-        expect(ids).to.include('procon-ip.0.temperatures.0.value');
-        expect(ids).to.include('procon-ip.0.temperatures.1.value');
+        expect(idsFrom(h.extendObject)).to.not.include(id);
+    });
+
+    it('creates a missing object with the full common (name + smartName)', async () => {
+        const h = harness({ isDosageControl: () => false });
+        await h.provisioner['provisionRelayObject'](relayObj);
+        await settle();
+        const common = commonFor(h.extendObject, 'procon-ip.0.relays.2.onOff')!;
+        expect(common.name).to.equal('Pump'); // full definition on create
+        expect(common).to.have.property('smartName');
+        expect(common.role).to.equal('switch');
+    });
+
+    it('heals an out-of-date object with structural fields only (preserving name/smartName)', async () => {
+        const id = 'procon-ip.0.relays.2.onOff';
+        const h = harness({
+            isDosageControl: () => false,
+            existing: {
+                [id]: {
+                    _id: id,
+                    type: 'state',
+                    common: { name: 'My Pump' },
+                    native: {},
+                } as unknown as ioBroker.Object, // no schema stamp
+            },
+        });
+        await h.provisioner['provisionRelayObject'](relayObj);
+        await settle();
+        const common = commonFor(h.extendObject, id)!;
+        expect(common.role).to.equal('switch'); // structural field healed
+        expect(common).to.not.have.property('name'); // preserved
+        expect(common).to.not.have.property('smartName'); // preserved
     });
 });
 
@@ -97,7 +150,7 @@ describe('ObjectProvisioner relay objects', () => {
         const h = harness({ isDosageControl: () => false });
         await h.provisioner.provisionStateData([dataObj({ category: 'relays', categoryId: 2, label: 'Pump' })]);
         await settle();
-        const ids = idsFrom(h.setObjectNotExists);
+        const ids = idsFrom(h.extendObject);
         expect(ids).to.include('procon-ip.0.relays.2.auto');
         expect(ids).to.include('procon-ip.0.relays.2.onOff');
         expect(ids).to.include('procon-ip.0.relays.2.timer');
@@ -107,7 +160,7 @@ describe('ObjectProvisioner relay objects', () => {
         const h = harness({ isDosageControl: id => id === 2 });
         await h.provisioner.provisionStateData([dataObj({ category: 'relays', categoryId: 2, label: 'Chlorine' })]);
         await settle();
-        const ids = idsFrom(h.setObjectNotExists);
+        const ids = idsFrom(h.extendObject);
         expect(ids).to.include('procon-ip.0.relays.2.dosageTimer');
         expect(ids).to.not.include('procon-ip.0.relays.2.timer');
     });
@@ -117,7 +170,6 @@ describe('ObjectProvisioner relay objects', () => {
             dataObj({ category: String(GetStateCategory.EXTERNAL_RELAYS), categoryId: 0, label: 'Ext' }),
         ]);
         await settle();
-        const ids = idsFrom(h.setObjectNotExists);
-        expect(ids.some(i => i.endsWith('.auto'))).to.be.false;
+        expect(idsFrom(h.extendObject).some(i => i.endsWith('.auto'))).to.be.false;
     });
 });

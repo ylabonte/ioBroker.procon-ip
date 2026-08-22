@@ -225,11 +225,11 @@ describe('mapping.sysInfoStateCommon', () => {
 });
 
 describe('mapping.booleanFlagStateCommon', () => {
-    it('is a read-only boolean state with the given name', () => {
+    it('is a read-only boolean indicator with the given name', () => {
         expect(booleanFlagStateCommon('CL enabled')).to.deep.equal({
             name: 'CL enabled',
             type: 'boolean',
-            role: 'state',
+            role: 'indicator',
             read: true,
             write: false,
         });

@@ -101,7 +101,7 @@ function sysInfoStateCommon(key) {
   return { name: key, type: "string", role: "state", read: true, write: false };
 }
 function booleanFlagStateCommon(name) {
-  return { name, type: "boolean", role: "state", read: true, write: false };
+  return { name, type: "boolean", role: "indicator", read: true, write: false };
 }
 function dataFieldStateCommon(obj, field) {
   const common = {
