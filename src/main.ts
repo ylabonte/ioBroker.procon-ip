@@ -47,7 +47,6 @@ export class ProconIp extends Adapter {
     private _stateData: GetStateData;
     private _bootstrapped = false;
     private _objectsCreated = false;
-    private _timeout: NodeJS.Timeout | null = null;
 
     /**
      * @param options adapter options forwarded to the ioBroker `Adapter` base;
@@ -141,87 +140,90 @@ export class ProconIp extends Adapter {
             );
         }
 
-        this._timeout = setTimeout(() => {
-            // Start the actual service
-            this._getStateService.start(
-                async (data: GetStateData) => {
-                    this.log.silly(`Start processing new GetState.csv`);
-                    connectionApproved = true;
-                    connectErrorLogged = false;
+        // Start the polling service directly. Objects were already bootstrapped
+        // above (or will be on the first successful poll if the controller was
+        // unreachable at startup), so there is nothing to defer.
+        this._getStateService.start(
+            async (data: GetStateData) => {
+                this.log.silly(`Start processing new GetState.csv`);
+                connectionApproved = true;
+                connectErrorLogged = false;
 
-                    // Create objects on the first successful poll if startup couldn't
-                    await this.bootstrapObjects(data);
+                // Create objects on the first successful poll if startup couldn't
+                await this.bootstrapObjects(data);
 
-                    // Set sys info states (only those whose value changed)
-                    data.sysInfo.toArrayOfObjects().forEach(info => {
-                        if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
-                            this._statePublisher.publishSysInfoState(info.key, info.value);
-                        }
-                    });
-
-                    this._statePublisher.publishAdvancedSysInfo(data.sysInfo, {
-                        bootstrapped: this._bootstrapped,
-                        previousDosageControl: this._stateData.sysInfo.dosageControl,
-                    });
-
-                    // Set actual sensor and actor/relay object states
-                    data.objects.forEach(obj => {
-                        // `previous` is undefined until the first successful poll
-                        // has populated `_stateData` (e.g. after a failed startup).
-                        const previous = this._stateData.getDataObject(obj.id);
-                        this.log.silly(
-                            `Processing '${obj.label}' (${obj.category}) — current value: ${obj.displayValue}`,
-                        );
-
-                        // Only update when value has changed or update is forced (on state change)
-                        const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
-                        if (
-                            shouldUpdateState({
-                                bootstrapped: this._bootstrapped,
-                                forced: forceObjStateUpdate >= 0,
-                                hasPrevious: !!previous,
-                                previousValue: previous?.value,
-                                currentValue: obj.value,
-                            })
-                        ) {
-                            if (previous && previous.label != obj.label) {
-                                this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
-                                this._statePublisher.updateObjectCommonName(obj).catch((e: unknown) => {
-                                    this.log.error(`Failed fixing label for '${obj.label}': ${errorMessage(e)}`);
-                                });
-                            }
-                            this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
-                            this._statePublisher.publishDataState(obj);
-                            if (forceObjStateUpdate > -1) {
-                                this._forceUpdate.splice(forceObjStateUpdate, 1);
-                            }
-                        }
-                    });
-
-                    this.log.silly(`Updating data object for next comparison`);
-                    this._stateData = data;
-                    this._bootstrapped = true;
-                    this.setStateChangedAsync('info.connection', true, true).catch(() => {});
-                },
-                (e: unknown) => {
-                    this.setStateChangedAsync('info.connection', false, true).catch(() => {});
-                    // Keep the polling loop running so the adapter recovers on its
-                    // own once the controller becomes reachable again. Log the
-                    // "cannot connect yet" warning only once per outage.
-                    if (!connectionApproved && !connectErrorLogged) {
-                        connectErrorLogged = true;
-                        this.log.warn(
-                            `Could not connect to the controller (${
-                                e instanceof Error ? e.message : String(e)
-                            }). Retrying until it becomes available.`,
-                        );
+                // Set sys info states (only those whose value changed)
+                data.sysInfo.toArrayOfObjects().forEach(info => {
+                    if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
+                        this._statePublisher.publishSysInfoState(info.key, info.value);
                     }
-                },
-            );
-        }, 300);
+                });
 
-        this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
-        this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+                this._statePublisher.publishAdvancedSysInfo(data.sysInfo, {
+                    bootstrapped: this._bootstrapped,
+                    previousDosageControl: this._stateData.sysInfo.dosageControl,
+                });
+
+                // Set actual sensor and actor/relay object states
+                data.objects.forEach(obj => {
+                    // `previous` is undefined until the first successful poll
+                    // has populated `_stateData` (e.g. after a failed startup).
+                    const previous = this._stateData.getDataObject(obj.id);
+                    this.log.silly(`Processing '${obj.label}' (${obj.category}) — current value: ${obj.displayValue}`);
+
+                    // Only update when value has changed or update is forced (on state change)
+                    const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
+                    if (
+                        shouldUpdateState({
+                            bootstrapped: this._bootstrapped,
+                            forced: forceObjStateUpdate >= 0,
+                            hasPrevious: !!previous,
+                            previousValue: previous?.value,
+                            currentValue: obj.value,
+                        })
+                    ) {
+                        if (previous && previous.label != obj.label) {
+                            this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
+                            this._statePublisher.updateObjectCommonName(obj).catch((e: unknown) => {
+                                this.log.error(`Failed fixing label for '${obj.label}': ${errorMessage(e)}`);
+                            });
+                        }
+                        this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
+                        this._statePublisher.publishDataState(obj);
+                        if (forceObjStateUpdate > -1) {
+                            this._forceUpdate.splice(forceObjStateUpdate, 1);
+                        }
+                    }
+                });
+
+                this.log.silly(`Updating data object for next comparison`);
+                this._stateData = data;
+                this._bootstrapped = true;
+                this.setStateChangedAsync('info.connection', true, true).catch(() => {});
+            },
+            (e: unknown) => {
+                this.setStateChangedAsync('info.connection', false, true).catch(() => {});
+                // Keep the polling loop running so the adapter recovers on its
+                // own once the controller becomes reachable again. Log the
+                // "cannot connect yet" warning only once per outage.
+                if (!connectionApproved && !connectErrorLogged) {
+                    connectErrorLogged = true;
+                    this.log.warn(
+                        `Could not connect to the controller (${
+                            e instanceof Error ? e.message : String(e)
+                        }). Retrying until it becomes available.`,
+                    );
+                }
+            },
+        );
+
+        // Subscribe only to the writable command channels, not every relay
+        // state — so our own acknowledged value writes don't wake onStateChange.
+        for (const category of ['relays', 'externalRelays']) {
+            for (const suffix of ['onOff', 'auto', 'timer', 'dosageTimer']) {
+                this.subscribeStates(`${category}.*.${suffix}`);
+            }
+        }
     }
 
     /**
@@ -249,9 +251,6 @@ export class ProconIp extends Adapter {
         } catch (e: unknown) {
             this.log.error(`Failed to stop GetState service: ${String(e)}`);
         } finally {
-            if (this._timeout) {
-                clearTimeout(this._timeout);
-            }
             callback();
         }
     }

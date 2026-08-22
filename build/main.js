@@ -40,7 +40,6 @@ class ProconIp extends import_adapter_core.Adapter {
   _stateData;
   _bootstrapped = false;
   _objectsCreated = false;
-  _timeout = null;
   /**
    * @param options adapter options forwarded to the ioBroker `Adapter` base;
    *   the adapter name is always `procon-ip`.
@@ -120,68 +119,67 @@ class ProconIp extends import_adapter_core.Adapter {
         `Could not reach the controller at startup (${e instanceof Error ? e.message : String(e)}). Will keep polling until it becomes available.`
       );
     }
-    this._timeout = setTimeout(() => {
-      this._getStateService.start(
-        async (data) => {
-          this.log.silly(`Start processing new GetState.csv`);
-          connectionApproved = true;
-          connectErrorLogged = false;
-          await this.bootstrapObjects(data);
-          data.sysInfo.toArrayOfObjects().forEach((info) => {
-            if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
-              this._statePublisher.publishSysInfoState(info.key, info.value);
-            }
-          });
-          this._statePublisher.publishAdvancedSysInfo(data.sysInfo, {
-            bootstrapped: this._bootstrapped,
-            previousDosageControl: this._stateData.sysInfo.dosageControl
-          });
-          data.objects.forEach((obj) => {
-            const previous = this._stateData.getDataObject(obj.id);
-            this.log.silly(
-              `Processing '${obj.label}' (${obj.category}) \u2014 current value: ${obj.displayValue}`
-            );
-            const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
-            if ((0, import_mapping.shouldUpdateState)({
-              bootstrapped: this._bootstrapped,
-              forced: forceObjStateUpdate >= 0,
-              hasPrevious: !!previous,
-              previousValue: previous == null ? void 0 : previous.value,
-              currentValue: obj.value
-            })) {
-              if (previous && previous.label != obj.label) {
-                this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
-                this._statePublisher.updateObjectCommonName(obj).catch((e) => {
-                  this.log.error(`Failed fixing label for '${obj.label}': ${(0, import_mapping.errorMessage)(e)}`);
-                });
-              }
-              this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
-              this._statePublisher.publishDataState(obj);
-              if (forceObjStateUpdate > -1) {
-                this._forceUpdate.splice(forceObjStateUpdate, 1);
-              }
-            }
-          });
-          this.log.silly(`Updating data object for next comparison`);
-          this._stateData = data;
-          this._bootstrapped = true;
-          this.setStateChangedAsync("info.connection", true, true).catch(() => {
-          });
-        },
-        (e) => {
-          this.setStateChangedAsync("info.connection", false, true).catch(() => {
-          });
-          if (!connectionApproved && !connectErrorLogged) {
-            connectErrorLogged = true;
-            this.log.warn(
-              `Could not connect to the controller (${e instanceof Error ? e.message : String(e)}). Retrying until it becomes available.`
-            );
+    this._getStateService.start(
+      async (data) => {
+        this.log.silly(`Start processing new GetState.csv`);
+        connectionApproved = true;
+        connectErrorLogged = false;
+        await this.bootstrapObjects(data);
+        data.sysInfo.toArrayOfObjects().forEach((info) => {
+          if (!this._bootstrapped || info.value !== this._stateData.sysInfo[info.key]) {
+            this._statePublisher.publishSysInfoState(info.key, info.value);
           }
+        });
+        this._statePublisher.publishAdvancedSysInfo(data.sysInfo, {
+          bootstrapped: this._bootstrapped,
+          previousDosageControl: this._stateData.sysInfo.dosageControl
+        });
+        data.objects.forEach((obj) => {
+          const previous = this._stateData.getDataObject(obj.id);
+          this.log.silly(`Processing '${obj.label}' (${obj.category}) \u2014 current value: ${obj.displayValue}`);
+          const forceObjStateUpdate = this._forceUpdate.indexOf(obj.id);
+          if ((0, import_mapping.shouldUpdateState)({
+            bootstrapped: this._bootstrapped,
+            forced: forceObjStateUpdate >= 0,
+            hasPrevious: !!previous,
+            previousValue: previous == null ? void 0 : previous.value,
+            currentValue: obj.value
+          })) {
+            if (previous && previous.label != obj.label) {
+              this.log.debug(`Updating label for '${obj.label}' (${obj.category})`);
+              this._statePublisher.updateObjectCommonName(obj).catch((e) => {
+                this.log.error(`Failed fixing label for '${obj.label}': ${(0, import_mapping.errorMessage)(e)}`);
+              });
+            }
+            this.log.debug(`Updating value for '${obj.label}' (${obj.category})`);
+            this._statePublisher.publishDataState(obj);
+            if (forceObjStateUpdate > -1) {
+              this._forceUpdate.splice(forceObjStateUpdate, 1);
+            }
+          }
+        });
+        this.log.silly(`Updating data object for next comparison`);
+        this._stateData = data;
+        this._bootstrapped = true;
+        this.setStateChangedAsync("info.connection", true, true).catch(() => {
+        });
+      },
+      (e) => {
+        this.setStateChangedAsync("info.connection", false, true).catch(() => {
+        });
+        if (!connectionApproved && !connectErrorLogged) {
+          connectErrorLogged = true;
+          this.log.warn(
+            `Could not connect to the controller (${e instanceof Error ? e.message : String(e)}). Retrying until it becomes available.`
+          );
         }
-      );
-    }, 300);
-    this.subscribeStates(`${this.name}.${this.instance}.relays.*`);
-    this.subscribeStates(`${this.name}.${this.instance}.externalRelays.*`);
+      }
+    );
+    for (const category of ["relays", "externalRelays"]) {
+      for (const suffix of ["onOff", "auto", "timer", "dosageTimer"]) {
+        this.subscribeStates(`${category}.*.${suffix}`);
+      }
+    }
   }
   /**
    * Create the adapter's objects. Runs once — either on startup or, if the
@@ -208,9 +206,6 @@ class ProconIp extends import_adapter_core.Adapter {
     } catch (e) {
       this.log.error(`Failed to stop GetState service: ${String(e)}`);
     } finally {
-      if (this._timeout) {
-        clearTimeout(this._timeout);
-      }
       callback();
     }
   }
