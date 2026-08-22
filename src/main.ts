@@ -6,6 +6,7 @@ import {
     UsrcfgCgiService,
     RelayDataInterpreter,
     GetStateData,
+    GetStateDataSysInfo,
     SetStateService,
     GetDmxService,
     DmxService,
@@ -28,7 +29,6 @@ declare global {
             updateInterval: number;
             requestTimeout: number;
             errorTolerance: number;
-            dmxEnabled: boolean;
         }
     }
 }
@@ -47,11 +47,17 @@ export class ProconIp extends Adapter {
     private _commandHandler!: CommandHandler;
     private _objectProvisioner!: ObjectProvisioner;
     private _statePublisher!: StatePublisher;
-    private _dmxController?: DmxController;
+    private _dmxController!: DmxController;
     private _forceUpdate: number[];
     private _stateData: GetStateData;
     private _bootstrapped = false;
     private _objectsCreated = false;
+    /**
+     * Tracks the controller's DMX-enabled state across polls so DMX channels are
+     * provisioned/removed only on an actual on↔off transition. `null` until the
+     * first successful poll has been reconciled.
+     */
+    private _dmxEnabled: boolean | null = null;
 
     /**
      * @param options adapter options forwarded to the ioBroker `Adapter` base;
@@ -114,6 +120,7 @@ export class ProconIp extends Adapter {
             namespace: this.namespace,
             getObject: id => this.getObjectAsync(id),
             extendObject: (id, obj) => this.extendObjectAsync(id, obj),
+            delObject: (id, options) => this.delObjectAsync(id, options),
             isDosageControl: relayId => this._getStateService.data.isDosageControl(relayId),
             isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled(),
         });
@@ -127,19 +134,20 @@ export class ProconIp extends Adapter {
             relayDataInterpreter: this._relayDataInterpreter,
             isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled(),
         });
-        if (this.config.dmxEnabled) {
-            this._dmxController = new DmxController({
-                log: this.log,
-                namespace: this.namespace,
-                getDmxService: new GetDmxService(serviceConfig, this.log),
-                dmxService: new DmxService(serviceConfig, this.log),
-                setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
-                ackCommand: (id, value) => {
-                    void this.setState(id, value, true).catch(() => {});
-                },
-                now: () => Date.now(),
-            });
-        }
+        // The DMX controller is always constructed (cheap — it only polls/writes
+        // when DMX is active). Whether DMX is actually exposed is decided at
+        // runtime from the controller's own DMX flag; see syncDmx().
+        this._dmxController = new DmxController({
+            log: this.log,
+            namespace: this.namespace,
+            getDmxService: new GetDmxService(serviceConfig, this.log),
+            dmxService: new DmxService(serviceConfig, this.log),
+            setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
+            ackCommand: (id, value) => {
+                void this.setState(id, value, true).catch(() => {});
+            },
+            now: () => Date.now(),
+        });
 
         this.log.debug(`GetStateService url: ${this._getStateService.url}`);
         this.log.debug(`UsrcfgCgiService url: ${this._usrcfgCgiService.url}`);
@@ -218,9 +226,7 @@ export class ProconIp extends Adapter {
                 this.log.silly(`Updating data object for next comparison`);
                 this._stateData = data;
                 this._bootstrapped = true;
-                if (this._dmxController) {
-                    await this._dmxController.poll();
-                }
+                await this.syncDmx(data.sysInfo);
                 this.setStateChangedAsync('info.connection', true, true).catch(() => {});
             },
             (e: unknown) => {
@@ -246,8 +252,47 @@ export class ProconIp extends Adapter {
                 this.subscribeStates(`${category}.*.${suffix}`);
             }
         }
-        if (this.config.dmxEnabled) {
+        // The `dmx.*` subscription is managed by syncDmx() — it is only active
+        // while the controller reports DMX as enabled.
+    }
+
+    /**
+     * Reconcile the exposed DMX channels with the controller's live DMX flag
+     * (`sysInfo.isDmxEnabled()`, correct since procon-ip 2.1.2). DMX is fully
+     * auto-detected: channels are provisioned and subscribed the moment the
+     * controller reports DMX on, polled every cycle while on, and removed again
+     * when it goes off. Runs on every successful poll, but only the on↔off
+     * transition does provisioning work — steady state is just a DMX poll (while
+     * on) or nothing (while off). The first call also clears any stale DMX
+     * channels left over from a previous run.
+     *
+     * @param sysInfo the current sysinfo snapshot from the latest poll.
+     */
+    private async syncDmx(sysInfo: GetStateDataSysInfo): Promise<void> {
+        const enabled = sysInfo.isDmxEnabled();
+        const previous = this._dmxEnabled;
+        this._dmxEnabled = enabled;
+
+        if (enabled === previous) {
+            // Steady state: keep polling while active, do nothing while inactive.
+            if (enabled) {
+                await this._dmxController.poll();
+            }
+            return;
+        }
+
+        if (enabled) {
+            this.log.info('DMX is enabled on the controller — activating dmx.CH01…CH16.');
+            await this._objectProvisioner.provisionDmx();
             this.subscribeStates('dmx.*');
+            await this._dmxController.poll();
+        } else {
+            this.unsubscribeStates('dmx.*');
+            await this._objectProvisioner.deprovisionDmx();
+            if (previous) {
+                // Only log a real transition, not the first-poll leftover sweep.
+                this.log.info('DMX was disabled on the controller — removed the dmx channels.');
+            }
         }
     }
 
@@ -264,9 +309,8 @@ export class ProconIp extends Adapter {
         this.log.debug(`Initially setting adapter objects`);
         await this._objectProvisioner.provisionSysInfo(data.sysInfo);
         await this._objectProvisioner.provisionStateData(data.objects);
-        if (this.config.dmxEnabled) {
-            await this._objectProvisioner.provisionDmx();
-        }
+        // DMX objects are provisioned on demand by syncDmx() once the first poll
+        // reveals whether the controller has DMX enabled.
         this._objectsCreated = true;
     }
 
@@ -295,7 +339,7 @@ export class ProconIp extends Adapter {
             return;
         }
 
-        if (this._dmxController?.isDmxChannel(id)) {
+        if (this._dmxController.isDmxChannel(id)) {
             this._dmxController.handleWrite(id, state.val as number).catch(e => {
                 this.log.error(`Error on DMX write (${id}): ${e}`);
             });

@@ -90,28 +90,30 @@ describe('StatePublisher.publishAdvancedSysInfo', () => {
         isPhMinusDosageEnabled: () => false,
         isChlorineDosageEnabled: () => true,
         isElectrolysis: () => false,
+        isDmxEnabled: () => true,
     } as unknown as GetStateDataSysInfo;
 
-    it('publishes all four flags on the first (not-yet-bootstrapped) pass', () => {
+    it('publishes the dmx flag plus all four dosage flags on the first (not-yet-bootstrapped) pass', () => {
         const h = harness();
         h.publisher.publishAdvancedSysInfo(sysInfo, { bootstrapped: false, previousDosageControl: 5 });
         const ids = writes(h.setStateChanged).map(w => w[0]);
         expect(ids).to.have.members([
+            'procon-ip.0.info.system.dmxEnabled',
             'procon-ip.0.info.system.phPlusDosageEnabled',
             'procon-ip.0.info.system.phMinusDosageEnabled',
             'procon-ip.0.info.system.chlorineDosageEnabled',
             'procon-ip.0.info.system.electrolysis',
         ]);
     });
-    it('skips publishing when bootstrapped and the dosage-control byte is unchanged', () => {
+    it('still publishes the dmx flag — but not the dosage flags — when bootstrapped and the dosage byte is unchanged', () => {
         const h = harness();
         h.publisher.publishAdvancedSysInfo(sysInfo, { bootstrapped: true, previousDosageControl: 5 });
-        expect(h.setStateChanged.called).to.be.false;
+        expect(h.setStateChanged.calledOnceWithExactly('procon-ip.0.info.system.dmxEnabled', true, true)).to.be.true;
     });
-    it('publishes when the dosage-control byte changed', () => {
+    it('publishes the dosage flags plus the dmx flag when the dosage-control byte changed', () => {
         const h = harness();
         h.publisher.publishAdvancedSysInfo(sysInfo, { bootstrapped: true, previousDosageControl: 4 });
-        expect(h.setStateChanged.callCount).to.equal(4);
+        expect(h.setStateChanged.callCount).to.equal(5);
     });
 });
 

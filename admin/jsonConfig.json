@@ -122,7 +122,7 @@
         },
         "dmxDescription": {
           "type": "staticText",
-          "text": "DMX512 lighting: enable to expose the controller's 16 DMX channels as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16). Requires a DMX-capable ProCon.IP.",
+          "text": "DMX512 lighting is handled automatically: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16), and they are removed again when DMX is switched off on the controller. No configuration needed.",
           "style": {
             "marginTop": 36,
             "marginBottom": 12
@@ -133,17 +133,6 @@
           "md": 12,
           "lg": 8,
           "xl": 6
-        },
-        "dmxEnabled": {
-          "type": "checkbox",
-          "label": "Enable DMX512 channels",
-          "default": false,
-          "newLine": true,
-          "xs": 12,
-          "sm": 6,
-          "md": 4,
-          "lg": 3,
-          "xl": 3
         }
       }
     }

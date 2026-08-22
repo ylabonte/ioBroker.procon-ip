@@ -11,6 +11,7 @@ import { ObjectProvisioner, type ObjectProvisionerDeps, OBJECT_SCHEMA_VERSION } 
 interface HarnessResult {
     provisioner: ObjectProvisioner;
     extendObject: sinon.SinonStub;
+    delObject: sinon.SinonStub;
     getObject: sinon.SinonStub;
     log: { error: sinon.SinonStub };
 }
@@ -24,6 +25,7 @@ function harness(opts?: {
     existing?: Record<string, ioBroker.Object>;
 }): HarnessResult {
     const extendObject = sinon.stub().resolves();
+    const delObject = sinon.stub().resolves();
     const getObject = sinon.stub().callsFake((id: string) => Promise.resolve(opts?.existing?.[id] ?? null));
     const log = { error: sinon.stub() };
     const deps: ObjectProvisionerDeps = {
@@ -31,10 +33,11 @@ function harness(opts?: {
         namespace: 'procon-ip.0',
         getObject,
         extendObject,
+        delObject,
         isDosageControl: opts?.isDosageControl ?? (() => false),
         isExtRelaysEnabled: () => opts?.isExtRelaysEnabled ?? true,
     };
-    return { provisioner: new ObjectProvisioner(deps), extendObject, getObject, log };
+    return { provisioner: new ObjectProvisioner(deps), extendObject, delObject, getObject, log };
 }
 
 // The ids passed to extendObject.
@@ -81,6 +84,7 @@ describe('ObjectProvisioner.provisionSysInfo', () => {
             'procon-ip.0.info.system.phValue',
             'procon-ip.0.info.system.phPlusDosageEnabled',
             'procon-ip.0.info.system.electrolysis',
+            'procon-ip.0.info.system.dmxEnabled',
         ]) {
             expect(ids, id).to.include(id);
         }
@@ -183,5 +187,20 @@ describe('ObjectProvisioner.provisionDmx', () => {
         expect(ids).to.include('procon-ip.0.dmx.CH01');
         expect(ids).to.include('procon-ip.0.dmx.CH16');
         expect(ids.filter(i => /\.dmx\.CH\d{2}$/.test(i))).to.have.lengthOf(16);
+    });
+});
+
+describe('ObjectProvisioner.deprovisionDmx', () => {
+    it('recursively deletes the dmx channel', async () => {
+        const h = harness();
+        await h.provisioner.deprovisionDmx();
+        expect(h.delObject.calledOnceWith('procon-ip.0.dmx', { recursive: true })).to.be.true;
+    });
+
+    it('swallows a delete failure (absent channel) without throwing, but logs it', async () => {
+        const h = harness();
+        h.delObject.rejects(new Error('Object does not exist'));
+        await h.provisioner.deprovisionDmx(); // must not reject
+        expect(h.log.error.calledOnce).to.be.true;
     });
 });

@@ -142,8 +142,6 @@
     "tier": 2,
     "connectionType": "local",
     "dataSource": "poll",
-    "encryptedNative": ["password", "username"],
-    "protectedNative": ["password", "username"],
     "compact": true,
     "adminUI": {
       "config": "json"
@@ -182,8 +180,7 @@
     "password": "",
     "updateInterval": 3000,
     "requestTimeout": 10000,
-    "errorTolerance": 10,
-    "dmxEnabled": false
+    "errorTolerance": 10
   },
   "objects": [],
   "instanceObjects": [

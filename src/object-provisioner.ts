@@ -65,6 +65,8 @@ export interface ObjectProvisionerDeps {
     getObject(id: string): Promise<ioBroker.Object | null | undefined>;
     /** Create-or-merge an object (adapter `extendObject`). */
     extendObject(id: string, obj: ioBroker.PartialObject): Promise<unknown>;
+    /** Delete an object and (recursively) its children (adapter `delObjectAsync`). */
+    delObject(id: string, options?: { recursive?: boolean }): Promise<void>;
     /** Whether the given relay control id is a dosage-control relay. */
     isDosageControl(relayId: number): boolean;
     /** Whether external relays are enabled on the controller. */
@@ -145,6 +147,14 @@ export class ObjectProvisioner {
             common: booleanFlagStateCommon('Electrolysis'),
             native: {},
         });
+        // Derived from configOtherEnable (bit 2). A read-only mirror of the
+        // controller's DMX flag, sitting next to the raw configOtherEnable state;
+        // it is also what drives the automatic DMX channel (de)activation.
+        await this.provision(this.id('info', 'system', 'dmxEnabled'), {
+            type: 'state',
+            common: booleanFlagStateCommon('DMX enabled'),
+            native: {},
+        });
     }
 
     /**
@@ -160,6 +170,22 @@ export class ObjectProvisioner {
                 common: dmxChannelStateCommon(name),
                 native: { dmxChannelIndex: i },
             });
+        }
+    }
+
+    /**
+     * Remove the `dmx` channel and its 16 channel states. Called when the
+     * controller reports DMX as disabled, so the object tree matches the live
+     * configuration. Tolerates an already-absent channel (no-op), so it is safe
+     * to call on the first poll to sweep up leftovers from a previous run.
+     */
+    public async deprovisionDmx(): Promise<void> {
+        try {
+            await this.deps.delObject(this.id('dmx'), { recursive: true });
+        } catch (e: unknown) {
+            // The channel may not exist (never provisioned / already removed);
+            // anything else is logged but must not break the poll loop.
+            this.deps.log.error(`Failed removing dmx channels: ${e instanceof Error ? e.message : String(e)}`);
         }
     }
 

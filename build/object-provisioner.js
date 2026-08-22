@@ -104,6 +104,11 @@ class ObjectProvisioner {
       common: (0, import_mapping.booleanFlagStateCommon)("Electrolysis"),
       native: {}
     });
+    await this.provision(this.id("info", "system", "dmxEnabled"), {
+      type: "state",
+      common: (0, import_mapping.booleanFlagStateCommon)("DMX enabled"),
+      native: {}
+    });
   }
   /**
    * Create/heal the `dmx` channel and its 16 writable channel states
@@ -118,6 +123,19 @@ class ObjectProvisioner {
         common: (0, import_mapping.dmxChannelStateCommon)(name),
         native: { dmxChannelIndex: i }
       });
+    }
+  }
+  /**
+   * Remove the `dmx` channel and its 16 channel states. Called when the
+   * controller reports DMX as disabled, so the object tree matches the live
+   * configuration. Tolerates an already-absent channel (no-op), so it is safe
+   * to call on the first poll to sweep up leftovers from a previous run.
+   */
+  async deprovisionDmx() {
+    try {
+      await this.deps.delObject(this.id("dmx"), { recursive: true });
+    } catch (e) {
+      this.deps.log.error(`Failed removing dmx channels: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
   /**

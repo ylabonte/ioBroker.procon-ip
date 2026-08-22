@@ -92,6 +92,13 @@ export class StatePublisher {
         sysInfo: GetStateDataSysInfo,
         opts: { bootstrapped: boolean; previousDosageControl: number },
     ): void {
+        // The DMX flag lives in configOtherEnable, independent of the dosage byte,
+        // so publish it every poll (setStateChanged dedupes) — it must reflect the
+        // controller even when only DMX, not dosage, was toggled.
+        this.deps.setStateChanged(this.id('info', 'system', 'dmxEnabled'), sysInfo.isDmxEnabled(), true).catch(e => {
+            this.deps.log.error(`Failed setting state for '${this.id('info', 'system', 'dmxEnabled')}': ${e}`);
+        });
+
         if (opts.bootstrapped && sysInfo.dosageControl === opts.previousDosageControl) {
             return;
         }

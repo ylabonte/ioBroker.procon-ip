@@ -60,6 +60,9 @@ class StatePublisher {
    * @param opts.previousDosageControl the dosage-control byte from the last snapshot.
    */
   publishAdvancedSysInfo(sysInfo, opts) {
+    this.deps.setStateChanged(this.id("info", "system", "dmxEnabled"), sysInfo.isDmxEnabled(), true).catch((e) => {
+      this.deps.log.error(`Failed setting state for '${this.id("info", "system", "dmxEnabled")}': ${e}`);
+    });
     if (opts.bootstrapped && sysInfo.dosageControl === opts.previousDosageControl) {
       return;
     }
