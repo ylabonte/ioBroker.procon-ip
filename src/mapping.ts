@@ -60,6 +60,36 @@ export function isTransientNetworkError(e: unknown): boolean {
 }
 
 /**
+ * Whether the DMX channels should be exposed and polled — the config mode gated
+ * by the controller's live DMX flag. `never` is a hard opt-out regardless of the
+ * controller.
+ *
+ * @param mode the configured DMX polling mode (`auto` or `never`).
+ * @param isDmxEnabled whether the controller reports DMX512 as enabled.
+ * @returns true when DMX should be active.
+ */
+export function dmxShouldBeActive(mode: string, isDmxEnabled: boolean): boolean {
+    return mode !== 'never' && isDmxEnabled;
+}
+
+/**
+ * Status text and colour for the admin DMX status indicator (`textSendTo`): a
+ * green/red/grey traffic light reflecting the effective DMX state.
+ *
+ * @param mode the configured DMX polling mode.
+ * @param isDmxEnabled whether the controller reports DMX512 as enabled.
+ * @returns the display text and a CSS colour for the indicator.
+ */
+export function dmxStatusText(mode: string, isDmxEnabled: boolean): { text: string; color: string } {
+    if (mode === 'never') {
+        return { text: 'DMX512 polling disabled in configuration', color: '#9e9e9e' };
+    }
+    return isDmxEnabled
+        ? { text: 'DMX512 enabled on the controller', color: '#4caf50' }
+        : { text: 'DMX512 not enabled on the controller', color: '#f44336' };
+}
+
+/**
  * True when the given string parses as a URL.
  *
  * @param url the candidate URL (e.g. the configured controller URL).

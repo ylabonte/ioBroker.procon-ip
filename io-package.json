@@ -143,6 +143,7 @@
     "connectionType": "local",
     "dataSource": "poll",
     "compact": true,
+    "messagebox": true,
     "adminUI": {
       "config": "json"
     },
@@ -180,7 +181,8 @@
     "password": "",
     "updateInterval": 3000,
     "requestTimeout": 10000,
-    "errorTolerance": 10
+    "errorTolerance": 10,
+    "dmxPolling": "auto"
   },
   "objects": [],
   "instanceObjects": [

@@ -49,6 +49,13 @@ class ProconIp extends import_adapter_core.Adapter {
    */
   _dmxEnabled = null;
   /**
+   * Timer for the offset DMX read. The DMX poll is deliberately scheduled at
+   * the midpoint of the update interval so it does not fire back-to-back with
+   * the GetState request — the controller's single-connection HTTP/1.0 firmware
+   * resets a connection that arrives while it is still handling another.
+   */
+  _dmxPollTimer;
+  /**
    * @param options adapter options forwarded to the ioBroker `Adapter` base;
    *   the adapter name is always `procon-ip`.
    */
@@ -60,6 +67,7 @@ class ProconIp extends import_adapter_core.Adapter {
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
+    this.on("message", this.onMessage.bind(this));
     this._forceUpdate = new Array();
     this._stateData = new import_procon_ip.GetStateData();
   }
@@ -205,24 +213,24 @@ class ProconIp extends import_adapter_core.Adapter {
     }
   }
   /**
-   * Reconcile the exposed DMX channels with the controller's live DMX flag
-   * (`sysInfo.isDmxEnabled()`, correct since procon-ip 2.1.2). DMX is fully
-   * auto-detected: channels are provisioned and subscribed the moment the
-   * controller reports DMX on, polled every cycle while on, and removed again
-   * when it goes off. Runs on every successful poll, but only the on↔off
-   * transition does provisioning work — steady state is just a DMX poll (while
-   * on) or nothing (while off). The first call also clears any stale DMX
-   * channels left over from a previous run.
+   * Reconcile the exposed DMX channels with the effective DMX state — the
+   * controller's live flag (`sysInfo.isDmxEnabled()`) unless the config's DMX
+   * polling mode is `never` (a hard opt-out). Channels are provisioned and
+   * subscribed the moment DMX becomes active, removed again when it goes off,
+   * and while active the DMX read is scheduled at the *midpoint* of the poll
+   * interval (see {@link scheduleDmxPoll}) rather than fired inline. Runs on
+   * every successful poll; only the on↔off transition does provisioning work.
+   * The first call also clears any stale DMX channels left from a previous run.
    *
    * @param sysInfo the current sysinfo snapshot from the latest poll.
    */
   async syncDmx(sysInfo) {
-    const enabled = sysInfo.isDmxEnabled();
+    const enabled = (0, import_mapping.dmxShouldBeActive)(this.config.dmxPolling, sysInfo.isDmxEnabled());
     const previous = this._dmxEnabled;
     this._dmxEnabled = enabled;
     if (enabled === previous) {
       if (enabled) {
-        await this._dmxController.poll();
+        this.scheduleDmxPoll();
       }
       return;
     }
@@ -232,10 +240,47 @@ class ProconIp extends import_adapter_core.Adapter {
       this.subscribeStates("dmx.*");
       await this._dmxController.poll();
     } else {
+      this.clearDmxPoll();
       this.unsubscribeStates("dmx.*");
       await this._objectProvisioner.deprovisionDmx();
       if (previous) {
         this.log.info("DMX was disabled on the controller \u2014 removed the dmx channels.");
+      }
+    }
+  }
+  /**
+   * Schedule the DMX read at the midpoint of the update interval, so it does
+   * not collide with the GetState request on the controller's single-connection
+   * HTTP/1.0 firmware. Replaces any pending timer; runs at most once per cycle.
+   * Uses the adapter's managed timer so it is auto-cleared on unload.
+   */
+  scheduleDmxPoll() {
+    this.clearDmxPoll();
+    const offset = Math.max(250, Math.floor(this.config.updateInterval / 2));
+    this._dmxPollTimer = this.setTimeout(() => {
+      this._dmxPollTimer = void 0;
+      this._dmxController.poll().catch((e) => this.log.debug(`DMX poll error: ${(0, import_mapping.errorMessage)(e)}`));
+    }, offset);
+  }
+  /** Cancel a pending offset DMX read (on deactivation and shutdown). */
+  clearDmxPoll() {
+    if (this._dmxPollTimer) {
+      this.clearTimeout(this._dmxPollTimer);
+      this._dmxPollTimer = void 0;
+    }
+  }
+  /**
+   * Answer admin `sendTo` messages. Serves the live DMX status indicator
+   * (`getDmxStatus`) with the effective state as `{ text, style }` for the
+   * jsonConfig `textSendTo` traffic light.
+   *
+   * @param obj the incoming message.
+   */
+  onMessage(obj) {
+    if (obj.command === "getDmxStatus") {
+      const status = (0, import_mapping.dmxStatusText)(this.config.dmxPolling, this._stateData.sysInfo.isDmxEnabled());
+      if (obj.callback) {
+        this.sendTo(obj.from, obj.command, { text: status.text, style: { color: status.color } }, obj.callback);
       }
     }
   }
@@ -258,6 +303,7 @@ class ProconIp extends import_adapter_core.Adapter {
   onUnload(callback) {
     var _a;
     try {
+      this.clearDmxPoll();
       (_a = this._getStateService) == null ? void 0 : _a.stop();
       this.setStateChangedAsync("info.connection", false, true).catch(() => {
       });

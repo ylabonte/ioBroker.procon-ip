@@ -8,6 +8,8 @@ import { GetStateCategory, type GetStateDataObject } from 'procon-ip';
 import {
     errorMessage,
     isTransientNetworkError,
+    dmxShouldBeActive,
+    dmxStatusText,
     isValidURL,
     isExternalRelay,
     isRelayCategory,
@@ -78,6 +80,29 @@ describe('mapping.isTransientNetworkError', () => {
         expect(isTransientNetworkError(undefined)).to.be.false;
         expect(isTransientNetworkError(null)).to.be.false;
         expect(isTransientNetworkError('ECONNRESET')).to.be.false; // a bare string, not an error object
+    });
+});
+
+describe('mapping.dmxShouldBeActive', () => {
+    it('is active only when auto-mode and the controller reports DMX enabled', () => {
+        expect(dmxShouldBeActive('auto', true)).to.be.true;
+        expect(dmxShouldBeActive('auto', false)).to.be.false;
+    });
+    it('never mode is a hard opt-out regardless of the controller', () => {
+        expect(dmxShouldBeActive('never', true)).to.be.false;
+        expect(dmxShouldBeActive('never', false)).to.be.false;
+    });
+});
+
+describe('mapping.dmxStatusText', () => {
+    it('green when enabled, red when not (auto mode)', () => {
+        expect(dmxStatusText('auto', true)).to.include({ color: '#4caf50' });
+        expect(dmxStatusText('auto', false)).to.include({ color: '#f44336' });
+    });
+    it('grey opt-out text when disabled by config, ignoring the controller flag', () => {
+        const off = dmxStatusText('never', true);
+        expect(off.color).to.equal('#9e9e9e');
+        expect(off.text).to.match(/disabled in configuration/i);
     });
 });
 
