@@ -67,7 +67,6 @@ class ProconIp extends import_adapter_core.Adapter {
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
-    this.on("message", this.onMessage.bind(this));
     this._forceUpdate = new Array();
     this._stateData = new import_procon_ip.GetStateData();
   }
@@ -267,21 +266,6 @@ class ProconIp extends import_adapter_core.Adapter {
     if (this._dmxPollTimer) {
       this.clearTimeout(this._dmxPollTimer);
       this._dmxPollTimer = void 0;
-    }
-  }
-  /**
-   * Answer admin `sendTo` messages. Serves the live DMX status indicator
-   * (`getDmxStatus`) with the effective state as `{ text, style }` for the
-   * jsonConfig `textSendTo` traffic light.
-   *
-   * @param obj the incoming message.
-   */
-  onMessage(obj) {
-    if (obj.command === "getDmxStatus") {
-      const status = (0, import_mapping.dmxStatusText)(this.config.dmxPolling, this._stateData.sysInfo.isDmxEnabled());
-      if (obj.callback) {
-        this.sendTo(obj.from, obj.command, { text: status.text, style: { color: status.color } }, obj.callback);
-      }
     }
   }
   /**

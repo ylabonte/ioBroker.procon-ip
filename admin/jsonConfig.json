@@ -134,23 +134,9 @@
           "lg": 8,
           "xl": 6
         },
-        "dmxStatus": {
-          "type": "textSendTo",
-          "label": "DMX512 status",
-          "command": "getDmxStatus",
-          "jsonData": "{}",
-          "container": "text",
-          "alsoDependsOn": ["dmxPolling"],
-          "newLine": true,
-          "xs": 12,
-          "sm": 12,
-          "md": 8,
-          "lg": 5,
-          "xl": 5
-        },
         "dmxPolling": {
           "type": "select",
-          "label": "DMX512 status query",
+          "label": "DMX512 status polling",
           "help": "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.",
           "default": "auto",
           "options": [

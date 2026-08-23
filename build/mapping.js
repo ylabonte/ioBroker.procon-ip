@@ -26,7 +26,6 @@ __export(mapping_exports, {
   dmxChannelIndexFromId: () => dmxChannelIndexFromId,
   dmxChannelStateCommon: () => dmxChannelStateCommon,
   dmxShouldBeActive: () => dmxShouldBeActive,
-  dmxStatusText: () => dmxStatusText,
   errorMessage: () => errorMessage,
   isExternalRelay: () => isExternalRelay,
   isLightLabel: () => isLightLabel,
@@ -74,12 +73,6 @@ function isTransientNetworkError(e) {
 }
 function dmxShouldBeActive(mode, isDmxEnabled) {
   return mode !== "never" && isDmxEnabled;
-}
-function dmxStatusText(mode, isDmxEnabled) {
-  if (mode === "never") {
-    return { text: "DMX512 polling disabled in configuration", color: "#9e9e9e" };
-  }
-  return isDmxEnabled ? { text: "DMX512 enabled on the controller", color: "#4caf50" } : { text: "DMX512 not enabled on the controller", color: "#f44336" };
 }
 function isValidURL(url) {
   try {
@@ -221,7 +214,6 @@ function dmxChannelIndexFromId(id) {
   dmxChannelIndexFromId,
   dmxChannelStateCommon,
   dmxShouldBeActive,
-  dmxStatusText,
   errorMessage,
   isExternalRelay,
   isLightLabel,

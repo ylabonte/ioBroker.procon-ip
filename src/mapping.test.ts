@@ -9,7 +9,6 @@ import {
     errorMessage,
     isTransientNetworkError,
     dmxShouldBeActive,
-    dmxStatusText,
     isValidURL,
     isExternalRelay,
     isRelayCategory,
@@ -91,18 +90,6 @@ describe('mapping.dmxShouldBeActive', () => {
     it('never mode is a hard opt-out regardless of the controller', () => {
         expect(dmxShouldBeActive('never', true)).to.be.false;
         expect(dmxShouldBeActive('never', false)).to.be.false;
-    });
-});
-
-describe('mapping.dmxStatusText', () => {
-    it('green when enabled, red when not (auto mode)', () => {
-        expect(dmxStatusText('auto', true)).to.include({ color: '#4caf50' });
-        expect(dmxStatusText('auto', false)).to.include({ color: '#f44336' });
-    });
-    it('grey opt-out text when disabled by config, ignoring the controller flag', () => {
-        const off = dmxStatusText('never', true);
-        expect(off.color).to.equal('#9e9e9e');
-        expect(off.text).to.match(/disabled in configuration/i);
     });
 });
 

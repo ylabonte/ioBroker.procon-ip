@@ -11,14 +11,7 @@ import {
     GetDmxService,
     DmxService,
 } from 'procon-ip';
-import {
-    buildServiceConfig,
-    dmxShouldBeActive,
-    dmxStatusText,
-    errorMessage,
-    isValidURL,
-    shouldUpdateState,
-} from './mapping';
+import { buildServiceConfig, dmxShouldBeActive, errorMessage, isValidURL, shouldUpdateState } from './mapping';
 import { CommandHandler } from './command-handler';
 import { ObjectProvisioner } from './object-provisioner';
 import { StatePublisher } from './state-publisher';
@@ -86,7 +79,6 @@ export class ProconIp extends Adapter {
         this.on('ready', this.onReady.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
-        this.on('message', this.onMessage.bind(this));
         this._forceUpdate = new Array<number>();
         this._stateData = new GetStateData();
     }
@@ -333,22 +325,6 @@ export class ProconIp extends Adapter {
         if (this._dmxPollTimer) {
             this.clearTimeout(this._dmxPollTimer);
             this._dmxPollTimer = undefined;
-        }
-    }
-
-    /**
-     * Answer admin `sendTo` messages. Serves the live DMX status indicator
-     * (`getDmxStatus`) with the effective state as `{ text, style }` for the
-     * jsonConfig `textSendTo` traffic light.
-     *
-     * @param obj the incoming message.
-     */
-    private onMessage(obj: ioBroker.Message): void {
-        if (obj.command === 'getDmxStatus') {
-            const status = dmxStatusText(this.config.dmxPolling, this._stateData.sysInfo.isDmxEnabled());
-            if (obj.callback) {
-                this.sendTo(obj.from, obj.command, { text: status.text, style: { color: status.color } }, obj.callback);
-            }
         }
     }
 

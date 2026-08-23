@@ -89,5 +89,12 @@
     "translate": "translate-adapter",
     "translate:all": "translate-adapter all",
     "release": "release-script"
+  },
+  "allowScripts": {
+    "esbuild@0.11.23": true,
+    "diskusage@1.2.0": true,
+    "esbuild@0.25.12": true,
+    "protobufjs@7.6.5": true,
+    "unix-dgram@2.0.6": true
   }
 }
