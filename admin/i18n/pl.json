@@ -11,10 +11,17 @@
     "Request timeout (ms)": "Limit czasu żądania (ms)",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "Poniższe opcje umożliwiają dostosowanie zachowania aktualizacji/żądań danych tego adaptera.",
     "Time between receiving data and next query in milliseconds.": "Czas między otrzymaniem danych a następnym zapytaniem w milisekundach.",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "Czas oczekiwania na odpowiedź ProCnn.IP w milisekundach.",
     "Update interval (ms)": "Interwał aktualizacji (ms)",
     "Use basic auth": "Użyj podstawowego uwierzytelniania",
     "Username": "Nazwa użytkownika",
     "admin": "Admin",
-    "http://<controller-url>": "http://<adres-kontrolera>"
+    "http://<controller-url>": "http://<adres-kontrolera>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "„Gdy włączone” udostępnia kanały DMX, gdy sterownik zgłasza, że DMX jest włączony. „Nigdy” całkowicie wyłącza obsługę DMX.",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "Oświetlenie DMX512 jest wykrywane automatycznie: gdy w Twoim ProCon.IP włączono DMX, jego 16 kanałów pojawia się jako zapisywalne stany ściemniacza 0–255 (dmx.CH01 … dmx.CH16) i są ponownie usuwane po wyłączeniu DMX w sterowniku. Użyj poniższej opcji, aby zrezygnować.",
+    "DMX512 status polling": "Odpytywanie stanu DMX512",
+    "Never": "Nigdy",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "Zalecana wartość to od 250 do 60000 milisekund (0,25 s i 1 min).",
+    "Setup": "Konfiguracja",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "Czas oczekiwania na odpowiedź ProCon.IP w milisekundach.",
+    "When enabled": "Gdy włączone"
 }

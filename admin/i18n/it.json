@@ -11,10 +11,17 @@
     "Request timeout (ms)": "Richiedi timeout (ms)",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "Le seguenti opzioni consentono di regolare il comportamento di aggiornamento/richiesta dati di questo adattatore.",
     "Time between receiving data and next query in milliseconds.": "Tempo tra la ricezione dei dati e la query successiva in millisecondi.",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "Tempo di attesa per una risposta da parte del ProCnn.IP in millisecondi.",
     "Update interval (ms)": "Intervallo di aggiornamento (ms)",
     "Use basic auth": "Utilizza l'autenticazione di base",
     "Username": "Nome utente",
     "admin": "amministratore",
-    "http://<controller-url>": "http://<URL-controller>"
+    "http://<controller-url>": "http://<URL-controller>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "«Quando abilitato» espone i canali DMX ogni volta che il controller segnala il DMX come abilitato. «Mai» disabilita completamente la gestione del DMX.",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "L'illuminazione DMX512 viene rilevata automaticamente: quando la tua ProCon.IP ha il DMX abilitato, i suoi 16 canali appaiono come stati dimmer scrivibili da 0 a 255 (dmx.CH01 … dmx.CH16) e vengono rimossi di nuovo quando il DMX viene disattivato sul controller. Usa l'opzione qui sotto per disattivarlo.",
+    "DMX512 status polling": "Interrogazione dello stato DMX512",
+    "Never": "Mai",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "Si consiglia di mantenerlo tra 250 e 60000 millisecondi (0,25 sec e 1 min).",
+    "Setup": "Configurazione",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "Tempo di attesa per una risposta della ProCon.IP in millisecondi.",
+    "When enabled": "Quando abilitato"
 }

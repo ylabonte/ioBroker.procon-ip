@@ -11,10 +11,17 @@
     "Request timeout (ms)": "Time-out aanvragen (ms)",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "Met de volgende opties kunt u het gegevensupdate-/verzoekgedrag van deze adapter aanpassen.",
     "Time between receiving data and next query in milliseconds.": "Tijd tussen het ontvangen van gegevens en de volgende vraag in milliseconden.",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "Tijd om in milliseconden te wachten op een antwoord van de ProCnn.IP.",
     "Update interval (ms)": "Update-interval (ms)",
     "Use basic auth": "Gebruik basisauthenticatie",
     "Username": "Gebruikersnaam",
     "admin": "beheerder",
-    "http://<controller-url>": "http://<controller-url>"
+    "http://<controller-url>": "http://<controller-url>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "'Indien ingeschakeld' toont de DMX-kanalen zodra de controller DMX als ingeschakeld meldt. 'Nooit' schakelt de DMX-verwerking volledig uit.",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "DMX512-verlichting wordt automatisch gedetecteerd: wanneer DMX op je ProCon.IP is ingeschakeld, verschijnen de 16 kanalen als schrijfbare dimmerstatussen van 0-255 (dmx.CH01 … dmx.CH16) en worden ze weer verwijderd wanneer DMX op de controller wordt uitgeschakeld. Gebruik de onderstaande optie om dit uit te schakelen.",
+    "DMX512 status polling": "DMX512-statusopvraging",
+    "Never": "Nooit",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "Houd het bij voorkeur tussen 250 en 60000 milliseconden (0,25 sec en 1 min).",
+    "Setup": "Instellen",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "Wachttijd op een antwoord van de ProCon.IP in milliseconden.",
+    "When enabled": "Indien ingeschakeld"
 }

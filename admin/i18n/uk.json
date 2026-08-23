@@ -11,10 +11,17 @@
     "Request timeout (ms)": "Час очікування запиту (мс)",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "Наступні параметри дозволяють налаштувати поведінку оновлення/запиту даних цього адаптера.",
     "Time between receiving data and next query in milliseconds.": "Час між отриманням даних і наступним запитом у мілісекундах.",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "Час очікування відповіді ProCnn.IP у мілісекундах.",
     "Update interval (ms)": "Інтервал оновлення (мс)",
     "Use basic auth": "Використовуйте базову авторизацію",
     "Username": "Ім'я користувача",
     "admin": "адмін",
-    "http://<controller-url>": "http://<controller-url>"
+    "http://<controller-url>": "http://<controller-url>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "«Коли увімкнено» показує канали DMX, коли контролер повідомляє, що DMX увімкнено. «Ніколи» повністю вимикає обробку DMX.",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "Освітлення DMX512 визначається автоматично: коли на вашому ProCon.IP увімкнено DMX, його 16 каналів з'являються як доступні для запису стани димера 0–255 (dmx.CH01 … dmx.CH16) і знову видаляються, коли DMX вимикається на контролері. Скористайтеся опцією нижче, щоб відмовитися.",
+    "DMX512 status polling": "Опитування стану DMX512",
+    "Never": "Ніколи",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "Рекомендується значення від 250 до 60000 мілісекунд (0,25 с і 1 хв).",
+    "Setup": "Налаштування",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "Час очікування відповіді від ProCon.IP у мілісекундах.",
+    "When enabled": "Коли увімкнено"
 }

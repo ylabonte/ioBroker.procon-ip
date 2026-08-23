@@ -11,10 +11,17 @@
     "Request timeout (ms)": "请求超时（毫秒）",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "以下选项允许您调整此适配器的数据更新/请求行为。",
     "Time between receiving data and next query in milliseconds.": "接收数据和下一次查询之间的时间（以毫秒为单位）。",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "等待 ProCnn.IP 答复的时间（以毫秒为单位）。",
     "Update interval (ms)": "更新间隔（毫秒）",
     "Use basic auth": "使用基本身份验证",
     "Username": "用户名",
     "admin": "行政",
-    "http://<controller-url>": "http://<控制器网址>"
+    "http://<controller-url>": "http://<控制器网址>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "“启用时”会在控制器报告 DMX 已启用时显示 DMX 通道。“从不”会完全禁用 DMX 处理。",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "DMX512 灯光会被自动检测：当您的 ProCon.IP 启用了 DMX 时，其 16 个通道会显示为可写的 0-255 调光状态（dmx.CH01 … dmx.CH16），并在控制器上关闭 DMX 时再次移除。使用下面的选项可以退出。",
+    "DMX512 status polling": "DMX512 状态轮询",
+    "Never": "从不",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "请将其合理地保持在 250 到 60000 毫秒之间（0.25 秒和 1 分钟）。",
+    "Setup": "设置",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "等待 ProCon.IP 响应的时间（毫秒）。",
+    "When enabled": "启用时"
 }

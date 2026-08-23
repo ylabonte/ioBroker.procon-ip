@@ -11,10 +11,17 @@
     "Request timeout (ms)": "Таймаут запроса (мс)",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "Следующие параметры позволяют настроить поведение обновления/запроса данных этого адаптера.",
     "Time between receiving data and next query in milliseconds.": "Время между получением данных и следующим запросом в миллисекундах.",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "Время ожидания ответа ProCnn.IP в миллисекундах.",
     "Update interval (ms)": "Интервал обновления (мс)",
     "Use basic auth": "Использовать базовую аутентификацию",
     "Username": "Имя пользователя",
     "admin": "администратор",
-    "http://<controller-url>": "http://<URL-контроллера>"
+    "http://<controller-url>": "http://<URL-контроллера>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "«Когда включено» показывает каналы DMX, когда контроллер сообщает, что DMX включён. «Никогда» полностью отключает обработку DMX.",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "Освещение DMX512 определяется автоматически: когда на вашем ProCon.IP включён DMX, его 16 каналов появляются как доступные для записи состояния диммера 0–255 (dmx.CH01 … dmx.CH16) и снова удаляются при отключении DMX на контроллере. Используйте параметр ниже, чтобы отказаться.",
+    "DMX512 status polling": "Опрос состояния DMX512",
+    "Never": "Никогда",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "Рекомендуется значение от 250 до 60000 миллисекунд (0,25 с и 1 мин).",
+    "Setup": "Настройка",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "Время ожидания ответа от ProCon.IP в миллисекундах.",
+    "When enabled": "Когда включено"
 }
