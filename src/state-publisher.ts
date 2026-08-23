@@ -29,10 +29,8 @@ export interface StatePublisherDeps {
      * keeps the poll loop from emitting redundant state events every cycle.
      */
     setStateChanged(id: string, value: ioBroker.StateValue, ack: boolean): Promise<unknown>;
-    /** Resolve an ioBroker object by full id (adapter `getObjectAsync`). */
-    getObject(id: string): Promise<ioBroker.Object | null | undefined>;
-    /** Overwrite an ioBroker object (adapter `setObject`). */
-    setObject(id: string, obj: ioBroker.SettableObject): Promise<unknown>;
+    /** Create-or-merge an object (adapter `extendObject`) — used to sync the name. */
+    extendObject(id: string, obj: ioBroker.PartialObject): Promise<unknown>;
     /** List the state objects under a channel (adapter `getStatesOfAsync`). */
     getStatesOf(id: string): Promise<ioBroker.StateObject[] | undefined>;
     /** Interprets relay auto/on state from a data object. */
@@ -167,16 +165,15 @@ export class StatePublisher {
      */
     public async updateObjectCommonName(obj: GetStateDataObject): Promise<void> {
         const objId = this.id(obj.category, obj.categoryId);
-        const ioObj = await this.deps.getObject(objId);
-        if (ioObj) {
-            ioObj.common.name = obj.label;
-            await this.deps.setObject(objId, ioObj);
-        }
+        // Merge just the name via extendObject (avoids the get-modify-setObject
+        // round-trip and the S5054 setObject-usage warning). extendObject leaves
+        // every other common field untouched.
+        const namePatch = { common: { name: obj.label } } as ioBroker.PartialObject;
+        await this.deps.extendObject(objId, namePatch);
         const objStates = await this.deps.getStatesOf(objId);
         if (objStates) {
             for (const state of objStates) {
-                state.common.name = obj.label;
-                await this.deps.setObject(state._id, state);
+                await this.deps.extendObject(state._id, namePatch);
             }
         }
     }

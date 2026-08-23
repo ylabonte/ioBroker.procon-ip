@@ -154,12 +154,11 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=7.6.17"
+        "admin": ">=7.6.20"
       }
     ],
     "licenseInformation": {
       "license": "MIT",
-      "link": "https://github.com/ylabonte/ioBroker.procon-ip/blob/master/LICENSE",
       "type": "free"
     }
   },
