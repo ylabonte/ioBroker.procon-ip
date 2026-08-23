@@ -21,6 +21,44 @@ export function errorMessage(e: unknown): string {
     return e instanceof Error ? e.message : String(e);
 }
 
+/** Error codes for transient connection failures a poll can safely shrug off and retry next cycle. */
+const TRANSIENT_NETWORK_CODES = new Set([
+    'ECONNRESET',
+    'ETIMEDOUT',
+    'ECONNREFUSED',
+    'ECONNABORTED',
+    'EPIPE',
+    'EHOSTUNREACH',
+    'ENETUNREACH',
+    'ENETDOWN',
+    'EAI_AGAIN',
+]);
+
+/**
+ * Whether the given error is a transient network/connection failure rather than
+ * a genuine fault. The ProCon.IP's legacy HTTP/1.0 firmware occasionally hangs
+ * and resets a connection (verified: the network path stays clean while a single
+ * request stalls ~5s then `ECONNRESET`s). Such a failure is expected, self-heals
+ * on the next poll, and should not be logged as an error.
+ *
+ * @param e the caught error.
+ * @returns true if the error is a transient connection failure (incl. request timeouts).
+ */
+export function isTransientNetworkError(e: unknown): boolean {
+    if (!e || typeof e !== 'object') {
+        return false;
+    }
+    const err = e as { code?: unknown; name?: unknown; message?: unknown };
+    if (typeof err.code === 'string' && TRANSIENT_NETWORK_CODES.has(err.code)) {
+        return true;
+    }
+    if (err.name === 'RequestTimeoutError') {
+        return true;
+    }
+    const message = typeof err.message === 'string' ? err.message : '';
+    return /ECONNRESET|ETIMEDOUT|socket hang up|timed out/i.test(message);
+}
+
 /**
  * True when the given string parses as a URL.
  *

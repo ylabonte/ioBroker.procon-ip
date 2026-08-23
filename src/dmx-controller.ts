@@ -12,7 +12,7 @@
  */
 
 import type { DmxService, GetDmxData, GetDmxService } from 'procon-ip';
-import { buildId, dmxChannelIndexFromId, errorMessage } from './mapping';
+import { buildId, dmxChannelIndexFromId, errorMessage, isTransientNetworkError } from './mapping';
 
 /** How long after a write polls skip republishing, so our optimistic value stands. */
 const QUIET_WINDOW_MS = 1500;
@@ -80,7 +80,14 @@ export class DmxController {
                 await this.deps.setStateChanged(this.id(channel.name), channel.value, true);
             }
         } catch (e: unknown) {
-            this.deps.log.error(`Failed to poll DMX: ${errorMessage(e)}`);
+            if (isTransientNetworkError(e)) {
+                // The controller's legacy firmware occasionally hangs and resets a
+                // connection; the poll self-heals next cycle, so keep it out of the
+                // error log (verified: the network path stays clean meanwhile).
+                this.deps.log.debug(`DMX poll skipped — transient connection error: ${errorMessage(e)}`);
+            } else {
+                this.deps.log.error(`Failed to poll DMX: ${errorMessage(e)}`);
+            }
         }
     }
 

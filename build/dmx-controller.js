@@ -60,7 +60,11 @@ class DmxController {
         await this.deps.setStateChanged(this.id(channel.name), channel.value, true);
       }
     } catch (e) {
-      this.deps.log.error(`Failed to poll DMX: ${(0, import_mapping.errorMessage)(e)}`);
+      if ((0, import_mapping.isTransientNetworkError)(e)) {
+        this.deps.log.debug(`DMX poll skipped \u2014 transient connection error: ${(0, import_mapping.errorMessage)(e)}`);
+      } else {
+        this.deps.log.error(`Failed to poll DMX: ${(0, import_mapping.errorMessage)(e)}`);
+      }
     }
   }
   /**

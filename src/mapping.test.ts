@@ -7,6 +7,7 @@ import { expect } from 'chai';
 import { GetStateCategory, type GetStateDataObject } from 'procon-ip';
 import {
     errorMessage,
+    isTransientNetworkError,
     isValidURL,
     isExternalRelay,
     isRelayCategory,
@@ -56,6 +57,27 @@ describe('mapping.errorMessage', () => {
         expect(errorMessage(42)).to.equal('42');
         expect(errorMessage(undefined)).to.equal('undefined');
         expect(errorMessage(null)).to.equal('null');
+    });
+});
+
+describe('mapping.isTransientNetworkError', () => {
+    it('is true for transient connection error codes', () => {
+        for (const code of ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'EPIPE', 'EHOSTUNREACH']) {
+            expect(isTransientNetworkError(Object.assign(new Error('x'), { code })), code).to.be.true;
+        }
+    });
+    it('is true for a RequestTimeoutError and for reset/timeout messages', () => {
+        expect(isTransientNetworkError(Object.assign(new Error('timed out'), { name: 'RequestTimeoutError' }))).to.be
+            .true;
+        expect(isTransientNetworkError(new Error('read ECONNRESET'))).to.be.true;
+        expect(isTransientNetworkError(new Error('socket hang up'))).to.be.true;
+    });
+    it('is false for genuine faults and non-errors', () => {
+        expect(isTransientNetworkError(Object.assign(new Error('nope'), { code: 'EACCES' }))).to.be.false;
+        expect(isTransientNetworkError(new Error('boom'))).to.be.false;
+        expect(isTransientNetworkError(undefined)).to.be.false;
+        expect(isTransientNetworkError(null)).to.be.false;
+        expect(isTransientNetworkError('ECONNRESET')).to.be.false; // a bare string, not an error object
     });
 });
 

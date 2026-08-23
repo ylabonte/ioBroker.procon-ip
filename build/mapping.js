@@ -30,6 +30,7 @@ __export(mapping_exports, {
   isLightLabel: () => isLightLabel,
   isRelayCategory: () => isRelayCategory,
   isTemperatureCategory: () => isTemperatureCategory,
+  isTransientNetworkError: () => isTransientNetworkError,
   isValidURL: () => isValidURL,
   relayAutoStateCommon: () => relayAutoStateCommon,
   relayControlId: () => relayControlId,
@@ -43,6 +44,31 @@ module.exports = __toCommonJS(mapping_exports);
 var import_procon_ip = require("procon-ip");
 function errorMessage(e) {
   return e instanceof Error ? e.message : String(e);
+}
+const TRANSIENT_NETWORK_CODES = /* @__PURE__ */ new Set([
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "ECONNREFUSED",
+  "ECONNABORTED",
+  "EPIPE",
+  "EHOSTUNREACH",
+  "ENETUNREACH",
+  "ENETDOWN",
+  "EAI_AGAIN"
+]);
+function isTransientNetworkError(e) {
+  if (!e || typeof e !== "object") {
+    return false;
+  }
+  const err = e;
+  if (typeof err.code === "string" && TRANSIENT_NETWORK_CODES.has(err.code)) {
+    return true;
+  }
+  if (err.name === "RequestTimeoutError") {
+    return true;
+  }
+  const message = typeof err.message === "string" ? err.message : "";
+  return /ECONNRESET|ETIMEDOUT|socket hang up|timed out/i.test(message);
 }
 function isValidURL(url) {
   try {
@@ -188,6 +214,7 @@ function dmxChannelIndexFromId(id) {
   isLightLabel,
   isRelayCategory,
   isTemperatureCategory,
+  isTransientNetworkError,
   isValidURL,
   relayAutoStateCommon,
   relayControlId,

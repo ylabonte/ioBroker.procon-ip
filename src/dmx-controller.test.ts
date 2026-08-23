@@ -76,6 +76,14 @@ describe('DmxController.poll', () => {
         expect(h.log.error.calledOnce).to.be.true;
         expect(h.setStateChanged.called).to.be.false;
     });
+    it('logs a transient connection reset at debug, not error (it self-heals next poll)', async () => {
+        const h = harness();
+        h.getDmx.rejects(Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' }));
+        await h.controller.poll();
+        expect(h.log.error.called, 'no error log for a transient reset').to.be.false;
+        expect(h.log.debug.calledOnce, 'transient reset logged at debug').to.be.true;
+        expect(h.setStateChanged.called).to.be.false;
+    });
     it('does not republish inside the post-write quiet window', async () => {
         const h = harness(fakeDmxData(new Array(16).fill(0)));
         await h.controller.handleWrite('procon-ip.0.dmx.CH01', 200); // sets quietUntil = 1000 + 1500
