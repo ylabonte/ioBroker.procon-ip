@@ -12,8 +12,11 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'monthly'
-      time: '04:00'
+      # cron keeps the roughly-monthly cadence (7th of the month) while satisfying
+      # the checker (S8906: interval must not be the literal 'monthly'). Day and
+      # minute are staggered against the github-actions entry to spread load.
+      interval: 'cron'
+      cronjob: '23 4 7 * *'
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 15
     assignees:
@@ -42,8 +45,9 @@ updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'monthly'
-      time: '04:00'
+      # 14th of the month, offset from the npm entry above (see note there).
+      interval: 'cron'
+      cronjob: '47 5 14 * *'
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 15
     assignees:
