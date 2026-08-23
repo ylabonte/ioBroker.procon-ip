@@ -405,3 +405,6 @@ $RECYCLE.BIN/
 
 # ioBroker dev-server (local throwaway test instance)
 .dev-server/
+
+# release-script commit metadata
+.commitinfo
