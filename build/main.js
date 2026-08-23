@@ -119,8 +119,7 @@ class ProconIp extends import_adapter_core.Adapter {
       log: this.log,
       namespace: this.namespace,
       setStateChanged: (id, value, ack) => this.setStateChangedAsync(id, value, ack),
-      getObject: (id) => this.getObjectAsync(id),
-      setObject: async (id, obj) => this.setObject(id, obj),
+      extendObject: (id, obj) => this.extendObjectAsync(id, obj),
       getStatesOf: (id) => this.getStatesOfAsync(id),
       relayDataInterpreter: this._relayDataInterpreter,
       isExtRelaysEnabled: () => this._stateData.sysInfo.isExtRelaysEnabled()

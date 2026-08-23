@@ -122,16 +122,12 @@ class StatePublisher {
    */
   async updateObjectCommonName(obj) {
     const objId = this.id(obj.category, obj.categoryId);
-    const ioObj = await this.deps.getObject(objId);
-    if (ioObj) {
-      ioObj.common.name = obj.label;
-      await this.deps.setObject(objId, ioObj);
-    }
+    const namePatch = { common: { name: obj.label } };
+    await this.deps.extendObject(objId, namePatch);
     const objStates = await this.deps.getStatesOf(objId);
     if (objStates) {
       for (const state of objStates) {
-        state.common.name = obj.label;
-        await this.deps.setObject(state._id, state);
+        await this.deps.extendObject(state._id, namePatch);
       }
     }
   }

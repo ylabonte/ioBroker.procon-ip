@@ -11,10 +11,17 @@
     "Request timeout (ms)": "Request timeout (ms)",
     "The following options allow you to adjust the data update/request behavior of this adapter.": "The following options allow you to adjust the data update/request behavior of this adapter.",
     "Time between receiving data and next query in milliseconds.": "Time between receiving data and next query in milliseconds.",
-    "Time to wait for an answer of the ProCnn.IP in milliseconds.": "Time to wait for an answer of the ProCnn.IP in milliseconds.",
     "Update interval (ms)": "Update interval (ms)",
     "Use basic auth": "Use basic auth",
     "Username": "Username",
     "admin": "admin",
-    "http://<controller-url>": "http://<controller-url>"
+    "http://<controller-url>": "http://<controller-url>",
+    "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.": "'When enabled' exposes the DMX channels whenever the controller reports DMX as enabled. 'Never' disables DMX handling entirely.",
+    "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.": "DMX512 lighting is auto-detected: when your ProCon.IP has DMX enabled, its 16 channels appear as writable 0-255 dimmer states (dmx.CH01 … dmx.CH16) and are removed again when DMX is switched off on the controller. Use the option below to opt out.",
+    "DMX512 status polling": "DMX512 status polling",
+    "Never": "Never",
+    "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).": "Please keep it reasonably between 250 and 60000 milliseconds (0.25 sec and 1 min).",
+    "Setup": "Setup",
+    "Time to wait for an answer of the ProCon.IP in milliseconds.": "Time to wait for an answer of the ProCon.IP in milliseconds.",
+    "When enabled": "When enabled"
 }

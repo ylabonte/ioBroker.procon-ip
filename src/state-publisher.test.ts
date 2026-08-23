@@ -16,8 +16,7 @@ import { StatePublisher, type StatePublisherDeps } from './state-publisher';
 interface Harness {
     publisher: StatePublisher;
     setStateChanged: sinon.SinonStub;
-    setObject: sinon.SinonStub;
-    getObject: sinon.SinonStub;
+    extendObject: sinon.SinonStub;
     getStatesOf: sinon.SinonStub;
     isAuto: sinon.SinonStub;
     isOn: sinon.SinonStub;
@@ -27,8 +26,7 @@ interface Harness {
 // Assemble a StatePublisher with stubbed I/O.
 function harness(opts?: { isExtRelaysEnabled?: boolean }): Harness {
     const setStateChanged = sinon.stub().resolves();
-    const setObject = sinon.stub().resolves();
-    const getObject = sinon.stub().resolves({ _id: 'x', type: 'channel', common: { name: 'old' }, native: {} });
+    const extendObject = sinon.stub().resolves();
     const getStatesOf = sinon.stub().resolves([{ _id: 'x.value', common: { name: 'old' } }]);
     const isAuto = sinon.stub().returns(true);
     const isOn = sinon.stub().returns(false);
@@ -37,8 +35,7 @@ function harness(opts?: { isExtRelaysEnabled?: boolean }): Harness {
         log,
         namespace: 'procon-ip.0',
         setStateChanged,
-        getObject,
-        setObject,
+        extendObject,
         getStatesOf,
         relayDataInterpreter: { isAuto, isOn } as unknown as RelayDataInterpreter,
         isExtRelaysEnabled: () => opts?.isExtRelaysEnabled ?? true,
@@ -46,8 +43,7 @@ function harness(opts?: { isExtRelaysEnabled?: boolean }): Harness {
     return {
         publisher: new StatePublisher(deps),
         setStateChanged,
-        setObject,
-        getObject,
+        extendObject,
         getStatesOf,
         isAuto,
         isOn,
@@ -153,16 +149,16 @@ describe('StatePublisher.publishRelayState', () => {
 });
 
 describe('StatePublisher.updateObjectCommonName', () => {
-    it('renames the channel object and each of its states to the new label', async () => {
+    it('merges the new label into the channel and each of its states via a name-only extendObject', async () => {
         const h = harness();
         await h.publisher.updateObjectCommonName(dataObj({ category: 'relays', categoryId: 2, label: 'New Name' }));
-        // channel object rewritten with the new name
-        const channelCall = h.setObject.getCalls().find(c => c.args[0] === 'procon-ip.0.relays.2');
-        expect(channelCall, 'channel setObject').to.exist;
-        expect((channelCall!.args[1] as ioBroker.Object).common.name).to.equal('New Name');
+        // channel object: a minimal { common: { name } } patch (not a full setObject)
+        const channelCall = h.extendObject.getCalls().find(c => c.args[0] === 'procon-ip.0.relays.2');
+        expect(channelCall, 'channel extendObject').to.exist;
+        expect(channelCall!.args[1]).to.deep.equal({ common: { name: 'New Name' } });
         // and its state object
-        const stateCall = h.setObject.getCalls().find(c => c.args[0] === 'x.value');
-        expect(stateCall, 'state setObject').to.exist;
-        expect((stateCall!.args[1] as ioBroker.StateObject).common.name).to.equal('New Name');
+        const stateCall = h.extendObject.getCalls().find(c => c.args[0] === 'x.value');
+        expect(stateCall, 'state extendObject').to.exist;
+        expect(stateCall!.args[1]).to.deep.equal({ common: { name: 'New Name' } });
     });
 });
