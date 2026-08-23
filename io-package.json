@@ -180,7 +180,8 @@
     "password": "",
     "updateInterval": 3000,
     "requestTimeout": 10000,
-    "errorTolerance": 10
+    "errorTolerance": 10,
+    "dmxPolling": "auto"
   },
   "objects": [],
   "instanceObjects": [

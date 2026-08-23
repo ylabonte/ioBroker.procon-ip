@@ -1,0 +1,12 @@
+{
+    "all": true,
+    "src": ["src"],
+    "include": ["src/**/*.ts"],
+    "exclude": ["src/**/*.test.ts", "src/**/*.test.mts", "src/main.ts"],
+    "reporter": ["text-summary", "lcov"],
+    "check-coverage": true,
+    "statements": 92,
+    "branches": 80,
+    "functions": 95,
+    "lines": 92
+}
