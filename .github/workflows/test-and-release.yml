@@ -45,7 +45,7 @@ jobs:
             # (which reads only that array, ignoring include/exclude) sees both
             # required versions; exclude trims the redundant 22 x windows/macos jobs.
             matrix:
-                node-version: ['22.x', '24.x']
+                node-version: [22.x, 24.x, 26.x]
                 os: [ubuntu-latest, windows-latest, macos-latest]
                 exclude:
                     - node-version: '22.x'
