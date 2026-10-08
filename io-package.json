@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "procon-ip",
-    "version": "1.9.0",
+    "version": "1.9.1",
     "news": {
+      "1.9.1": {
+        "en": "Node.js 26 (the new LTS) is now the reference platform in CI: it is tested on Linux, Windows and macOS, while Node.js 22 and 24 keep being tested on Linux.\nUpdated dependencies, including `@iobroker/testing` 6.3.0.",
+        "de": "Node.js 26 (das neue LTS) ist jetzt die Referenzplattform in CI: Es wird unter Linux, Windows und macOS getestet, Node.js 22 und 24 weiter.\nAbhängigkeiten wie `@iobroker /testing` 6.3.0 aktualisiert.",
+        "ru": "Node.js 26 (новая LTS) теперь является эталонной платформой в CI: она протестирована на Linux, Windows и macOS, а Node.js 22 и 24 продолжают тестироваться на Linux.\nОбновленные зависимости, включая `@iobroker /testing` 6.3.0.",
+        "pt": "O Node.js 26 (o novo LTS) agora é a plataforma de referência em CI: é testado em Linux, Windows e macOS, e o Node.js 22 e 24 continuam em Linux.\nDependências atualizadas, incluindo `@iobroker /testing` 6.3.0.",
+        "nl": "Node.js 26 (het nieuwe LTS) is nu het referentieplatform in CI: het is getest op Linux, Windows en MacOS, terwijl Node.js 22 en 24 nog steeds worden getest op Linux.\nBijgewerkte afhankelijkheden, waaronder `@iobroker /testing` 6.3.0.",
+        "fr": "Node.js 26 (le nouveau LTS) est désormais la plateforme de référence en CI : elle est testée sur Linux, Windows et macOS, et Node.js 22 et 24 sur Linux.\nDépendances mises à jour, dont `@iobroker /testing` 6.3.0.",
+        "it": "Node.js 26 (il nuovo LTS) è ora la piattaforma di riferimento in CI: è testata su Linux, Windows e macOS, mentre Node.js 22 e 24 su Linux.\nDipendenze aggiornate, tra cui @iobroker /testing 6.3.0.",
+        "es": "Node.js 26 (la nueva LTS) es ahora la plataforma de referencia en CI: se prueba en Linux, Windows y macOS, mientras que Node.js 22 y 24 se siguen probando en Linux.\nDependencias actualizadas, incluida `@iobroker /testing` 6.3.0.",
+        "pl": "Node.js 26 (nowy LTS) jest teraz platformą referencyjną w CI: jest testowany na Linuksie, Windows i macOS, podczas gdy Node.js 22 i 24 są nadal testowane na Linuksie.\nZaktualizowane zależności, w tym `@iobroker /testing` 6.3.0.",
+        "uk": "Node.js 26 (новий LTS) тепер є еталонною платформою в CI: він тестується на Linux, Windows та macOS, тоді як Node.js 22 та 24 продовжують тестуватися на Linux.\nОновлені залежності, включаючи `@iobroker /testing` 6.3.0.",
+        "zh-cn": "Node.js 26（新的 LTS）现在是 CI 中的参考平台：它在 Linux、Windows 和 macOS 上进行了测试，而 Node.js 22 和 24 则继续在 Linux 上进行测试。\n更新了依赖关系，包括 @iobroker /testing 6.3.0。"
+      },
       "1.9.0": {
         "en": "**DMX512 lighting support (opt-in):** the controller's 16 DMX channels appear as writable 0–255 dimmer states (`dmx.CH01` … `dmx.CH16`).\nObject definitions now self-heal on upgrade — improved roles and types reach existing installations while your custom names are preserved.\nFewer redundant events: states are written only when they actually change, and relay/dosage/timer commands are acknowledged the moment the controller confirms them.\nMore robust HTTP transport (fixes silently-dropped writes on the controller's legacy firmware), plus a large internal refactor with a CI coverage gate — no functional change from that part.",
         "de": "**DMX512-Lichtsteuerung (optional):** Die 16 DMX-Kanäle der Steuerung erscheinen als beschreibbare Dimmer-States von 0–255 (`dmx.CH01` … `dmx.CH16`).\nObjektdefinitionen heilen sich beim Upgrade jetzt selbst — verbesserte Rollen und Typen erreichen bestehende Installationen, während deine eigenen Namen erhalten bleiben.\nWeniger redundante Events: States werden nur bei tatsächlicher Änderung geschrieben, und Relais-/Dosier-/Timer-Befehle werden bestätigt, sobald die Steuerung sie quittiert.\nRobusterer HTTP-Transport (behebt stillschweigend verworfene Schreibvorgänge auf der alten Controller-Firmware) plus ein großer interner Refactor mit CI-Coverage-Gate — daraus keine funktionale Änderung.",
@@ -80,19 +93,6 @@
         "pl": "Aktualizacja zależności i mała optymalizacja w realizacji.",
         "uk": "Оновлення та оптимізація залежностей в реалізації.",
         "zh-cn": "实施中的依赖性更新和小优化."
-      },
-      "1.5.2": {
-        "en": "Minor UI changes in adapter config and dependency updates.",
-        "de": "Kleine Änderungen an der Konfigurationsoberfläche des Adapters und Abhängigkeitsaktualisierungen.",
-        "ru": "Незначительные изменения пользовательского интерфейса в конфигурации адаптера и обновления зависимостей.",
-        "pt": "Pequenas mudanças de interface de usuário nas atualizações de configuração e dependência do adaptador.",
-        "nl": "Kleine wijzigingen in adapterconfiguratie en afhankelijkheidsupdates.",
-        "fr": "Changements mineurs d'interface utilisateur dans la configuration de l'adaptateur et les mises à jour de dépendance.",
-        "it": "Minori modifiche dell'interfaccia utente negli aggiornamenti di configurazione e dipendenza dell'adattatore.",
-        "es": "Menor UI cambia en configuración de adaptador y actualizaciones de dependencia.",
-        "pl": "Mniejsze zmiany interfejsu użytkownika w aktualizacjach konfiguracji adaptera i zależności.",
-        "uk": "Мінор UI зміни в налаштуваннях адаптера та оновлення залежності.",
-        "zh-cn": "适配器配置和依赖性更新中小的UI变化."
       }
     },
     "titleLang": {

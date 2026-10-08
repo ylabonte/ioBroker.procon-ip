@@ -107,7 +107,7 @@ If you want to support this adapter or say thank you, you can:
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.9.1 (2026-10-08)
 
 - Node.js 26 (the new LTS) is now the reference platform in CI: it is tested on Linux, Windows and macOS, while Node.js 22 and 24 keep being tested on Linux.
 - Updated dependencies, including `@iobroker/testing` 6.3.0.
@@ -143,13 +143,6 @@ If you want to support this adapter or say thank you, you can:
 - Raise minimum required admin version to 7.6.17.
 - Remove calls to deprecated methods.
 - Minor code cleanup.
-- Dependency updates.
-
-### 1.6.0 (2024-09-08)
-
-- Fix versioning according to prior changes in requirements (should have happened with v1.5.5).
-    - Raise minimum required js-controller version to 5.0.19.
-    - Raise minimum required node version to 20.
 - Dependency updates.
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
