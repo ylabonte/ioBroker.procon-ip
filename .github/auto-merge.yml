@@ -1,6 +1,6 @@
 # Auto-merge rules for Dependabot PRs.
 # Consumed by iobroker-bot-orga/action-automerge-dependabot
-# (see .github/workflows/dependabot-auto-merge.yml).
+# (see .github/workflows/automerge-dependabot.yml).
 #
 # Supported update_type values: semver:patch, semver:minor, semver:major
 # (hierarchical: semver:minor also matches patch). These rules intentionally
