@@ -70,6 +70,7 @@
     "dev:setup": "dev-server setup",
     "dev": "dev-server watch",
     "test:ts": "c8 mocha --config test/mocharc.custom.json",
+    "test:unit": "npm run test:ts",
     "coverage": "c8 --reporter=text mocha --config test/mocharc.custom.json",
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
