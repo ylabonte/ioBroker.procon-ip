@@ -1,0 +1,116 @@
+# Unit test + coverage reporting with a coverage ratchet.
+#
+# Kept separate from test-and-release.yml on purpose: that file follows the
+# ioBroker template (bot "Update from template" PRs, repo checker, release via
+# iobroker.dev), so nothing here may interfere with it.
+#
+# On pull requests the unit tests run twice — on the PR and on its base commit —
+# and the job fails if any coverage metric (statements/branches/functions/lines)
+# decreases. Label a PR `coverage-override` to accept an intended drop (e.g.
+# well-tested code was removed). The absolute minimums stay in .c8rc.json.
+name: Coverage
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened, labeled, unlabeled]
+    push:
+        branches:
+            - 'master'
+
+concurrency:
+    group: coverage-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    coverage:
+        name: coverage
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+            # Sticky PR comment and the test results check run
+            pull-requests: write
+            checks: write
+
+        env:
+            # Fork and Dependabot PRs only get a read-only token: report to the
+            # job summary only and skip the PR comment / check run there.
+            CAN_WRITE: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '26.x'
+                  cache: 'npm'
+
+            - run: npm ci
+
+            - name: Unit tests with coverage
+              run: >-
+                  npx c8 --reporter=json-summary --reporter=text-summary --reporter=lcov
+                  mocha --config test/mocharc.custom.json
+                  --reporter json --reporter-option output=test-results.json
+
+            - name: Checkout base commit
+              if: always() && github.event_name == 'pull_request'
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ github.event.pull_request.base.sha }}
+                  path: .base
+
+            - name: Base coverage
+              id: base
+              if: always() && github.event_name == 'pull_request'
+              # A broken base must not block the PR; the ratchet is skipped then.
+              continue-on-error: true
+              working-directory: .base
+              run: |
+                  npm ci
+                  npx c8 --no-check-coverage --reporter=json-summary \
+                    mocha --config test/mocharc.custom.json --reporter dot
+
+            - name: Compare coverage
+              id: compare
+              if: always() && hashFiles('coverage/coverage-summary.json') != ''
+              env:
+                  HEAD_SUMMARY: coverage/coverage-summary.json
+                  BASE_SUMMARY: ${{ github.event_name == 'pull_request' && '.base/coverage/coverage-summary.json' || '' }}
+                  BASE_LABEL: ${{ github.event_name == 'pull_request' && format('{0} ({1})', github.base_ref, github.event.pull_request.base.sha) || '' }}
+                  TEST_RESULTS: test-results.json
+                  C8RC: .c8rc.json
+                  OVERRIDE: ${{ contains(github.event.pull_request.labels.*.name, 'coverage-override') }}
+                  REPORT_FILE: coverage-report.md
+              run: node .github/scripts/coverage-ratchet.mjs
+
+            - name: Sticky PR comment
+              if: always() && env.CAN_WRITE == 'true' && hashFiles('coverage-report.md') != ''
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  PR: ${{ github.event.pull_request.number }}
+              run: |
+                  id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+                    --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- coverage-ratchet -->"))) | .id' | head -n1)
+                  if [ -n "$id" ]; then
+                    gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@coverage-report.md > /dev/null
+                  else
+                    gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F body=@coverage-report.md > /dev/null
+                  fi
+
+            - name: Test results check run
+              if: always() && env.CAN_WRITE == 'true' && hashFiles('test-results.json') != ''
+              uses: dorny/test-reporter@v3
+              with:
+                  name: Unit test results
+                  path: test-results.json
+                  reporter: mocha-json
+
+            - name: Enforce coverage ratchet
+              if: always() && steps.compare.outputs.decreased == 'true'
+              run: |
+                  echo "::error::Coverage decreased compared to the base commit. Add tests or label the PR 'coverage-override'."
+                  exit 1
