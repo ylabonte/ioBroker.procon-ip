@@ -108,6 +108,8 @@ jobs:
                   name: Unit test results
                   path: test-results.json
                   reporter: mocha-json
+                  # v3 defaults to the job summary; we want a dedicated check run
+                  use-actions-summary: 'false'
 
             - name: Enforce coverage ratchet
               if: always() && steps.compare.outputs.decreased == 'true'
