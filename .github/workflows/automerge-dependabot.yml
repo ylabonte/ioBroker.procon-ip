@@ -25,3 +25,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config-file-path: '.github/auto-merge.yml'
+          # The master ruleset requires linear history, so the action's
+          # default 'merge' method is rejected ("Merge commits are not allowed").
+          merge-method: 'squash'
