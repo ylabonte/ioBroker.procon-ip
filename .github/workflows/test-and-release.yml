@@ -39,11 +39,12 @@ jobs:
 
         runs-on: ${{ matrix.os }}
         strategy:
-            # Sparse matrix: 24.x (reference) on all three OSes, plus 22.x (the
-            # engines floor) and 26.x (next) on ubuntu only -> 5 jobs. 22 + 24 live
-            # in the top-level node-version array so the ioBroker repo-checker
-            # (which reads only that array, ignoring include/exclude) sees both
-            # required versions; exclude trims the redundant 22 x windows/macos jobs.
+            # Sparse matrix: 26.x (current LTS, reference) on all three OSes, plus
+            # 22.x (the engines floor) and 24.x on ubuntu only -> 5 jobs. All three
+            # versions live in the top-level node-version array so the ioBroker
+            # repo-checker (which reads only that array, ignoring include/exclude)
+            # sees every required version; exclude trims the redundant 22/24 x
+            # windows/macos jobs.
             matrix:
                 node-version: [22.x, 24.x, 26.x]
                 os: [ubuntu-latest, windows-latest, macos-latest]
@@ -52,9 +53,10 @@ jobs:
                       os: windows-latest
                     - node-version: '22.x'
                       os: macos-latest
-                include:
-                    - node-version: '26.x'
-                      os: ubuntu-latest
+                    - node-version: '24.x'
+                      os: windows-latest
+                    - node-version: '24.x'
+                      os: macos-latest
 
         steps:
             - uses: ioBroker/testing-action-adapter@v1

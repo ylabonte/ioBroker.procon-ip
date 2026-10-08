@@ -1,29 +1,7 @@
 const path = require('path');
 const http = require('node:http');
-const crypto = require('node:crypto');
 const { expect } = require('chai');
 const { tests } = require('@iobroker/testing');
-
-// Mirror js-controller's encrypt(): AES-192-CBC when the secret is 48 hex chars,
-// legacy XOR otherwise. `controllerUrl` is an encryptedNative field, so the
-// adapter decrypts it on read — the test must therefore store it ENCRYPTED, or
-// the adapter sees garbage ("Invalid controller URL").
-function encryptLegacy(key, value) {
-    let result = '';
-    for (let i = 0; i < value.length; i++) {
-        result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ value.charCodeAt(i));
-    }
-    return result;
-}
-function encryptValue(key, value) {
-    if (!/^[0-9a-f]{48}$/.test(key)) {
-        return encryptLegacy(key, value);
-    }
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-192-cbc', Buffer.from(key, 'hex'), iv);
-    const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
-    return `$/aes-192-cbc:${iv.toString('hex')}:${encrypted.toString('hex')}`;
-}
 
 // A real /GetState.csv sample from a ProCon.IP V.1.7.6. The adapter parses this
 // into its objects; relay #1 ("Terassenlicht") becomes procon-ip.0.relays.0.*,
@@ -55,16 +33,15 @@ async function waitForStamp(harness, id, timeoutMs) {
     return null;
 }
 
-// Point the adapter at the mock (controllerUrl encrypted with the system secret,
-// DMX off, fast poll) and start it. Waits only for `alive`; provisioning is then
-// awaited via waitForStamp / getObject so a config slip surfaces as an assertion
-// rather than a hang.
+// Point the adapter at the mock (DMX off, fast poll) and start it. controllerUrl is
+// an encryptedNative field; since @iobroker/testing 6, changeAdapterConfig encrypts
+// such fields itself, so it is passed in plain text. Waits only for `alive`;
+// provisioning is then awaited via waitForStamp / getObject so a config slip
+// surfaces as an assertion rather than a hang.
 async function startWithMock(harness, mockUrl) {
-    const sysConfig = await getObject(harness, 'system.config');
-    const secret = sysConfig.native.secret;
     await harness.changeAdapterConfig('procon-ip', {
         native: {
-            controllerUrl: encryptValue(secret, mockUrl),
+            controllerUrl: mockUrl,
             basicAuth: false,
             dmxPolling: 'never',
             updateInterval: 1000,

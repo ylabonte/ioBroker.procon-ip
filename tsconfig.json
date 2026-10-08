@@ -14,6 +14,8 @@
 
 		"noEmitOnError": true,
 		"outDir": "./build/",
+		// TS 6 no longer infers rootDir (TS5011); ts-node needs it for the unit tests
+		"rootDir": "./src",
 		"removeComments": false,
 
 		// This is necessary for the automatic typing of the adapter config
