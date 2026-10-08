@@ -394,3 +394,11 @@ export function dmxChannelIndexFromId(id: string): number | null {
     }
     return oneBased - 1;
 }
+
+// TEMP: ratchet live test, reverted before merge
+export function ratchetProbe(a: number): number {
+    if (a > 1) {
+        return a * 2;
+    }
+    return a - 1;
+}
