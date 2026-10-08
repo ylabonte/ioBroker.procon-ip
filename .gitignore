@@ -408,3 +408,8 @@ $RECYCLE.BIN/
 
 # release-script commit metadata
 .commitinfo
+
+# Coverage workflow artifacts (.github/workflows/coverage.yml)
+.base/
+test-results.json
+coverage-report.md
