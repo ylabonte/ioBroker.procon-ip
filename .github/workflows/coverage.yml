@@ -85,7 +85,7 @@ jobs:
                   C8RC: .c8rc.json
                   OVERRIDE: ${{ contains(github.event.pull_request.labels.*.name, 'coverage-override') }}
                   REPORT_FILE: coverage-report.md
-              run: node .github/scripts/coverage-ratchet.mjs
+              run: node scripts/coverage-ratchet.mjs
 
             - name: Sticky PR comment
               if: always() && env.CAN_WRITE == 'true' && hashFiles('coverage-report.md') != ''
