@@ -17,8 +17,13 @@ on:
         branches:
             - 'master'
 
+# A new push cancels the run for the outdated commit. Label events get a group
+# of their own instead: Dependabot labels its PRs right after opening them, and
+# a cancelled `coverage` run on the head commit makes the Dependabot auto-merge
+# action give up ("cannot automerge due to failed checks"). Label runs are not
+# skipped either — a skipped check counts as passing and would mask a failure.
 concurrency:
-    group: coverage-${{ github.ref }}
+    group: coverage-${{ github.ref }}${{ (github.event.action == 'labeled' || github.event.action == 'unlabeled') && format('-label-{0}', github.run_id) || '' }}
     cancel-in-progress: true
 
 permissions:
