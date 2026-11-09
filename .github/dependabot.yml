@@ -1,8 +1,9 @@
 # Dependabot configuration.
 #
 # Updates are grouped into consolidated PRs to avoid a flood of single-dependency
-# PRs. Minor and patch updates are grouped per dependency type; major updates are
-# intentionally left ungrouped so they get an individual PR and a manual review.
+# PRs. Minor and patch updates are grouped per dependency type, npm security
+# updates into one group of their own; major updates are intentionally left
+# ungrouped so they get an individual PR and a manual review.
 #
 # The npm cooldown delays normal updates by 7 days (security updates are exempt).
 # Note: cooldown is not supported for the github-actions ecosystem.
@@ -38,6 +39,16 @@ updates:
           - 'patch'
       development-dependencies:
         dependency-type: 'development'
+        update-types:
+          - 'minor'
+          - 'patch'
+      # Security updates arrive off-schedule and, without a group, as one PR per
+      # package. Grouping them keeps simultaneous advisories in a single PR
+      # instead of several PRs racing each other through auto-merge.
+      security-updates:
+        applies-to: 'security-updates'
+        patterns:
+          - '*'
         update-types:
           - 'minor'
           - 'patch'
